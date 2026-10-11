@@ -7,24 +7,30 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// Southeast Asia / Myanmar Route Clean IP Pool
-const CLEAN_EDGE_IPS = [
-  '104.16.132.229',
-  '172.67.182.112',
-  '104.18.2.161',
-  '162.159.192.1',
-  '104.16.85.20',
-  '104.17.209.9'
+// ခွင့်ပြုထားသော Tier-1 Cloud ASN / ISP Keywords
+const TRUSTED_CLOUDS = [
+  'amazon', 'aws',
+  'digitalocean',
+  'vultr', 'choopa',
+  'google', 'gcp',
+  'alibaba', 'aliyun',
+  'tencent',
+  'cloudflare'
 ];
 
-// Reality SNI Pool
+// ခွင့်ပြုထားသော ဒေသများ
+const ALLOWED_COUNTRIES = ['SG', 'JP']; // Singapore & Japan သီးသန့်
+
+// Reality Clean SNI Pool
 const SNI_POOL = [
   'gateway.icloud.com',
   'speed.cloudflare.com',
   'graph.facebook.com'
 ];
 
-// 1. Scrape Sources
+// ==========================================
+// ၁။ Multi-Source Scraper
+// ==========================================
 async function fetchSources() {
   const tgChannels = [
     'https://t.me/s/v2ray_free_conf',
@@ -64,7 +70,36 @@ async function fetchSources() {
   return [...new Set(rawList)];
 }
 
-// 2. TCP Ping Latency Test
+// ==========================================
+// ၂။ IP Info, Geo & Cloud Provider စစ်ဆေးခြင်း
+// ==========================================
+async function verifyServerProviderAndLocation(host) {
+  try {
+    const res = await axios.get(`http://ip-api.com/json/${host}?fields=status,countryCode,org,as,isp`, { timeout: 3000 });
+    if (res.data && res.data.status === 'success') {
+      const country = res.data.countryCode; // SG, JP, etc.
+      const org = (res.data.org + ' ' + res.data.as + ' ' + res.data.isp).toLowerCase();
+
+      // Singapore သို့မဟုတ် Japan ဖြစ်မဖြစ် စစ်ဆေးခြင်း
+      if (!ALLOWED_COUNTRIES.includes(country)) {
+        return { valid: false };
+      }
+
+      // AWS, DigitalOcean, Vultr, Google Cloud, Alibaba, Tencent ဖြစ်မဖြစ် စစ်ဆေးခြင်း
+      const isTrustedCloud = TRUSTED_CLOUDS.some(cloud => org.includes(cloud));
+      if (!isTrustedCloud) {
+        return { valid: false };
+      }
+
+      return { valid: true, country, org: res.data.isp };
+    }
+  } catch (err) {}
+  return { valid: false };
+}
+
+// ==========================================
+// ၃။ TCP Ping စစ်ဆေးခြင်း (<100ms Filter)
+// ==========================================
 function testTcpLatency(host, port = 443, timeout = 1200) {
   return new Promise((resolve) => {
     const start = Date.now();
@@ -89,9 +124,11 @@ function testTcpLatency(host, port = 443, timeout = 1200) {
   });
 }
 
-// 3. Gemini AI Core: Auto-Repair
+// ==========================================
+// ၄။ Gemini AI Auto-Repair
+// ==========================================
 async function aiRepairAndTune(rawKeys) {
-  if (!GEMINI_API_KEY) return rawKeys.slice(0, 15);
+  if (!GEMINI_API_KEY) return rawKeys.slice(0, 20);
 
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -99,40 +136,41 @@ async function aiRepairAndTune(rawKeys) {
   const prompt = `
 You are an expert Xray-core v1.8.24, Sing-box, v2rayNG and Clash Meta network protocol specialist.
 Task:
-1. Examine these raw proxy keys:
-${rawKeys.slice(0, 25).join('\n')}
+1. Review these raw proxy keys:
+${rawKeys.slice(0, 30).join('\n')}
 
-2. Fix any syntax corruption, bad url encoding, missing query parameters, or broken Reality public keys.
-3. Optimize strictly for Southeast Asia / Myanmar latency:
+2. Fix syntax errors, repair corrupt base64, query parameters, and validate standard URI schema.
+3. Optimize for Singapore (SG) and Japan (JP) Cloud Server nodes:
    - Target Clean SNIs: ${SNI_POOL.join(', ')}
    - Fingerprint: chrome or safari
    - Security: reality or tls
-   - Target Core Standard Schema:
+   - URI Schema:
      vless://UUID@HOST:PORT?encryption=none&security=reality&sni=...&fp=chrome&pbk=...&type=...#NAME
-4. Return ONLY valid URI lines (one per line). Output zero explanation and zero markdown blocks.
+4. Return ONLY valid URI lines without any explanation or markdown formatting.
 `;
 
   try {
     const result = await model.generateContent(prompt);
-    const cleaned = result.response.text().trim().split(/\r?\n/).filter(l => l.includes('://'));
-    return cleaned;
+    return result.response.text().trim().split(/\r?\n/).filter(l => l.includes('://'));
   } catch (err) {
-    console.error("AI tuning failed, fallback to raw keys:", err.message);
-    return rawKeys.slice(0, 15);
+    console.error("AI tuning failed, using raw fallback:", err.message);
+    return rawKeys.slice(0, 20);
   }
 }
 
-// 4. Main Workflow
+// ==========================================
+// ၅။ Main Pipeline
+// ==========================================
 async function main() {
-  console.log("[1/4] Scraping Telegram & GitHub sources...");
+  console.log("[1/5] Scraping candidate keys...");
   const rawNodes = await fetchSources();
-  console.log(`Retrieved ${rawNodes.length} raw proxy candidates.`);
+  console.log(`Retrieved ${rawNodes.length} candidate keys.`);
 
-  console.log("[2/4] Gemini AI Auto-Repairing keys...");
+  console.log("[2/5] Repairing format with Gemini AI...");
   const repairedNodes = await aiRepairAndTune(rawNodes);
 
-  console.log("[3/4] Measuring TCP Latency & Filtering Ping...");
-  const testedNodes = [];
+  console.log("[3/5] Filtering Cloud Providers (AWS/DO/Vultr/GCP/Alibaba) & Geo (SG/JP)...");
+  const filteredNodes = [];
 
   for (let i = 0; i < repairedNodes.length; i++) {
     const nodeUri = repairedNodes[i];
@@ -141,31 +179,44 @@ async function main() {
       const host = parsed.hostname;
       const port = parseInt(parsed.port, 10) || 443;
 
-      const ping = await testTcpLatency(host, port);
+      // Cloud Provider & SG/JP စစ်ဆေးခြင်း
+      const check = await verifyServerProviderAndLocation(host);
+      if (check.valid) {
+        // Ping latency စစ်ဆေးခြင်း
+        const ping = await testTcpLatency(host, port);
 
-      if (ping < 800) {
-        const sni = SNI_POOL[i % SNI_POOL.length];
-        const basePart = nodeUri.split('?')[0];
-        const searchParams = new URLSearchParams(nodeUri.split('?')[1]?.split('#')[0] || '');
+        // Ping 100ms ဝန်းကျင် အကောင်းဆုံးများကိုသာ စစ်ထုတ်ခြင်း
+        if (ping <= 120) {
+          const sni = SNI_POOL[i % SNI_POOL.length];
+          const basePart = nodeUri.split('?')[0];
+          const searchParams = new URLSearchParams(nodeUri.split('?')[1]?.split('#')[0] || '');
 
-        searchParams.set('sni', sni);
-        searchParams.set('fp', 'chrome');
+          searchParams.set('sni', sni);
+          searchParams.set('fp', 'chrome');
 
-        const tunedUri = `${basePart}?${searchParams.toString()}#SG-AI-LOWPING-${testedNodes.length + 1}[Ping:${ping}ms]`;
-        testedNodes.push({ uri: tunedUri, ping });
+          const nodeName = `${check.country}-AI-${check.org.substring(0, 10).replace(/[^a-zA-Z0-9]/g, '')}[Ping:${ping}ms]`;
+          const tunedUri = `${basePart}?${searchParams.toString()}#${nodeName}`;
+
+          filteredNodes.push({ uri: tunedUri, ping });
+        }
       }
     } catch (e) {}
+
+    // ip-api rate limit မထိစေရန် delay အနည်းငယ်ထားခြင်း
+    await new Promise(r => setTimeout(r, 150));
   }
 
-  testedNodes.sort((a, b) => a.ping - b.ping);
+  // Ping အနည်းဆုံးဖြစ်သော Server များကို ရှေ့ဆုံးထား စီပေးခြင်း
+  filteredNodes.sort((a, b) => a.ping - b.ping);
 
-  const finalPool = testedNodes.length > 0 ? testedNodes.map(n => n.uri) : repairedNodes.slice(0, 5);
+  const finalPool = filteredNodes.length > 0 ? filteredNodes.map(n => n.uri) : repairedNodes.slice(0, 5);
 
-  console.log(`[4/4] Successfully ready ${finalPool.length} nodes.`);
+  console.log(`[4/5] Matched ${finalPool.length} High-Performance SG/JP Cloud Nodes.`);
 
+  // Base64 Encode လုပ်ပြီး NekoBox / Sing-box / Clash Meta Sub ဖိုင်အဖြစ် သိမ်းဆည်းခြင်း
   const base64Data = Buffer.from(finalPool.join('\n')).toString('base64');
   fs.writeFileSync('sub.txt', base64Data, 'utf-8');
-  console.log("sub.txt has been generated successfully!");
+  console.log("[5/5] sub.txt successfully updated!");
 }
 
 main();
