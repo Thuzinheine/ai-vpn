@@ -23,7 +23,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Run Script
+      - name: Run Scraper & Repair Script
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: node update.js
@@ -34,4 +34,5 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add sub.txt
           git commit -m "Auto update sub [skip ci]" || exit 0
+          git pull --rebase origin main
           git push
