@@ -1,10 +1,10 @@
 /**
- * update.js - AI-VPN Core Scraper
+ * update.js - AI-VPN Core Scraper (ES Module)
  * Reality & Hysteria 2 Specialized Aggregator
  */
-const fs = require('fs');
-const https = require('https');
-const http = require('http');
+import fs from 'node:fs';
+import https from 'node:https';
+import http from 'node:http';
 
 // Reality & Hysteria 2 ပါဝင်သော Public Aggregator Sources များ
 const SOURCES = [
@@ -35,7 +35,6 @@ function fetchUrl(url) {
 function decodeContent(content) {
   if (!content) return '';
   content = content.trim();
-  // Base64 decode attempt
   try {
     const buff = Buffer.from(content.replace(/\s+/g, ''), 'base64');
     const decoded = buff.toString('utf-8');
@@ -58,10 +57,10 @@ async function main() {
         const trimmed = line.trim();
         if (!trimmed) continue;
 
-        // 1. Hysteria 2 Check
+        // 1. Hysteria 2 စစ်ဆေးခြင်း
         const isHy2 = trimmed.startsWith('hy2://') || trimmed.startsWith('hysteria2://');
         
-        // 2. VLESS Reality Check (security=reality ပါရမည်)
+        // 2. VLESS Reality စစ်ဆေးခြင်း
         const isReality = trimmed.startsWith('vless://') && trimmed.includes('security=reality');
 
         if (isHy2 || isReality) {
@@ -77,7 +76,7 @@ async function main() {
   const uniqueNodes = Array.from(new Set(collected));
   console.log(`Discovered ${uniqueNodes.length} unique Reality & Hysteria 2 nodes.`);
 
-  // Node အရေအတွက် အများဆုံး 50 ခုသာ ကန့်သတ်ယူခြင်း
+  // အများဆုံး 50 ခုသာ ရွေးထုတ်ခြင်း
   const finalNodes = uniqueNodes.slice(0, 50);
 
   if (finalNodes.length === 0) {
@@ -85,7 +84,7 @@ async function main() {
     return;
   }
 
-  // Base64 encode ပြုလုပ်ပြီး sub.txt ထဲသို့ ရေးသားခြင်း
+  // Base64 encode ပြုလုပ်၍ sub.txt ထဲသို့ ရေးသားခြင်း
   const base64Output = Buffer.from(finalNodes.join('\n'), 'utf-8').toString('base64');
   fs.writeFileSync('sub.txt', base64Output, 'utf-8');
   console.log(`Successfully written ${finalNodes.length} nodes to sub.txt`);
