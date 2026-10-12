@@ -150,11 +150,11 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
         <div>
           <div class="eyebrow">Production Engine / Multi-Protocol</div>
           <h1>Universal Node Control Center</h1>
-          <p class="subtitle">gstatic.com latency & Cloudflare speed verification engine</p>
+          <p class="subtitle">Real GeoIP Verification & gstatic/Cloudflare benchmark engine</p>
         </div>
       </div>
       <div class="top-actions">
-        <div class="core-pill"><span class="dot"></span> LIVE VERIFIED</div>
+        <div class="core-pill"><span class="dot"></span> GEOIP VERIFIED</div>
         <button class="icon-btn" onclick="fetchAndParseNodes()" title="Reload from GitHub"><i class="fa-solid fa-rotate"></i></button>
         <button class="primary" onclick="addCustomNode()">＋ Add Node</button>
       </div>
@@ -192,8 +192,6 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
         <div class="metric-value" id="selectedCount">0</div>
         <div class="metric-foot"><span class="trend">⚡ Auto Selected</span><span>·</span><span>fast-sub target</span></div>
       </article>
-      
-      <!-- Protocols Card (Fully Dynamic) -->
       <article class="card metric" style="--accent:var(--amber);--glow:var(--amber)">
         <div class="metric-head"><span>Protocols In Pool</span><span class="metric-icon"><i class="fa-solid fa-layer-group"></i></span></div>
         <div class="metric-value" id="protocolCountMetric">0 Types</div>
@@ -245,9 +243,9 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
 
     <section class="card nodes" id="nodesPanel">
       <div class="panel-head node-head">
-        <div><h2>Nodes Pool</h2><p>Live verified endpoints across all protocols</p></div>
+        <div><h2>Nodes Pool</h2><p>Real GeoIP Verified Server Endpoints</p></div>
         <div class="node-tools">
-          <input class="search" id="nodeSearch" placeholder="Search SNI, Host, Type..." oninput="filterNodes()">
+          <input class="search" id="nodeSearch" placeholder="Search Country, SNI, Host..." oninput="filterNodes()">
           <select class="select" id="protocolFilter" onchange="filterNodes()">
             <option value="all">All Protocols</option>
             <option value="vless">VLESS</option>
@@ -271,7 +269,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
           <thead>
             <tr>
               <th style="width:40px">Include</th>
-              <th>Node / Location</th>
+              <th>Real GeoIP / Location</th>
               <th>Protocol</th>
               <th>SNI / Host</th>
               <th>Latency (gstatic)</th>
@@ -314,7 +312,14 @@ function toast(msg){
 function scrollToNodes(){ document.getElementById('nodesPanel').scrollIntoView({ behavior: 'smooth' }); }
 function scrollToConfig(){ document.getElementById('configSection').scrollIntoView({ behavior: 'smooth' }); }
 
-// Protocol Parser ကို တိကျစွာ ခွဲခြားရေးဆွဲခြင်း
+// Country Code မှ Flag Emoji သို့ တိုက်ရိုက်ပြောင်းလဲခြင်း
+function getFlagEmoji(code) {
+  if (!code || code === 'UN' || code.length !== 2) return '🌐';
+  const codePoints = code.toUpperCase().split('').map(c => 127397 + c.charCodeAt(0));
+  return String.fromCodePoint(...codePoints);
+}
+
+// True GeoIP Tag Parser
 function parseProtocolAndHost(uri, idx) {
   let name = `Node-${idx + 1}`;
   let host = "speed.cloudflare.com";
@@ -342,20 +347,23 @@ function parseProtocolAndHost(uri, idx) {
     } catch(e) {}
   }
 
-  let flag = "🌐";
-  if (name.includes("SG") || name.includes("Singapore")) flag = "🇸🇬";
-  else if (name.includes("JP") || name.includes("Japan")) flag = "🇯🇵";
-  else if (name.includes("US") || name.includes("America")) flag = "🇺🇸";
-  else if (name.includes("HK") || name.includes("Hong Kong")) flag = "🇭🇰";
-  else if (name.includes("MY") || name.includes("Malaysia")) flag = "🇲🇾";
-  else if (name.includes("TH") || name.includes("Thailand")) flag = "🇹🇭";
+  // Real GeoIP Tag [SG], [JP], [HK], [MY], etc. ခွဲထုတ်ခြင်း
+  let flag = '🌐';
+  const matchCode = name.match(/\[([A-Z]{2})\]/);
+  if (matchCode) {
+    flag = getFlagEmoji(matchCode[1]);
+  } else {
+    if (name.includes("Singapore")) flag = "🇸🇬";
+    else if (name.includes("Japan")) flag = "🇯🇵";
+    else if (name.includes("Hong Kong")) flag = "🇭🇰";
+    else if (name.includes("Malaysia")) flag = "🇲🇾";
+    else if (name.includes("Thailand")) flag = "🇹🇭";
+  }
 
   return { name, host, proto, flag };
 }
 
-// Protocols In Pool Card ကို လက်ရှိ စစ်ထုတ်ထားသည့် အခြေအနေအတိုင်း တိုက်ရိုက် Dynamic Update လုပ်ခြင်း
 function updateDynamicProtocolsMetric() {
-  // Checkbox အမှန်ခြစ်ခံထားရသော Node များကို ဦးစားပေး စစ်ဆေးပြီး မရှိပါက Pool တစ်ခုလုံးကို ပြမည်
   const selectedNodes = parsedNodes.filter(n => n.selected);
   const targetPool = selectedNodes.length > 0 ? selectedNodes : parsedNodes;
 
@@ -397,7 +405,7 @@ async function fetchAndParseNodes() {
 
     updateDynamicProtocolsMetric();
     renderNodes();
-    toast(`Loaded ${parsedNodes.length} nodes successfully.`);
+    toast(`Loaded ${parsedNodes.length} GeoIP-verified nodes.`);
   } catch(e) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--red)">Failed to load sub.txt. Make sure file exists in repo.</td></tr>`;
   }
@@ -551,7 +559,6 @@ async function runBenchmarkAll() {
     
     if (parsedNodes[i].ping && parsedNodes[i].ping < best) best = parsedNodes[i].ping;
     
-    // Ping < 100ms သာ Auto Select လုပ်မည်
     parsedNodes[i].selected = (parsedNodes[i].ping !== null && parsedNodes[i].ping < PING_THRESHOLD);
 
     const completed = i + 1;
