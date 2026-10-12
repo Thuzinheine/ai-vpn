@@ -1,24 +1,24 @@
 /**
- * update.js - 10ium/telegram-configs-collector Asia Dedicated Scraper
- * Country Targets: SG, JP, HK, MY, TH (Low Latency & Clean IP)
+ * update.js - True GeoIP Verified Multi-Protocol Aggregator (ES Module)
  */
 import fs from 'node:fs';
 import https from 'node:https';
 import http from 'node:http';
 import net from 'node:net';
+import dns from 'node:dns/promises';
 
-// 10ium Country-based Subscription Links (Asia Region)
 const SOURCES = [
-  // Singapore (အနိမ့်ဆုံး Ping ရရှိနိုင်သော အဓိက Source)
+  // 10ium Country Asia Feeds (Clean IPs)
   'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/singapore',
-  // Japan (AI Service များနှင့် Streaming များအတွက် အကောင်းဆုံး)
   'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/japan',
-  // Hong Kong
   'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/hong%20kong',
-  // Malaysia
   'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/malaysia',
-  // Thailand
-  'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/thailand'
+  // Dedicated Multi-Protocol Mix Feeds
+  'https://raw.githubusercontent.com/NiREvil/vless/main/sub/link',
+  'https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/protocols/vless',
+  'https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/protocols/vmess',
+  'https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/protocols/hysteria2',
+  'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Sub1.txt'
 ];
 
 const SUPPORTED_PROTOCOLS = ['vless://', 'vmess://', 'trojan://', 'ss://', 'hy2://', 'hysteria2://'];
@@ -53,7 +53,6 @@ function decodeRecursive(content) {
   return content;
 }
 
-// TCP Handshake ဖြင့် Node လက်ရှိ အသက်ရှင်နေခြင်း စစ်ဆေးခြင်း
 function verifyNodeConnection(host, port, timeout = 1500) {
   return new Promise((resolve) => {
     const socket = new net.Socket();
@@ -76,7 +75,7 @@ function verifyNodeConnection(host, port, timeout = 1500) {
   });
 }
 
-// Host & Port ခွဲထုတ်ခြင်း (VMess, VLESS, Trojan, SS, Hy2 အားလုံး အကျုံးဝင်သည်)
+// Host & Port ခွဲထုတ်ခြင်း
 function extractHostPort(uri) {
   try {
     if (uri.startsWith('vmess://')) {
@@ -97,23 +96,63 @@ function extractHostPort(uri) {
       return { host: parts[0], port: parseInt(parts[1], 10) || 8388 };
     }
 
-    const clean = uri.replace(/^[^:]+:\/\//, '');
-    const mainPart = clean.split('?')[0].split('#')[0];
-    const hostPort = mainPart.includes('@') ? mainPart.split('@')[1] : mainPart;
-    const parts = hostPort.split(':');
-    return { host: parts[0], port: parseInt(parts[1], 10) || 443 };
+    // vless, trojan, hy2
+    const parsedUrl = new URL(uri);
+    const host = parsedUrl.hostname;
+    const port = parseInt(parsedUrl.port, 10) || 443;
+    if (host) return { host, port };
   } catch (e) {
-    return null;
+    try {
+      const clean = uri.replace(/^[^:]+:\/\//, '');
+      const mainPart = clean.split('?')[0].split('#')[0];
+      const hostPort = mainPart.includes('@') ? mainPart.split('@')[1] : mainPart;
+      const parts = hostPort.split(':');
+      return { host: parts[0], port: parseInt(parts[1], 10) || 443 };
+    } catch (err) {}
+  }
+  return null;
+}
+
+// Real IP & Country Lookup စစ်ဆေးခြင်း
+async function resolveTrueCountry(host) {
+  try {
+    let targetIp = host;
+    if (!net.isIP(host)) {
+      const resolved = await dns.lookup(host);
+      targetIp = resolved.address;
+    }
+    const rawGeo = await fetchUrl(`https://ipwho.is/${targetIp}`);
+    const geo = JSON.parse(rawGeo);
+    if (geo && geo.success) {
+      return { code: geo.country_code || 'UN', name: geo.country || 'Unknown' };
+    }
+  } catch (e) {}
+  return { code: 'UN', name: 'Global Edge' };
+}
+
+// Config ၏ နာမည် (#hash သို့မဟုတ် vmess ps) တွင် တကယ့် Country Tag ထည့်ခြင်း
+function injectCountryToUri(uri, countryCode, countryName, index) {
+  const label = `[${countryCode}] ${countryName} - Node ${index}`;
+  try {
+    if (uri.startsWith('vmess://')) {
+      const b64 = uri.replace('vmess://', '').trim();
+      const json = JSON.parse(Buffer.from(b64, 'base64').toString('utf-8'));
+      json.ps = label;
+      return 'vmess://' + Buffer.from(JSON.stringify(json)).toString('base64');
+    }
+    const baseUri = uri.split('#')[0];
+    return `${baseUri}#${encodeURIComponent(label)}`;
+  } catch (e) {
+    return uri;
   }
 }
 
 async function main() {
-  console.log('--- Step 1: Digging 10ium Asia Country Feeds ---');
+  console.log('--- Step 1: Digging Raw Feeds ---');
   let rawNodes = [];
 
   for (const src of SOURCES) {
     try {
-      console.log(`Fetching Country Feed: ${src}`);
       const raw = await fetchUrl(src);
       const text = decodeRecursive(raw);
       const lines = text.split(/[\r\n]+/);
@@ -125,39 +164,54 @@ async function main() {
           rawNodes.push(trimmed);
         }
       }
-    } catch (err) {
-      console.log(`Failed: ${src}`);
-    }
+    } catch (err) {}
   }
 
   const unique = Array.from(new Set(rawNodes));
-  console.log(`Found ${unique.length} candidate Asia nodes from 10ium.`);
+  console.log(`Discovered ${unique.length} candidate nodes.`);
 
-  console.log('--- Step 2: Live Socket Handshake Verification ---');
-  // Asia node များထဲမှ ပထမ ၁၅၀ ခုအား latency စစ်ဆေးခြင်း
-  const candidates = unique.slice(0, 150);
+  console.log('--- Step 2: Protocol-Balanced Verification & GeoIP Lookup ---');
+  const buckets = { vless: [], vmess: [], trojan: [], ss: [], hy2: [] };
+  
+  unique.forEach(uri => {
+    if (uri.startsWith('vless://')) buckets.vless.push(uri);
+    else if (uri.startsWith('vmess://')) buckets.vmess.push(uri);
+    else if (uri.startsWith('trojan://')) buckets.trojan.push(uri);
+    else if (uri.startsWith('ss://')) buckets.ss.push(uri);
+    else if (uri.startsWith('hy2://') || uri.startsWith('hysteria2://')) buckets.hy2.push(uri);
+  });
+
   let aliveNodes = [];
+  let globalIndex = 1;
 
-  for (const uri of candidates) {
-    const target = extractHostPort(uri);
-    if (!target || !target.host) continue;
+  for (const [proto, list] of Object.entries(buckets)) {
+    let count = 0;
+    for (const uri of list.slice(0, 35)) {
+      const target = extractHostPort(uri);
+      if (!target || !target.host) continue;
 
-    const isAlive = await verifyNodeConnection(target.host, target.port, 1200);
-    if (isAlive) {
-      console.log(`[PASS LIVE] ${target.host}:${target.port}`);
-      aliveNodes.push(uri);
-      if (aliveNodes.length >= 60) break; // အကောင်းဆုံး ၆၀ ခု ရလျှင် ရပ်မည်
+      const isAlive = await verifyNodeConnection(target.host, target.port, 1200);
+      if (isAlive) {
+        // True GeoIP ရှာဖွေခြင်း
+        const country = await resolveTrueCountry(target.host);
+        console.log(`[ALIVE] ${target.host}:${target.port} -> Real Country: ${country.code} (${country.name})`);
+        
+        const taggedUri = injectCountryToUri(uri, country.code, country.name, globalIndex++);
+        aliveNodes.push(taggedUri);
+        count++;
+        if (count >= 12) break;
+      }
     }
   }
 
   if (aliveNodes.length === 0) {
-    console.log('No alive nodes found. Leaving sub.txt untouched.');
+    console.log('No alive nodes found.');
     return;
   }
 
   const base64Output = Buffer.from(aliveNodes.join('\n'), 'utf-8').toString('base64');
   fs.writeFileSync('sub.txt', base64Output, 'utf-8');
-  console.log(`Successfully compiled sub.txt with ${aliveNodes.length} Verified Asia Nodes!`);
+  console.log(`Successfully generated sub.txt with ${aliveNodes.length} Verified GeoIP Nodes.`);
 }
 
 main();
