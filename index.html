@@ -78,7 +78,33 @@ h1{font-size:clamp(22px,2.5vw,30px);line-height:1.15;letter-spacing:-.04em;margi
 .search{width:180px;padding:8px 12px;border:1px solid var(--line);background:#0c111d;border-radius:10px;color:var(--text);outline:none;font-size:11px}
 .search:focus,.select:focus{border-color:#8c83ff80;box-shadow:0 0 0 3px #8c83ff10}
 .select{background:#141b2a;border:1px solid var(--line);color:#b9c5dc;padding:7px 10px;border-radius:9px;font-size:11px;outline:none}
-.table-scroll{overflow-x:auto;max-height:480px}
+
+/* CUSTOM SLIM & GLOW SCROLLBAR FOR NODES POOL */
+.table-scroll{
+  overflow-x:auto;
+  max-height:480px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 231, 244, 0.35) rgba(12, 17, 29, 0.6);
+}
+.table-scroll::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.table-scroll::-webkit-scrollbar-track {
+  background: rgba(12, 17, 29, 0.6);
+  border-radius: 10px;
+}
+.table-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(107, 231, 244, 0.45), rgba(167, 139, 250, 0.45));
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(107, 231, 244, 0.25);
+  transition: background 0.2s ease;
+}
+.table-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(107, 231, 244, 0.8), rgba(167, 139, 250, 0.8));
+  box-shadow: 0 0 12px rgba(107, 231, 244, 0.5);
+}
+
 table{border-collapse:collapse;width:100%;min-width:680px}
 thead{position:sticky;top:0;background:#111624;z-index:2}
 th{padding:10px 18px;text-align:left;color:#6f7c97;text-transform:uppercase;letter-spacing:.12em;font-size:9px;font-weight:800;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -142,7 +168,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
       </div>
     </header>
 
-    <!-- LIVE BENCHMARK PROGRESS BAR CARD (Auto Shown During Test) -->
+    <!-- LIVE BENCHMARK PROGRESS BAR CARD -->
     <section class="progress-card" id="progressCard">
       <div class="progress-header">
         <span style="font-weight:600;color:var(--cyan);display:flex;align-items:center;gap:8px">
@@ -414,7 +440,6 @@ async function testSingleNode(node) {
   }
 }
 
-// REAL-TIME PROGRESS BENCHMARK RUNNER
 async function runBenchmarkAll(){
   if(parsedNodes.length === 0) return;
   const btn = document.getElementById("benchBtn");
@@ -445,7 +470,6 @@ async function runBenchmarkAll(){
     const completed = i + 1;
     const pct = Math.round((completed / total) * 100);
 
-    // Update Percentage, Progress Bar and Counters
     progressRatio.innerText = `${completed} / ${total}`;
     progressPercent.innerText = `${pct}%`;
     progressFill.style.width = `${pct}%`;
@@ -455,7 +479,6 @@ async function runBenchmarkAll(){
     renderNodes();
   }
 
-  // Sort by ping after completion
   parsedNodes.sort((a,b) => (a.ping || 999) - (b.ping || 999));
   renderNodes();
 
