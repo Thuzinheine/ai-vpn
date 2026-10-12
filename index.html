@@ -1,35 +1,38 @@
 <!DOCTYPE html>
-<html lang="my">
+<html lang="my" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VPN Studio</title>
+  <title>VPN Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
-            sans: ['-apple-system', 'BlinkMacSystemFont', 'Plus Jakarta Sans', 'Helvetica Neue', 'sans-serif'],
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'Plus Jakarta Sans', 'sans-serif'],
             mono: ['SF Mono', 'JetBrains Mono', 'Menlo', 'monospace'],
           },
           colors: {
-            ios: {
-              bg: '#f8fafc',
-              card: '#ffffff',
-              border: '#e2e8f0',
-              borderLight: '#f1f5f9',
-              blue: '#0284c7',
-              blueHover: '#0369a1',
-              green: '#16a34a',
-              textPrimary: '#0f172a',
-              textSecondary: '#64748b',
-              textMuted: '#94a3b8'
+            mac: {
+              base: '#000000',
+              panel: '#121214',
+              sub: '#1c1c1e',
+              border: 'rgba(255, 255, 255, 0.08)',
+              hover: 'rgba(255, 255, 255, 0.04)',
+              blue: '#0a84ff',
+              blueHover: '#0071e3',
+              green: '#30d158',
+              amber: '#ff9f0a',
+              text: '#ffffff',
+              muted: '#86868b',
+              dim: '#545458'
             }
           }
         }
@@ -38,183 +41,185 @@
   </script>
 
   <style>
-    body {
-      background-color: #f8fafc;
-      color: #0f172a;
+    html, body {
+      height: 100vh;
+      overflow: hidden; /* Screen မရွေ့အောင် Main Page Scroll အပြည့်ဖျောက်ထားပါသည် */
+      background-color: #000000;
+      color: #ffffff;
       -webkit-font-smoothing: antialiased;
     }
-    .clean-shadow {
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+    .panel-scroll::-webkit-scrollbar {
+      width: 4px;
     }
-    .clean-scroll::-webkit-scrollbar {
-      width: 6px;
+    .panel-scroll::-webkit-scrollbar-track {
+      background: transparent;
     }
-    .clean-scroll::-webkit-scrollbar-track {
-      background: #f8fafc;
-    }
-    .clean-scroll::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
+    .panel-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
       border-radius: 9999px;
-    }
-    .clean-scroll::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
     }
   </style>
 </head>
-<body class="min-h-screen p-4 sm:p-8 flex justify-center selection:bg-ios-blue/15 selection:text-ios-blue">
+<body class="flex flex-col p-3 sm:p-4 selection:bg-mac-blue/30 selection:text-white">
 
-  <div class="max-w-3xl w-full space-y-6">
-
-    <!-- Header Section -->
-    <header class="flex flex-wrap items-center justify-between gap-4 pb-2 border-b border-ios-border">
-      <div>
-        <h1 class="text-xl font-bold tracking-tight text-ios-textPrimary flex items-center gap-2">
-          <span>AI VPN Studio</span>
-          <span class="text-[11px] font-semibold font-mono px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
-            v2.6
-          </span>
-        </h1>
-        <p class="text-xs text-ios-textSecondary mt-0.5">Automated Node Aggregation & Latency Tuning Hub</p>
+  <!-- Top Single Bar Header -->
+  <header class="h-11 bg-mac-panel border border-mac-border rounded-xl px-4 flex items-center justify-between flex-shrink-0 mb-3">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-1.5">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f56]"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-[#27c93f]"></span>
       </div>
+      <span class="text-xs font-semibold tracking-tight text-white pl-2 border-l border-mac-border">AI-VPN Core</span>
+      <span class="text-[10px] text-mac-muted font-mono">Edge Dashboard</span>
+    </div>
 
-      <div class="flex items-center gap-2 text-xs">
-        <div class="bg-white border border-ios-border px-3 py-1.5 rounded-xl flex items-center gap-2 clean-shadow">
-          <span class="text-ios-textMuted font-medium">Selected</span>
-          <span id="selectedCount" class="font-bold text-ios-blue font-mono">0</span>
-          <span class="text-slate-300">/</span>
-          <span id="nodeCount" class="font-medium text-slate-600 font-mono">0</span>
-        </div>
-        <div class="bg-white border border-ios-border px-3 py-1.5 rounded-xl flex items-center gap-2 clean-shadow">
-          <span class="text-ios-textMuted font-medium">Best Latency</span>
-          <span id="bestPing" class="font-bold text-ios-green font-mono">-- ms</span>
-        </div>
+    <!-- Metrics Status -->
+    <div class="flex items-center gap-2 text-xs font-mono">
+      <div class="bg-mac-sub px-2.5 py-1 rounded-lg border border-mac-border flex items-center gap-1.5">
+        <span class="text-mac-muted text-[10px] font-sans">Active</span>
+        <span id="selectedCount" class="font-bold text-mac-blue">0</span>
+        <span class="text-mac-dim">/</span>
+        <span id="nodeCount" class="text-mac-muted">0</span>
       </div>
-    </header>
-
-    <!-- Subscription Links Card -->
-    <section class="bg-ios-card border border-ios-border rounded-2xl p-5 space-y-4 clean-shadow">
-      <div class="flex items-center justify-between pb-2 border-b border-ios-borderLight">
-        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Subscription Endpoints</span>
-        <span class="text-[11px] text-slate-400">Direct GitHub Raw</span>
+      <div class="bg-mac-sub px-2.5 py-1 rounded-lg border border-mac-border flex items-center gap-1.5">
+        <span class="text-mac-muted text-[10px] font-sans">Latency</span>
+        <span id="bestPing" class="font-bold text-mac-green">-- ms</span>
       </div>
+    </div>
+  </header>
 
-      <!-- Main sub.txt -->
-      <div class="space-y-1">
-        <div class="flex justify-between items-center text-xs">
-          <label class="font-medium text-slate-700">Official Pool (50 Nodes Auto)</label>
-          <span class="text-[11px] text-slate-400 font-mono">sub.txt</span>
-        </div>
-        <div class="flex items-center gap-2 bg-slate-50 border border-ios-border rounded-xl p-1.5">
-          <input type="text" id="officialSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt"
-            class="w-full bg-transparent border-0 px-2 text-xs text-slate-600 font-mono truncate select-all focus:outline-none">
-          <button onclick="copyLink('officialSubUrl', 'copyOfficialBtn')" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium clean-shadow transition active:scale-95 flex items-center gap-1">
-            <i class="fa-regular fa-copy text-[11px]"></i>
-            <span id="copyOfficialBtn">Copy</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- fast-sub.txt -->
-      <div class="space-y-1">
-        <div class="flex justify-between items-center text-xs">
-          <label class="font-medium text-ios-blue">Fast Pool (Custom Benchmarked)</label>
-          <span class="text-[11px] text-ios-blue/70 font-mono">fast-sub.txt</span>
-        </div>
-        <div class="flex items-center gap-2 bg-sky-50/50 border border-sky-100 rounded-xl p-1.5">
-          <input type="text" id="fastSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/fast-sub.txt"
-            class="w-full bg-transparent border-0 px-2 text-xs text-ios-blue font-mono truncate select-all focus:outline-none">
-          <button onclick="copyLink('fastSubUrl', 'copyFastBtn')" class="bg-white hover:bg-sky-50 text-ios-blue border border-sky-200 px-3 py-1.5 rounded-lg text-xs font-semibold clean-shadow transition active:scale-95 flex items-center gap-1">
-            <i class="fa-regular fa-copy text-[11px]"></i>
-            <span id="copyFastBtn">Copy</span>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Controls & Operations Card -->
-    <section class="bg-ios-card border border-ios-border rounded-2xl p-5 space-y-4 clean-shadow">
+  <!-- 100% Height Non-Scrollable Split Workspace -->
+  <main class="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1 min-h-0">
+    
+    <!-- Left Column: Controls (Col Span 4) -->
+    <section class="lg:col-span-4 bg-mac-panel border border-mac-border rounded-xl p-4 flex flex-col justify-between overflow-hidden">
       
-      <!-- PAT Token -->
-      <div class="space-y-1.5">
-        <label class="text-xs font-medium text-slate-600 flex items-center gap-1.5">
-          <i class="fa-solid fa-key text-slate-400"></i> GitHub Token (PAT)
-        </label>
-        <div class="relative">
-          <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" 
-            class="w-full bg-slate-50 border border-ios-border rounded-xl pl-3 pr-9 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-ios-blue focus:bg-white font-mono transition">
-          <button type="button" onclick="toggleTokenVisibility()" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600">
-            <i id="eyeIcon" class="fa-regular fa-eye text-xs"></i>
+      <div class="space-y-3">
+        <!-- 1. All Nodes sub.txt -->
+        <div class="space-y-1">
+          <div class="flex justify-between items-center text-[11px]">
+            <span class="text-mac-muted font-medium flex items-center gap-1.5">
+              <i class="fa-solid fa-layer-group text-[10px]"></i> Main Sub (50 Pool)
+            </span>
+            <span class="text-mac-dim font-mono text-[10px]">sub.txt</span>
+          </div>
+          <div class="flex items-center gap-1.5 bg-mac-sub border border-mac-border rounded-lg p-1">
+            <input type="text" id="officialSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt"
+              class="w-full bg-transparent border-0 px-2 text-[11px] text-mac-muted font-mono truncate select-all focus:outline-none">
+            <button onclick="copyLink('officialSubUrl', 'copyOfficialBtn')" class="bg-white/10 hover:bg-white/20 text-white px-2.5 py-1 rounded text-[10px] font-medium transition active:scale-95 flex items-center gap-1 flex-shrink-0">
+              <i class="fa-regular fa-copy"></i>
+              <span id="copyOfficialBtn">Copy</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Fast Nodes fast-sub.txt -->
+        <div class="space-y-1">
+          <div class="flex justify-between items-center text-[11px]">
+            <span class="text-mac-blue font-medium flex items-center gap-1.5">
+              <i class="fa-solid fa-bolt text-[10px]"></i> Fast Sub (Selected Pool)
+            </span>
+            <span class="text-mac-blue/60 font-mono text-[10px]">fast-sub.txt</span>
+          </div>
+          <div class="flex items-center gap-1.5 bg-mac-sub border border-mac-border rounded-lg p-1">
+            <input type="text" id="fastSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/fast-sub.txt"
+              class="w-full bg-transparent border-0 px-2 text-[11px] text-mac-blue font-mono truncate select-all focus:outline-none">
+            <button onclick="copyLink('fastSubUrl', 'copyFastBtn')" class="bg-mac-blue/20 hover:bg-mac-blue/30 text-mac-blue px-2.5 py-1 rounded text-[10px] font-medium transition active:scale-95 flex items-center gap-1 flex-shrink-0">
+              <i class="fa-regular fa-copy"></i>
+              <span id="copyFastBtn">Copy</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- PAT Key Input -->
+        <div class="space-y-1 pt-1">
+          <label class="text-[11px] text-mac-muted font-medium flex items-center gap-1.5">
+            <i class="fa-solid fa-key text-[10px]"></i> GitHub PAT Token
+          </label>
+          <div class="relative">
+            <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" 
+              class="w-full bg-mac-sub border border-mac-border rounded-lg pl-2.5 pr-8 py-1.5 text-xs text-white placeholder-mac-dim focus:outline-none focus:border-mac-blue font-mono">
+            <button type="button" onclick="toggleTokenVisibility()" class="absolute right-2.5 top-2 text-mac-dim hover:text-white">
+              <i id="eyeIcon" class="fa-regular fa-eye text-xs"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Buttons Grid -->
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button onclick="triggerGithubUpdate()" id="updateBtn"
+            class="bg-mac-sub hover:bg-white/10 border border-mac-border text-white font-medium py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 active:scale-95 transition">
+            <i id="btnIcon" class="fa-solid fa-rotate text-[11px]"></i>
+            <span>Action Scrape</span>
           </button>
+
+          <button onclick="runBenchmarkAll()" id="benchmarkBtn"
+            class="bg-mac-blue hover:bg-mac-blueHover text-white font-medium py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 active:scale-95 transition">
+            <i id="testIcon" class="fa-solid fa-gauge text-[11px]"></i>
+            <span>Benchmark</span>
+          </button>
+        </div>
+
+        <!-- Save to fast-sub.txt -->
+        <button onclick="saveFastSubToGithub()" id="saveFastBtn"
+          class="w-full bg-mac-sub hover:bg-white/10 border border-mac-border text-white font-medium py-2 rounded-lg text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+          <i id="saveFastIcon" class="fa-solid fa-cloud-arrow-up text-mac-blue text-[11px]"></i>
+          <span id="saveFastText">Save to fast-sub.txt</span>
+        </button>
+
+        <!-- Dynamic Status Bar -->
+        <div id="statusBox" class="hidden p-2 rounded-lg text-[11px] flex items-center gap-2 border">
+          <i id="statusIcon" class="fa-solid fa-info text-[10px]"></i>
+          <span id="statusMessage" class="truncate font-medium"></span>
         </div>
       </div>
 
-      <!-- Action Buttons Toolbar -->
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
-        <button onclick="triggerGithubUpdate()" id="updateBtn"
-          class="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 clean-shadow active:scale-95 transition">
-          <i id="btnIcon" class="fa-solid fa-arrows-rotate text-xs text-slate-500"></i>
-          <span>Scrape Pool</span>
-        </button>
-
-        <button onclick="runBenchmarkAll()" id="benchmarkBtn"
-          class="bg-ios-blue hover:bg-ios-blueHover text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 clean-shadow active:scale-95 transition">
-          <i id="testIcon" class="fa-solid fa-stopwatch text-xs"></i>
-          <span>Test Latency</span>
-        </button>
-
-        <button onclick="saveFastSubToGithub()" id="saveFastBtn"
-          class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 clean-shadow active:scale-95 transition">
-          <i id="saveFastIcon" class="fa-solid fa-cloud-arrow-up text-xs"></i>
-          <span id="saveFastText">Save fast-sub.txt</span>
-        </button>
-      </div>
-
-      <!-- Status Toast Message -->
-      <div id="statusBox" class="hidden p-3 rounded-xl text-xs flex items-center gap-2 border transition-all">
-        <i id="statusIcon" class="fa-solid fa-circle-info text-xs"></i>
-        <span id="statusMessage" class="leading-tight font-medium"></span>
-      </div>
-
-      <!-- External Key Input Field -->
-      <div class="pt-3 border-t border-ios-borderLight space-y-1.5">
-        <label class="text-xs font-medium text-slate-600">Add External VLESS Key</label>
-        <div class="flex gap-2">
+      <!-- External Key Input -->
+      <div class="pt-2 border-t border-mac-border space-y-1.5">
+        <span class="text-[10px] text-mac-muted font-medium">Add External VLESS Key</span>
+        <div class="flex gap-1.5">
           <input type="text" id="customNodeInput" placeholder="vless://..."
-            class="w-full bg-slate-50 border border-ios-border rounded-xl px-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-ios-blue focus:bg-white font-mono transition">
-          <button onclick="addCustomNode()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 px-4 py-2 rounded-xl text-xs font-semibold active:scale-95 transition">
+            class="w-full bg-mac-sub border border-mac-border rounded-lg px-2 py-1.5 text-xs text-white placeholder-mac-dim focus:outline-none focus:border-mac-blue font-mono">
+          <button onclick="addCustomNode()" class="bg-mac-sub hover:bg-white/10 border border-mac-border text-white px-3 py-1.5 rounded-lg text-xs font-medium active:scale-95 transition">
             Add
           </button>
         </div>
       </div>
+
     </section>
 
-    <!-- Node Selection Pool -->
-    <section class="bg-ios-card border border-ios-border rounded-2xl p-5 space-y-3.5 clean-shadow">
+    <!-- Right Column: Node Selection Pool (Col Span 8) -->
+    <section class="lg:col-span-8 bg-mac-panel border border-mac-border rounded-xl p-3 flex flex-col overflow-hidden min-h-0">
       
-      <!-- List Filter Toolbar -->
-      <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-ios-borderLight">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700">Node Selection Pool</h2>
+      <!-- Toolbar -->
+      <div class="flex items-center justify-between pb-2.5 border-b border-mac-border flex-shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold text-white">Nodes Pool</span>
+          <span class="text-[10px] text-mac-dim font-mono">(Click icon to copy)</span>
+        </div>
 
-        <div class="flex items-center gap-1.5 text-xs">
-          <span class="text-slate-400 text-[11px]">Filter:</span>
-          <button onclick="selectPreset('all')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded-lg text-xs font-medium transition">All</button>
-          <button onclick="selectPreset('good')" class="bg-sky-50 hover:bg-sky-100 text-ios-blue px-2.5 py-1 rounded-lg text-xs font-medium transition">&lt; 350ms</button>
-          <button onclick="selectPreset('none')" class="bg-slate-100 hover:bg-slate-200 text-slate-500 px-2.5 py-1 rounded-lg text-xs font-medium transition">Clear</button>
-          <button onclick="fetchAndParseNodes()" title="Reload from GitHub" class="text-slate-400 hover:text-slate-700 ml-1 p-1 transition">
-            <i class="fa-solid fa-rotate-right text-xs"></i>
+        <!-- Apple Style Filter Pills -->
+        <div class="flex items-center gap-1 bg-mac-sub p-1 rounded-lg border border-mac-border text-[10px]">
+          <button onclick="selectPreset('all')" class="hover:bg-white/10 text-white px-2 py-0.5 rounded transition">All</button>
+          <button onclick="selectPreset('good')" class="hover:bg-white/10 text-mac-blue px-2 py-0.5 rounded transition">&lt; 350ms</button>
+          <button onclick="selectPreset('none')" class="hover:bg-white/10 text-mac-muted px-2 py-0.5 rounded transition">Clear</button>
+          <button onclick="fetchAndParseNodes()" title="Reload list" class="text-mac-muted hover:text-white px-1.5 py-0.5 rounded transition">
+            <i class="fa-solid fa-rotate-right text-[10px]"></i>
           </button>
         </div>
       </div>
 
-      <!-- Nodes List Container (Vertical Stack, No Narrow Cramping) -->
-      <div id="nodeListContainer" class="space-y-2 max-h-[500px] overflow-y-auto pr-1 clean-scroll">
-        <div class="text-center py-16 text-xs text-slate-400">
-          <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading active nodes...
+      <!-- Internal Scrollable Node List (Main Page doesn't scroll) -->
+      <div id="nodeListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-2 overflow-y-auto panel-scroll flex-1 content-start pr-1">
+        <div class="col-span-full text-center py-24 text-xs text-mac-dim">
+          <i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Loading active nodes...
         </div>
       </div>
+
     </section>
 
-  </div>
+  </main>
 
   <script>
     const OWNER = "Thuzinheine";
@@ -241,16 +246,16 @@
       const msg = document.getElementById("statusMessage");
       const icon = document.getElementById("statusIcon");
 
-      box.className = "p-3 rounded-xl text-xs flex items-center gap-2 border transition-all ";
+      box.className = "p-2 rounded-lg text-[11px] flex items-center gap-2 border ";
       if (type === "success") {
-        box.classList.add("bg-emerald-50", "border-emerald-200", "text-emerald-700");
-        icon.className = "fa-solid fa-circle-check text-xs text-emerald-600";
+        box.classList.add("bg-mac-sub", "border-mac-green/30", "text-mac-green");
+        icon.className = "fa-solid fa-check text-[10px] text-mac-green";
       } else if (type === "error") {
-        box.classList.add("bg-rose-50", "border-rose-200", "text-rose-700");
-        icon.className = "fa-solid fa-circle-exclamation text-xs text-rose-600";
+        box.classList.add("bg-mac-sub", "border-rose-500/30", "text-rose-400");
+        icon.className = "fa-solid fa-circle-exclamation text-[10px] text-rose-400";
       } else {
-        box.classList.add("bg-slate-50", "border-slate-200", "text-slate-600");
-        icon.className = "fa-solid fa-circle-notch fa-spin text-xs text-ios-blue";
+        box.classList.add("bg-mac-sub", "border-mac-border", "text-mac-muted");
+        icon.className = "fa-solid fa-circle-notch fa-spin text-[10px] text-mac-blue";
       }
       msg.innerText = message;
       box.classList.remove("hidden");
@@ -258,7 +263,7 @@
 
     async function fetchAndParseNodes() {
       const listEl = document.getElementById("nodeListContainer");
-      listEl.innerHTML = `<div class="text-center py-16 text-xs text-slate-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading sub.txt...</div>`;
+      listEl.innerHTML = `<div class="col-span-full text-center py-24 text-xs text-mac-dim"><i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Loading sub.txt...</div>`;
       
       try {
         const url = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/sub.txt?t=${Date.now()}`;
@@ -283,43 +288,43 @@
         document.getElementById("nodeCount").innerText = parsedNodes.length;
         renderNodes();
       } catch (e) {
-        listEl.innerHTML = `<div class="text-center py-16 text-xs text-rose-500">Failed to load sub.txt</div>`;
+        listEl.innerHTML = `<div class="col-span-full text-center py-24 text-xs text-rose-400">Unable to load sub.txt</div>`;
       }
     }
 
     function renderNodes() {
       const listEl = document.getElementById("nodeListContainer");
       if (parsedNodes.length === 0) {
-        listEl.innerHTML = `<div class="text-center py-16 text-xs text-slate-400">No nodes found.</div>`;
+        listEl.innerHTML = `<div class="col-span-full text-center py-24 text-xs text-mac-dim">No nodes available.</div>`;
         return;
       }
 
       listEl.innerHTML = parsedNodes.map((n, i) => `
-        <div class="bg-white border ${n.selected ? 'border-sky-300 bg-sky-50/20' : 'border-ios-border'} hover:border-slate-300 px-3.5 py-2.5 rounded-xl flex items-center justify-between gap-3 clean-shadow transition">
-          <div class="flex items-center gap-3 min-w-0 flex-1">
+        <div class="bg-mac-sub border ${n.selected ? 'border-mac-blue/40' : 'border-mac-border'} hover:border-white/20 px-2.5 py-1.5 rounded-lg flex items-center justify-between gap-2 transition h-[48px]">
+          <div class="flex items-center gap-2 min-w-0 flex-1">
             <input type="checkbox" ${n.selected ? 'checked' : ''} onchange="toggleSelect(${i})"
-              class="w-4 h-4 rounded border-slate-300 text-ios-blue focus:ring-0 cursor-pointer accent-ios-blue">
+              class="w-3.5 h-3.5 rounded bg-mac-panel border-mac-border text-mac-blue focus:ring-0 cursor-pointer accent-mac-blue">
             
             <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full flex-shrink-0 ${n.ping ? (n.ping < 250 ? 'bg-emerald-500' : 'bg-amber-500') : 'bg-slate-300'}"></span>
-                <h3 class="text-xs font-semibold ${n.selected ? 'text-slate-800' : 'text-slate-500'} truncate">${n.name}</h3>
+              <div class="flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${n.ping ? (n.ping < 250 ? 'bg-mac-green' : 'bg-mac-amber') : 'bg-mac-dim'}"></span>
+                <h3 class="text-xs font-medium ${n.selected ? 'text-white' : 'text-mac-muted'} truncate">${n.name}</h3>
               </div>
-              <p class="text-[11px] text-slate-400 font-mono mt-0.5 truncate pl-4">${n.host}</p>
+              <p class="text-[10px] text-mac-dim font-mono mt-0.5 truncate pl-3">${n.host}</p>
             </div>
           </div>
 
-          <div class="flex items-center gap-3 flex-shrink-0">
+          <div class="flex items-center gap-2 flex-shrink-0">
             <div class="text-right font-mono">
-              <div class="text-xs font-bold ${n.ping ? (n.ping < 250 ? 'text-emerald-600' : 'text-amber-600') : 'text-slate-400'}">
+              <div class="text-[11px] font-medium ${n.ping ? (n.ping < 250 ? 'text-mac-green' : 'text-mac-amber') : 'text-mac-dim'}">
                 ${n.ping !== null ? n.ping + ' ms' : '-- ms'}
               </div>
-              <div class="text-[10px] text-slate-400">
+              <div class="text-[9px] text-mac-dim">
                 ${n.speed !== null ? n.speed + ' MB/s' : '-- MB/s'}
               </div>
             </div>
-            <button onclick="copySingleNode(${i})" title="Copy key" class="bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 p-2 rounded-lg text-xs active:scale-95 transition">
-              <i class="fa-regular fa-copy"></i>
+            <button onclick="copySingleNode(${i})" title="Copy key" class="bg-white/5 hover:bg-white/15 text-mac-muted hover:text-white p-1 rounded text-xs active:scale-95 transition">
+              <i class="fa-regular fa-copy text-[11px]"></i>
             </button>
           </div>
         </div>
@@ -356,7 +361,7 @@
       const val = input.value.trim();
 
       if (!val || !val.startsWith("vless://")) {
-        showStatus("vless:// key အပြည့်အစုံ ထည့်ပေးပါ", "error");
+        showStatus("Invalid vless:// key", "error");
         return;
       }
 
@@ -381,7 +386,7 @@
       input.value = "";
       document.getElementById("nodeCount").innerText = parsedNodes.length;
       renderNodes();
-      showStatus(`Node "${name}" ကို ထည့်သွင်းပြီးပါပြီ`, "success");
+      showStatus(`Added "${name}"`, "success");
     }
 
     async function testSingleNode(node) {
@@ -414,8 +419,8 @@
       const btn = document.getElementById("benchmarkBtn");
       const icon = document.getElementById("testIcon");
       btn.disabled = true;
-      icon.className = "fa-solid fa-spinner fa-spin text-xs";
-      showStatus("Testing latency for all nodes...", "loading");
+      icon.className = "fa-solid fa-spinner fa-spin text-[11px]";
+      showStatus("Benchmarking latency...", "loading");
 
       let best = 9999;
 
@@ -432,8 +437,8 @@
       document.getElementById("bestPing").innerText = best !== 9999 ? `${best} ms` : "--";
 
       btn.disabled = false;
-      icon.className = "fa-solid fa-stopwatch text-xs";
-      showStatus("Benchmark Complete!", "success");
+      icon.className = "fa-solid fa-gauge text-[11px]";
+      showStatus("Benchmark Complete", "success");
     }
 
     async function saveFastSubToGithub() {
@@ -441,12 +446,12 @@
       const selectedUris = parsedNodes.filter(n => n.selected).map(n => n.uri);
 
       if (!token) {
-        showStatus("GitHub Token (PAT) အရင် ထည့်ပေးပါ", "error");
+        showStatus("GitHub PAT required", "error");
         return;
       }
 
       if (selectedUris.length === 0) {
-        showStatus("Node အနည်းဆုံး ၁ ခု ရွေးချယ်ပေးပါ", "error");
+        showStatus("Select at least 1 node", "error");
         return;
       }
 
@@ -455,9 +460,9 @@
       const saveText = document.getElementById("saveFastText");
 
       saveBtn.disabled = true;
-      saveIcon.className = "fa-solid fa-spinner fa-spin text-xs";
+      saveIcon.className = "fa-solid fa-spinner fa-spin text-[11px]";
       saveText.innerText = "Saving...";
-      showStatus("fast-sub.txt သို့ GitHub ပေါ် သိမ်းဆည်းနေပါသည်...", "loading");
+      showStatus("Saving to fast-sub.txt...", "loading");
 
       try {
         const base64Content = btoa(selectedUris.join('\n'));
@@ -493,18 +498,18 @@
         });
 
         if (updateRes.ok) {
-          showStatus(`fast-sub.txt သို့ Node ${selectedUris.length} ခု သိမ်းဆည်းပြီးပါပြီ!`, "success");
+          showStatus(`Saved ${selectedUris.length} nodes to fast-sub.txt`, "success");
           document.getElementById("fastSubUrl").value = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/fast-sub.txt?t=${Date.now()}`;
         } else {
           const err = await updateRes.json();
           showStatus(`Error: ${err.message}`, "error");
         }
       } catch (err) {
-        showStatus("Network Error ဖြစ်ပေါ်နေပါသည်", "error");
+        showStatus("Network connection error", "error");
       } finally {
         saveBtn.disabled = false;
-        saveIcon.className = "fa-solid fa-cloud-arrow-up text-xs";
-        saveText.innerText = "Save fast-sub.txt";
+        saveIcon.className = "fa-solid fa-cloud-arrow-up text-[11px] text-mac-blue";
+        saveText.innerText = "Save to fast-sub.txt";
       }
     }
 
@@ -515,13 +520,13 @@
       const btn = document.getElementById(btnId);
       btn.innerText = "Copied";
       setTimeout(() => btn.innerText = "Copy", 2000);
-      showStatus("Link copied!", "success");
+      showStatus("Link copied", "success");
     }
 
     function copySingleNode(index) {
       const node = parsedNodes[index];
       navigator.clipboard.writeText(node.uri);
-      showStatus(`Node "${node.name}" key copied!`, "success");
+      showStatus(`Copied "${node.name}"`, "success");
     }
 
     async function triggerGithubUpdate() {
@@ -530,14 +535,14 @@
       const icon = document.getElementById("btnIcon");
 
       if (!token) {
-        showStatus("PAT Token required!", "error");
+        showStatus("PAT Token required", "error");
         return;
       }
 
       localStorage.setItem("gh_token", token);
       btn.disabled = true;
-      icon.className = "fa-solid fa-spinner fa-spin text-xs";
-      showStatus("GitHub Actions သို့ အချက်ပြနေပါသည်...", "loading");
+      icon.className = "fa-solid fa-spinner fa-spin text-[11px]";
+      showStatus("Dispatching Action...", "loading");
 
       try {
         const response = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW_ID}/dispatches`, {
@@ -551,16 +556,16 @@
         });
 
         if (response.status === 204) {
-          showStatus("Workflow dispatched! Refreshing pool in 15s...", "success");
+          showStatus("Action dispatched! Refreshing in 15s...", "success");
           setTimeout(() => fetchAndParseNodes(), 15000);
         } else {
-          showStatus("Trigger failed.", "error");
+          showStatus("Trigger failed", "error");
         }
       } catch (err) {
-        showStatus("Network Error.", "error");
+        showStatus("Network Error", "error");
       } finally {
         btn.disabled = false;
-        icon.className = "fa-solid fa-arrows-rotate text-xs";
+        icon.className = "fa-solid fa-rotate text-[11px]";
       }
     }
 
