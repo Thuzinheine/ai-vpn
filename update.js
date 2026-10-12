@@ -1,18 +1,23 @@
 /**
  * update.js - AI-VPN Core Aggregator
- * Protocols: Hysteria 2 & VLESS Reality
+ * Protocols: Hysteria 2 (High Priority) & VLESS Reality
  */
 import fs from 'node:fs';
 import https from 'node:https';
 import http from 'node:http';
 
+// Hysteria 2 နှင့် Reality အစစ်အမှန်များ သီးသန့်တင်သော Public Feeds များ
 const SOURCES = [
-  'https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/xray/normal/mix',
-  'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Sub1.txt',
-  'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Sub2.txt',
-  'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge.txt',
+  // Hysteria 2 Dedicated Feeds
+  'https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/protocols/hysteria2',
+  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria',
+  'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/hysteria2.txt',
+  'https://raw.githubusercontent.com/LalatinaHub/Mineral/master/result/nodes',
+  
+  // VLESS Reality Dedicated Feeds
   'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/reality',
-  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria'
+  'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/reality.txt',
+  'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Sub1.txt'
 ];
 
 function fetchUrl(url) {
@@ -38,58 +43,76 @@ function fetchUrl(url) {
   });
 }
 
-function decodeContent(content) {
+function decodeRecursive(content) {
   if (!content) return '';
   content = content.trim();
-  try {
-    const buff = Buffer.from(content.replace(/\s+/g, ''), 'base64');
-    const decoded = buff.toString('utf-8');
-    if (decoded.includes('://')) return decoded;
-  } catch (e) {}
+  // Multi-pass Base64 decode
+  for (let i = 0; i < 3; i++) {
+    try {
+      const buff = Buffer.from(content.replace(/\s+/g, ''), 'base64');
+      const decoded = buff.toString('utf-8');
+      if (decoded.includes('://')) {
+        content = decoded;
+      } else {
+        break;
+      }
+    } catch (e) {
+      break;
+    }
+  }
   return content;
 }
 
 async function main() {
-  console.log('--- Starting Reality & Hysteria 2 Node Aggregation ---');
-  let collected = [];
+  console.log('--- Aggregating Hysteria 2 & VLESS Reality ---');
+  let hy2List = [];
+  let realityList = [];
 
   for (const src of SOURCES) {
     try {
-      console.log(`Fetching: ${src}`);
+      console.log(`Checking: ${src}`);
       const raw = await fetchUrl(src);
-      const text = decodeContent(raw);
+      const text = decodeRecursive(raw);
       const lines = text.split(/[\r\n]+/);
 
       for (const line of lines) {
         const trimmed = line.trim();
         if (!trimmed) continue;
 
-        const isHy2 = trimmed.startsWith('hy2://') || trimmed.startsWith('hysteria2://');
-        const isReality = trimmed.startsWith('vless://') && trimmed.includes('security=reality');
-
-        if (isHy2 || isReality) {
-          collected.push(trimmed);
+        // 1. Hysteria 2 Extract
+        if (trimmed.startsWith('hy2://') || trimmed.startsWith('hysteria2://')) {
+          hy2List.push(trimmed);
+        }
+        // 2. Reality Extract
+        else if (trimmed.startsWith('vless://') && trimmed.includes('security=reality')) {
+          realityList.push(trimmed);
         }
       }
     } catch (err) {
-      console.log(`Failed to fetch from ${src}: ${err.message}`);
+      console.log(`Error reading ${src}: ${err.message}`);
     }
   }
 
-  const uniqueNodes = Array.from(new Set(collected));
-  console.log(`Discovered ${uniqueNodes.length} valid Reality & Hysteria 2 nodes.`);
+  // Deduplicate
+  const uniqueHy2 = Array.from(new Set(hy2List));
+  const uniqueReality = Array.from(new Set(realityList));
 
-  const finalNodes = uniqueNodes.slice(0, 50);
+  console.log(`[Results] Found Hy2: ${uniqueHy2.length} | Found Reality: ${uniqueReality.length}`);
+
+  // Hysteria 2 ကို ဦးစားပေး အလုံးရေ ထည့်သွင်းခြင်း (ဥပမာ Hy2 မှ အလုံး ၂၅ ခု + Reality မှ အလုံး ၂၅ ခု)
+  const finalNodes = [
+    ...uniqueHy2.slice(0, 25),
+    ...uniqueReality.slice(0, 25)
+  ];
 
   if (finalNodes.length === 0) {
-    console.log('No valid Reality or Hysteria 2 nodes found. sub.txt remains unchanged.');
+    console.log('No valid nodes collected.');
     return;
   }
 
   const base64Output = Buffer.from(finalNodes.join('\n'), 'utf-8').toString('base64');
   fs.writeFileSync('sub.txt', base64Output, 'utf-8');
-  console.log(`Successfully written ${finalNodes.length} nodes to sub.txt`);
-  console.log('--- Aggregation Completed Successfully ---');
+  console.log(`Successfully compiled sub.txt with ${finalNodes.length} nodes (Hy2 prioritized).`);
 }
 
 main();
