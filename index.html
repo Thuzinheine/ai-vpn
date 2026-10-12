@@ -112,20 +112,20 @@ tbody tr{transition:background .15s}tbody tr:hover{background:#ffffff04}
 .small-btn:hover{color:white;background:#ffffff0b}
 input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height:15px}
 
-/* Modal CSS */
-.modal-overlay{position:fixed;inset:0;background:rgba(4,7,14,.78);backdrop-filter:blur(8px);display:none;place-items:center;z-index:50;padding:16px}
+/* Modal Styling */
+.modal-overlay{position:fixed;inset:0;background:rgba(4,7,14,.82);backdrop-filter:blur(10px);display:none;place-items:center;z-index:100;padding:16px}
 .modal-overlay.open{display:grid}
-.modal-card{width:100%;max-width:540px;background:#0e1322;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;animation:popIn .2s ease-out}
+.modal-card{width:100%;max-width:620px;background:#0d1220;border:1px solid rgba(155,174,216,.2);border-radius:22px;box-shadow:var(--shadow);overflow:hidden;animation:popIn .2s ease-out}
 @keyframes popIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
-.modal-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--line)}
-.modal-head h3{margin:0;font-size:16px;font-weight:750;letter-spacing:-.02em}
-.modal-body{padding:20px 24px;display:grid;gap:14px}
-.modal-foot{padding:16px 24px 22px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--line)}
-.field-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;display:block}
-.custom-textarea{width:100%;background:#090d16;border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:#fff;font-family:monospace;font-size:11px;outline:none;resize:vertical;min-height:95px}
-.custom-textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(107,231,244,.12)}
-
-.toast{position:fixed;right:22px;bottom:22px;padding:12px 18px;background:#172235;border:1px solid #7b8bab35;color:#eaf2ff;border-radius:13px;box-shadow:var(--shadow);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s;z-index:100;font-size:12px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line);background:#101726}
+.modal-head h3{margin:0;font-size:15px;font-weight:750}
+.modal-body{padding:20px 22px;display:grid;gap:14px;max-height:75vh;overflow-y:auto}
+.field-box{background:#090d16;padding:14px;border-radius:14px;border:1px solid var(--line)}
+.field-label{font-size:11px;font-weight:750;color:#9cb0d8;margin-bottom:6px;display:block}
+.queue-box{background:#0a0f1c;border-radius:12px;border:1px solid var(--line);overflow:hidden;margin-top:4px}
+.queue-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #ffffff06;font-size:12px}
+.queue-item:last-child{border-bottom:0}
+.toast{position:fixed;right:22px;bottom:22px;padding:12px 18px;background:#172235;border:1px solid #7b8bab35;color:#eaf2ff;border-radius:13px;box-shadow:var(--shadow);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s;z-index:200;font-size:12px}
 .toast.show{opacity:1;transform:translateY(0)}
 .mobile-menu{display:none}
 
@@ -145,7 +145,8 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
       <button class="active"><i class="fa-solid fa-gauge-high"></i> Overview</button>
       <button onclick="scrollToNodes()"><i class="fa-solid fa-server"></i> Active Pool <span class="count" id="navCount">0</span></button>
       <button onclick="scrollToConfig()"><i class="fa-solid fa-link"></i> Subscriptions</button>
-      <button onclick="openCustomModal()"><i class="fa-solid fa-square-plus" style="color:var(--cyan)"></i> ＋ Add Custom Nodes</button>
+      <!-- Menu Item အသစ် -->
+      <button onclick="openCustomModal()"><i class="fa-solid fa-folder-plus" style="color:var(--cyan)"></i> Add Custom Nodes</button>
       <button onclick="runBenchmarkAll()"><i class="fa-solid fa-bolt"></i> Run Benchmark</button>
     </nav>
     <div class="sidebar-bottom">
@@ -164,13 +165,13 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
         <div>
           <div class="eyebrow">10ium/telegram-configs-collector / Asia Mixed</div>
           <h1>Asia Country Subscriptions Center</h1>
-          <p class="subtitle">Clean IP & low-latency nodes with Custom Node Manager</p>
+          <p class="subtitle">Clean IP & low-latency nodes with Staged Custom Node Manager</p>
         </div>
       </div>
       <div class="top-actions">
         <div class="core-pill"><span class="dot"></span> 10IUM DEDICATED</div>
         <button class="icon-btn" onclick="fetchAndParseNodes()" title="Reload from GitHub"><i class="fa-solid fa-rotate"></i></button>
-        <button class="primary" onclick="openCustomModal()"><i class="fa-solid fa-plus mr-1"></i> Add Custom Node</button>
+        <button class="primary" onclick="openCustomModal()"><i class="fa-solid fa-plus mr-1"></i> Add Custom Nodes</button>
       </div>
     </header>
 
@@ -313,53 +314,83 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
   </main>
 </div>
 
-<!-- Modal: Add Custom Node & Push to GitHub (With Dynamic File Creation) -->
+<!-- Modal: Step-by-Step Staged Custom Node Manager -->
 <div class="modal-overlay" id="customModal">
   <div class="modal-card">
     <div class="modal-head">
-      <h3><i class="fa-solid fa-square-plus" style="color:var(--cyan);margin-right:8px"></i> Add Custom Nodes to GitHub</h3>
+      <h3><i class="fa-solid fa-layer-group" style="color:var(--cyan);margin-right:8px"></i> Custom Node Manager (Queue System)</h3>
       <button class="icon-btn" onclick="closeCustomModal()"><i class="fa-solid fa-xmark"></i></button>
     </div>
+    
     <div class="modal-body">
-      <div>
-        <label class="field-label">Custom Node Name / Remark (Optional)</label>
-        <input type="text" id="modalCustomName" placeholder="e.g. [SG] VIP-Dedicated-01" class="custom-input" style="width:100%">
-        <small style="color:var(--muted);font-size:10px;margin-top:4px;display:block">ချန်ထားခဲ့ပါက Config မူလနာမည်အတိုင်း သိမ်းဆည်းပါမည်။</small>
+      <!-- အဆင့် (၁): Node တစ်ခုချင်းစီ စိတ်ကြိုက်နာမည်ဖြင့် ထည့်သွင်းခြင်း -->
+      <div class="field-box">
+        <span style="font-weight:700;color:var(--cyan);font-size:12px;display:block;margin-bottom:10px">
+          အဆင့် (၁) - Node တစ်ခုချင်းစီ စိတ်ကြိုက်နာမည်ဖြင့် ထည့်ပါ (Add to Local Queue)
+        </span>
+        <div style="margin-bottom:10px">
+          <label class="field-label">၁။ စိတ်ကြိုက်ပေးလိုသော နာမည် (Custom Name)</label>
+          <input type="text" id="stageNodeName" placeholder="ဥပမာ- [SG] VIP-Dedicated-01" class="custom-input" style="width:100%">
+        </div>
+        <div style="margin-bottom:10px">
+          <label class="field-label">၂။ Node Key / Config (URI)</label>
+          <input type="text" id="stageNodeUri" placeholder="vless://, vmess://, trojan://, ss://, hy2://..." class="custom-input" style="width:100%">
+        </div>
+        <button class="primary" onclick="addNodeToQueue()" style="width:100%;padding:10px">
+          <i class="fa-solid fa-plus mr-1"></i> စာရင်းထဲသို့ ထည့်မည် (Add to Queue)
+        </button>
       </div>
+
+      <!-- အဆင့် (၂): စုဆောင်းထားသော Node များစာရင်း -->
       <div>
-        <label class="field-label">Node URI Config(s)</label>
-        <textarea id="modalCustomUris" class="custom-textarea" placeholder="Paste single or multiple keys (vless://, vmess://, trojan://, ss://, hy2://)..."></textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <label class="field-label" style="margin:0">
+            လက်ရှိ စုဆောင်းထားသော Node များ (<span id="stagedCount" style="color:var(--cyan)">0</span> ခု)
+          </label>
+          <button class="ghost" onclick="clearQueue()" style="padding:3px 8px;font-size:10px;color:var(--red)">Clear All</button>
+        </div>
+        <div class="queue-box" id="queueList">
+          <div style="padding:18px;text-align:center;color:var(--muted);font-size:11px">
+            Node မရှိသေးပါ။ အပေါ်ကနေ တစ်ခုချင်းစီ ရိုက်ထည့်ပြီး "စာရင်းထဲသို့ ထည့်မည်" ကို နှိပ်ပါ။
+          </div>
+        </div>
       </div>
-      <div>
-        <label class="field-label">Target File to Save on GitHub</label>
-        <select id="modalTargetFile" class="select" style="width:100%" onchange="handleTargetFileChange()">
+
+      <!-- အဆင့် (၃): စုပြီးမှ GitHub ပေါ်သို့ တစ်ခါတည်း တင်မည့် Target File ရွေးချယ်မှု -->
+      <div class="field-box" style="border-color:rgba(167,139,250,.25)">
+        <span style="font-weight:700;color:var(--violet);font-size:12px;display:block;margin-bottom:10px">
+          အဆင့် (၂) - GitHub ပေါ်သို့ တစ်ပြိုင်နက် သိမ်းဆည်းမည့် File သတ်မှတ်ပါ
+        </span>
+        <label class="field-label">Target File</label>
+        <select id="modalTargetFile" class="select" style="width:100%;margin-bottom:10px" onchange="handleTargetFileChange()">
           <option value="sub.txt">Main Pool (sub.txt)</option>
           <option value="fast-sub.txt">Curated Fast Sub (fast-sub.txt)</option>
           <option value="__new__">＋ Create New Sub File (ဖိုင်အသစ် သီးသန့်ဆောက်မည်)...</option>
         </select>
-      </div>
-      
-      <!-- ဖိုင်အသစ်နာမည် ရိုက်ထည့်ရန် ကွက်လပ် -->
-      <div id="newFileNameContainer" style="display:none;background:#101726;padding:12px;border-radius:12px;border:1px solid rgba(167,139,250,.3)">
-        <label class="field-label" style="color:var(--violet)">New Sub File Name (.txt)</label>
-        <div style="display:flex;align-items:center;gap:6px">
-          <input type="text" id="customNewFileName" placeholder="vip-sub" class="custom-input" style="width:100%;color:#fff">
-          <span style="color:var(--muted);font-family:monospace;font-size:12px">.txt</span>
+
+        <div id="newFileNameContainer" style="display:none;margin-bottom:10px">
+          <label class="field-label" style="color:var(--violet)">ဖိုင်အသစ် အမည်ရိုက်ထည့်ပါ (.txt)</label>
+          <div style="display:flex;align-items:center;gap:6px">
+            <input type="text" id="customNewFileName" placeholder="vip-sub" class="custom-input" style="width:100%">
+            <span style="color:var(--muted);font-family:monospace;font-size:12px">.txt</span>
+          </div>
         </div>
-        <small style="color:var(--muted);font-size:10px;margin-top:4px;display:block">ဥပမာ- vip-sub, my-nodes (နောက်က .txt ထည့်ရန်မလိုပါ)</small>
+
+        <button class="primary" id="modalPushBtn" onclick="submitBatchToGithub()" style="width:100%;background:linear-gradient(105deg,#a78bfa,#6be7f4);color:#08131a;padding:12px">
+          <i class="fa-solid fa-cloud-arrow-up mr-1"></i> အားလုံးကို GitHub ပေါ်သို့ တင်မည် (Save All to GitHub)
+        </button>
       </div>
 
-      <div id="modalLinkResult" style="display:none;background:#131b2e;padding:12px;border-radius:12px;border:1px solid rgba(107,231,244,.2)">
-        <span style="font-size:11px;color:var(--green);font-weight:700;display:block;margin-bottom:6px"><i class="fa-solid fa-circle-check mr-1"></i> Uploaded Successfully! Subscription Link:</span>
+      <!-- Subscription Link ရလဒ် ထုတ်ပေးသည့် Box -->
+      <div id="modalLinkResult" style="display:none;background:#101a2c;padding:14px;border-radius:14px;border:1px solid rgba(107,231,244,.3)">
+        <span style="font-size:12px;color:var(--green);font-weight:700;display:block;margin-bottom:6px">
+          <i class="fa-solid fa-circle-check mr-1"></i> GitHub ပေါ် အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ! Subscription Link:
+        </span>
         <div style="display:flex;gap:6px">
           <input type="text" id="modalGeneratedLink" readonly class="custom-input" style="color:var(--cyan)">
           <button class="primary" onclick="copyLink('modalGeneratedLink')" style="padding:6px 12px">Copy Link</button>
         </div>
       </div>
-    </div>
-    <div class="modal-foot">
-      <button class="ghost" onclick="closeCustomModal()">Cancel</button>
-      <button class="primary" id="modalPushBtn" onclick="submitCustomNodesToGithub()"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Save & Push to GitHub</button>
     </div>
   </div>
 </div>
@@ -372,6 +403,7 @@ const REPO = "ai-vpn";
 const WORKFLOW_ID = "main.yml";
 const PING_THRESHOLD = 100;
 let parsedNodes = [];
+let stagedQueue = []; // စုစည်းထားသော Local Node Queue စာရင်း
 
 const COUNTRY_FLAGS = {
   'SG': '🇸🇬', 'HK': '🇭🇰', 'IN': '🇮🇳', 'ID': '🇮🇩', 'JP': '🇯🇵',
@@ -395,27 +427,192 @@ function toast(msg){
 function scrollToNodes(){ document.getElementById('nodesPanel').scrollIntoView({ behavior: 'smooth' }); }
 function scrollToConfig(){ document.getElementById('configSection').scrollIntoView({ behavior: 'smooth' }); }
 
-function handleTargetFileChange() {
-  const val = document.getElementById("modalTargetFile").value;
-  const newNameBox = document.getElementById("newFileNameContainer");
-  if (val === "__new__") {
-    newNameBox.style.display = "block";
-    document.getElementById("customNewFileName").focus();
-  } else {
-    newNameBox.style.display = "none";
-  }
-}
-
 function openCustomModal(){
   document.getElementById("customModal").classList.add("open");
   document.getElementById("modalLinkResult").style.display = "none";
-  document.getElementById("modalTargetFile").value = "sub.txt";
-  document.getElementById("newFileNameContainer").style.display = "none";
-  document.getElementById("customNewFileName").value = "";
+  renderQueueUI();
 }
 
 function closeCustomModal(){
   document.getElementById("customModal").classList.remove("open");
+}
+
+function handleTargetFileChange() {
+  const val = document.getElementById("modalTargetFile").value;
+  document.getElementById("newFileNameContainer").style.display = (val === "__new__") ? "block" : "none";
+}
+
+// ၁။ Node တစ်ခုချင်းစီ စိတ်ကြိုက်နာမည်ဖြင့် Local Queue ထဲ ထည့်သွင်းခြင်း
+function addNodeToQueue() {
+  const nameInput = document.getElementById("stageNodeName");
+  const uriInput = document.getElementById("stageNodeUri");
+
+  const customName = nameInput.value.trim();
+  const rawUri = uriInput.value.trim();
+
+  if (!rawUri || !rawUri.includes('://')) {
+    toast("မှန်ကန်သော Node Config (vless, vmess, trojan, etc.) ကို ထည့်ပေးပါ!");
+    return;
+  }
+
+  // စိတ်ကြိုက်နာမည် တပ်ဆင်ခြင်း
+  let finalUri = rawUri;
+  if (customName) {
+    try {
+      if (rawUri.startsWith('vmess://')) {
+        const rawB64 = rawUri.replace(/^vmess:\/\//i, '').trim();
+        const json = JSON.parse(atob(rawB64));
+        json.ps = customName;
+        finalUri = 'vmess://' + btoa(JSON.stringify(json));
+      } else {
+        finalUri = `${rawUri.split('#')[0]}#${encodeURIComponent(customName)}`;
+      }
+    } catch(e) {
+      finalUri = rawUri;
+    }
+  }
+
+  stagedQueue.push({
+    name: customName || `Custom-Node-${stagedQueue.length + 1}`,
+    uri: finalUri
+  });
+
+  // Input Box များကို Clear လုပ်ပြီး Focus ပြန်ပေးခြင်း
+  nameInput.value = "";
+  uriInput.value = "";
+  nameInput.focus();
+
+  renderQueueUI();
+  toast(`Node ထည့်ပြီးပါပြီ! (စုစုပေါင်း ${stagedQueue.length} ခု)`);
+}
+
+function removeQueueItem(index) {
+  stagedQueue.splice(index, 1);
+  renderQueueUI();
+}
+
+function clearQueue() {
+  stagedQueue = [];
+  renderQueueUI();
+}
+
+// Queue စာရင်း UI ဆွဲခြင်း
+function renderQueueUI() {
+  const container = document.getElementById("queueList");
+  const countEl = document.getElementById("stagedCount");
+  countEl.innerText = stagedQueue.length;
+
+  if (stagedQueue.length === 0) {
+    container.innerHTML = `
+      <div style="padding:18px;text-align:center;color:var(--muted);font-size:11px">
+        Node မရှိသေးပါ။ အပေါ်ကနေ တစ်ခုချင်းစီ ရိုက်ထည့်ပြီး "စာရင်းထဲသို့ ထည့်မည်" ကို နှိပ်ပါ။
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = stagedQueue.map((item, idx) => `
+    <div class="queue-item">
+      <div>
+        <strong style="color:#edf2ff;display:block">${item.name}</strong>
+        <span style="font-family:monospace;font-size:10px;color:var(--muted)">${item.uri.substring(0, 38)}...</span>
+      </div>
+      <button class="small-btn" onclick="removeQueueItem(${idx})" style="color:var(--red)" title="ဖျက်မည်">
+        <i class="fa-solid fa-trash-can"></i>
+      </button>
+    </div>
+  `).join('');
+}
+
+// ၂။ စုဆောင်းထားသော Node အားလုံးကို GitHub သို့ တစ်ပြိုင်နက် Push တင်ခြင်း
+async function submitBatchToGithub() {
+  const token = document.getElementById("tokenInput").value.trim();
+  if (!token) {
+    toast("Dashboard ရှိ GitHub PAT Token ကို အရင်ဖြည့်ပေးပါ!");
+    return;
+  }
+  localStorage.setItem("gh_token", token);
+
+  if (stagedQueue.length === 0) {
+    toast("စာရင်းထဲတွင် ထည့်ထားသော Node တစ်ခုမှ မရှိသေးပါ!");
+    return;
+  }
+
+  const selectedTarget = document.getElementById("modalTargetFile").value;
+  let targetFile = selectedTarget;
+
+  if (selectedTarget === "__new__") {
+    let inputName = document.getElementById("customNewFileName").value.trim();
+    if (!inputName) {
+      toast("ဖိုင်အသစ်နာမည်ကို ရိုက်ထည့်ပေးပါ!");
+      return;
+    }
+    if (!inputName.endsWith(".txt")) inputName += ".txt";
+    targetFile = inputName.replace(/[^a-zA-Z0-9_\-\.]/g, "-");
+  }
+
+  const pushBtn = document.getElementById("modalPushBtn");
+  pushBtn.disabled = true;
+  pushBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> GitHub ပေါ်သို့ တင်နေပါသည်...`;
+
+  try {
+    let existingNodes = [];
+    let sha = null;
+
+    try {
+      const getRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${targetFile}`, {
+        headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" }
+      });
+      if (getRes.ok) {
+        const data = await getRes.json();
+        sha = data.sha;
+        const decoded = atob(data.content.trim().replace(/\s+/g, ''));
+        existingNodes = decoded.split(/[\r\n]+/).filter(l => l.includes('://'));
+      }
+    } catch(e) {}
+
+    const newUris = stagedQueue.map(item => item.uri);
+    const mergedList = Array.from(new Set([...newUris, ...existingNodes]));
+    const base64Content = btoa(mergedList.join('\n'));
+
+    const putRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${targetFile}`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: `Add ${newUris.length} custom node(s) to ${targetFile}`,
+        content: base64Content,
+        branch: "main",
+        ...(sha ? { sha } : {})
+      })
+    });
+
+    if (putRes.ok) {
+      const finalRawUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${targetFile}`;
+      document.getElementById("modalGeneratedLink").value = finalRawUrl;
+      document.getElementById("modalLinkResult").style.display = "block";
+      toast(`Node ${newUris.length} ခုလုံးကို "${targetFile}" သို့ တင်ပြီးပါပြီ!`);
+
+      // Queue ရှင်းလင်းခြင်း
+      stagedQueue = [];
+      renderQueueUI();
+
+      if (targetFile === "sub.txt") {
+        setTimeout(fetchAndParseNodes, 1200);
+      }
+    } else {
+      const err = await putRes.json();
+      toast(`GitHub Error: ${err.message}`);
+    }
+  } catch(err) {
+    toast(`Operation failed: ${err.message}`);
+  } finally {
+    pushBtn.disabled = false;
+    pushBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> အားလုံးကို GitHub ပေါ်သို့ တင်မည် (Save All to GitHub)`;
+  }
 }
 
 function parseProtocolAndHost(uri, idx) {
@@ -579,7 +776,6 @@ function filterNodes() {
 }
 
 // Latency စစ်ဆေးခြင်း: www.gstatic.com/generate_204
-// Speed test: speed.cloudflare.com
 async function testSingleNode(node) {
   const pingStart = performance.now();
   let pingOk = false;
@@ -741,120 +937,6 @@ async function saveFastSubToGithub() {
   } finally {
     btn.disabled = false;
     btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> Save Selected to fast-sub.txt`;
-  }
-}
-
-// Custom Node များကို စိတ်ကြိုက်ဖိုင်အသစ်ဖြင့်ဖြစ်စေ၊ ရှိပြီးသားဖိုင်ဖြင့်ဖြစ်စေ Push လုပ်ပြီး Link ထုတ်ပေးခြင်း
-async function submitCustomNodesToGithub() {
-  const token = document.getElementById("tokenInput").value.trim();
-  if (!token) {
-    toast("Please enter your GitHub PAT token in the Dashboard first!");
-    return;
-  }
-  localStorage.setItem("gh_token", token);
-
-  const rawUris = document.getElementById("modalCustomUris").value.trim();
-  const customName = document.getElementById("modalCustomName").value.trim();
-  const selectedTarget = document.getElementById("modalTargetFile").value;
-  const pushBtn = document.getElementById("modalPushBtn");
-
-  let targetFile = selectedTarget;
-  if (selectedTarget === "__new__") {
-    let inputName = document.getElementById("customNewFileName").value.trim();
-    if (!inputName) {
-      toast("Please enter a name for the new sub file!");
-      return;
-    }
-    if (!inputName.endsWith(".txt")) {
-      inputName += ".txt";
-    }
-    targetFile = inputName.replace(/[^a-zA-Z0-9_\-\.]/g, "-");
-  }
-
-  if (!rawUris) {
-    toast("Please enter at least one node URI!");
-    return;
-  }
-
-  const lines = rawUris.split(/[\r\n]+/).map(l => l.trim()).filter(l => l.includes('://'));
-  if (lines.length === 0) {
-    toast("No valid node URIs found (e.g. vless://, vmess://, etc.)!");
-    return;
-  }
-
-  const formattedUris = lines.map((uri, idx) => {
-    if (!customName) return uri;
-    const finalLabel = lines.length > 1 ? `${customName}-${idx + 1}` : customName;
-    try {
-      if (uri.startsWith('vmess://')) {
-        const rawB64 = uri.replace(/^vmess:\/\//i, '').trim();
-        const json = JSON.parse(atob(rawB64));
-        json.ps = finalLabel;
-        return 'vmess://' + btoa(JSON.stringify(json));
-      }
-      return `${uri.split('#')[0]}#${encodeURIComponent(finalLabel)}`;
-    } catch(e) {
-      return uri;
-    }
-  });
-
-  pushBtn.disabled = true;
-  pushBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Saving to GitHub...`;
-
-  try {
-    let existingNodes = [];
-    let sha = null;
-
-    try {
-      const getRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${targetFile}`, {
-        headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" }
-      });
-      if (getRes.ok) {
-        const data = await getRes.json();
-        sha = data.sha;
-        const decoded = atob(data.content.trim().replace(/\s+/g, ''));
-        existingNodes = decoded.split(/[\r\n]+/).filter(l => l.includes('://'));
-      }
-    } catch(e) {}
-
-    const mergedList = Array.from(new Set([...formattedUris, ...existingNodes]));
-    const base64Content = btoa(mergedList.join('\n'));
-
-    const putPayload = {
-      message: `Add ${formattedUris.length} custom node(s) to ${targetFile}`,
-      content: base64Content,
-      branch: "main"
-    };
-    if (sha) putPayload.sha = sha;
-
-    const putRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${targetFile}`, {
-      method: "PUT",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Accept": "application/vnd.github+json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(putPayload)
-    });
-
-    if (putRes.ok) {
-      const finalRawUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${targetFile}`;
-      document.getElementById("modalGeneratedLink").value = finalRawUrl;
-      document.getElementById("modalLinkResult").style.display = "block";
-      toast(`Successfully saved to "${targetFile}"!`);
-
-      if (targetFile === "sub.txt") {
-        setTimeout(fetchAndParseNodes, 1200);
-      }
-    } else {
-      const err = await putRes.json();
-      toast(`GitHub Error: ${err.message}`);
-    }
-  } catch(err) {
-    toast(`Operation failed: ${err.message}`);
-  } finally {
-    pushBtn.disabled = false;
-    pushBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> Save & Push to GitHub`;
   }
 }
 
