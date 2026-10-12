@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VPN Dashboard</title>
+  <title>VPN Hub</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,19 +20,18 @@
             mono: ['SF Mono', 'JetBrains Mono', 'Menlo', 'monospace'],
           },
           colors: {
-            mac: {
-              base: '#000000',
-              panel: '#121214',
-              sub: '#1c1c1e',
+            island: {
+              bg: '#000000',
+              card: '#161618',
+              cardSub: '#202024',
               border: 'rgba(255, 255, 255, 0.08)',
               hover: 'rgba(255, 255, 255, 0.04)',
               blue: '#0a84ff',
-              blueHover: '#0071e3',
               green: '#30d158',
-              amber: '#ff9f0a',
+              orange: '#ff9f0a',
               text: '#ffffff',
-              muted: '#86868b',
-              dim: '#545458'
+              muted: '#8e8e93',
+              dim: '#48484a'
             }
           }
         }
@@ -41,185 +40,192 @@
   </script>
 
   <style>
-    html, body {
-      height: 100vh;
-      overflow: hidden; /* Screen မရွေ့အောင် Main Page Scroll အပြည့်ဖျောက်ထားပါသည် */
-      background-color: #000000;
+    body {
+      background-color: #09090b;
       color: #ffffff;
       -webkit-font-smoothing: antialiased;
     }
-    .panel-scroll::-webkit-scrollbar {
+    .custom-scroll::-webkit-scrollbar {
       width: 4px;
     }
-    .panel-scroll::-webkit-scrollbar-track {
+    .custom-scroll::-webkit-scrollbar-track {
       background: transparent;
     }
-    .panel-scroll::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.15);
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.16);
       border-radius: 9999px;
     }
   </style>
 </head>
-<body class="flex flex-col p-3 sm:p-4 selection:bg-mac-blue/30 selection:text-white">
+<body class="min-h-screen flex items-center justify-center p-3 sm:p-6 selection:bg-island-blue/30 selection:text-white">
 
-  <!-- Top Single Bar Header -->
-  <header class="h-11 bg-mac-panel border border-mac-border rounded-xl px-4 flex items-center justify-between flex-shrink-0 mb-3">
-    <div class="flex items-center gap-3">
-      <div class="flex items-center gap-1.5">
-        <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f56]"></span>
-        <span class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]"></span>
-        <span class="w-2.5 h-2.5 rounded-full bg-[#27c93f]"></span>
+  <!-- Floating Compact Island Container -->
+  <div class="w-full max-w-[680px] bg-island-card border border-island-border rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
+
+    <!-- Top Compact Header -->
+    <div class="flex items-center justify-between pb-3 border-b border-island-border">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-island-cardSub border border-island-border flex items-center justify-center text-island-blue">
+          <i class="fa-solid fa-shield-halved text-xs"></i>
+        </div>
+        <div>
+          <h1 class="text-xs font-semibold text-white tracking-tight">AI-VPN Core Hub</h1>
+          <p class="text-[11px] text-island-muted">Automated Node Aggregation & Benchmark</p>
+        </div>
       </div>
-      <span class="text-xs font-semibold tracking-tight text-white pl-2 border-l border-mac-border">AI-VPN Core</span>
-      <span class="text-[10px] text-mac-muted font-mono">Edge Dashboard</span>
+
+      <!-- Quick Metrics Pills -->
+      <div class="flex items-center gap-1.5 text-xs font-mono">
+        <div class="bg-island-cardSub px-2.5 py-1 rounded-full border border-island-border flex items-center gap-1.5">
+          <span class="text-island-muted text-[10px] font-sans">Pool</span>
+          <span id="selectedCount" class="font-semibold text-island-blue">0</span>
+          <span class="text-island-dim">/</span>
+          <span id="nodeCount" class="text-island-muted">0</span>
+        </div>
+        <div class="bg-island-cardSub px-2.5 py-1 rounded-full border border-island-border flex items-center gap-1.5">
+          <span class="text-island-muted text-[10px] font-sans">Ping</span>
+          <span id="bestPing" class="font-semibold text-island-green">-- ms</span>
+        </div>
+      </div>
     </div>
 
-    <!-- Metrics Status -->
-    <div class="flex items-center gap-2 text-xs font-mono">
-      <div class="bg-mac-sub px-2.5 py-1 rounded-lg border border-mac-border flex items-center gap-1.5">
-        <span class="text-mac-muted text-[10px] font-sans">Active</span>
-        <span id="selectedCount" class="font-bold text-mac-blue">0</span>
-        <span class="text-mac-dim">/</span>
-        <span id="nodeCount" class="text-mac-muted">0</span>
-      </div>
-      <div class="bg-mac-sub px-2.5 py-1 rounded-lg border border-mac-border flex items-center gap-1.5">
-        <span class="text-mac-muted text-[10px] font-sans">Latency</span>
-        <span id="bestPing" class="font-bold text-mac-green">-- ms</span>
-      </div>
+    <!-- Segmented View Switcher (Dashboard / Nodes Pool) -->
+    <div class="grid grid-cols-2 p-1 bg-island-cardSub border border-island-border rounded-xl text-xs font-medium">
+      <button onclick="switchView('overview')" id="btnTabOverview" class="py-1.5 rounded-lg bg-island-card text-white shadow-sm transition">
+        <i class="fa-solid fa-sliders text-[10px] mr-1.5"></i> Overview & Links
+      </button>
+      <button onclick="switchView('nodes')" id="btnTabNodes" class="py-1.5 rounded-lg text-island-muted hover:text-white transition">
+        <i class="fa-solid fa-list-check text-[10px] mr-1.5"></i> Node Selection Pool
+      </button>
     </div>
-  </header>
 
-  <!-- 100% Height Non-Scrollable Split Workspace -->
-  <main class="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1 min-h-0">
-    
-    <!-- Left Column: Controls (Col Span 4) -->
-    <section class="lg:col-span-4 bg-mac-panel border border-mac-border rounded-xl p-4 flex flex-col justify-between overflow-hidden">
+    <!-- VIEW 1: Overview, Sub Links & Controls -->
+    <div id="viewOverview" class="space-y-3.5">
       
-      <div class="space-y-3">
-        <!-- 1. All Nodes sub.txt -->
+      <!-- Sub URLs Compact Box -->
+      <div class="bg-island-cardSub/60 border border-island-border rounded-2xl p-3.5 space-y-2.5">
+        
+        <!-- sub.txt -->
         <div class="space-y-1">
           <div class="flex justify-between items-center text-[11px]">
-            <span class="text-mac-muted font-medium flex items-center gap-1.5">
-              <i class="fa-solid fa-layer-group text-[10px]"></i> Main Sub (50 Pool)
+            <span class="text-island-muted font-medium flex items-center gap-1">
+              <i class="fa-solid fa-globe text-[10px]"></i> Main Sub (50 Nodes Pool)
             </span>
-            <span class="text-mac-dim font-mono text-[10px]">sub.txt</span>
+            <span class="text-island-dim font-mono text-[10px]">sub.txt</span>
           </div>
-          <div class="flex items-center gap-1.5 bg-mac-sub border border-mac-border rounded-lg p-1">
+          <div class="flex items-center gap-2 bg-island-card border border-island-border rounded-xl p-1.5">
             <input type="text" id="officialSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt"
-              class="w-full bg-transparent border-0 px-2 text-[11px] text-mac-muted font-mono truncate select-all focus:outline-none">
-            <button onclick="copyLink('officialSubUrl', 'copyOfficialBtn')" class="bg-white/10 hover:bg-white/20 text-white px-2.5 py-1 rounded text-[10px] font-medium transition active:scale-95 flex items-center gap-1 flex-shrink-0">
-              <i class="fa-regular fa-copy"></i>
+              class="w-full bg-transparent border-0 px-2 text-[11px] text-island-muted font-mono truncate select-all focus:outline-none">
+            <button onclick="copyLink('officialSubUrl', 'copyOfficialBtn')" class="bg-white/5 hover:bg-white/10 text-white px-2.5 py-1 rounded-lg text-[11px] font-medium transition active:scale-95 flex items-center gap-1 flex-shrink-0">
+              <i class="fa-regular fa-copy text-[10px]"></i>
               <span id="copyOfficialBtn">Copy</span>
             </button>
           </div>
         </div>
 
-        <!-- 2. Fast Nodes fast-sub.txt -->
+        <!-- fast-sub.txt -->
         <div class="space-y-1">
           <div class="flex justify-between items-center text-[11px]">
-            <span class="text-mac-blue font-medium flex items-center gap-1.5">
-              <i class="fa-solid fa-bolt text-[10px]"></i> Fast Sub (Selected Pool)
+            <span class="text-island-blue font-medium flex items-center gap-1">
+              <i class="fa-solid fa-bolt text-[10px]"></i> Fast Sub (Custom Benchmarked)
             </span>
-            <span class="text-mac-blue/60 font-mono text-[10px]">fast-sub.txt</span>
+            <span class="text-island-blue/60 font-mono text-[10px]">fast-sub.txt</span>
           </div>
-          <div class="flex items-center gap-1.5 bg-mac-sub border border-mac-border rounded-lg p-1">
+          <div class="flex items-center gap-2 bg-island-card border border-island-border rounded-xl p-1.5">
             <input type="text" id="fastSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/fast-sub.txt"
-              class="w-full bg-transparent border-0 px-2 text-[11px] text-mac-blue font-mono truncate select-all focus:outline-none">
-            <button onclick="copyLink('fastSubUrl', 'copyFastBtn')" class="bg-mac-blue/20 hover:bg-mac-blue/30 text-mac-blue px-2.5 py-1 rounded text-[10px] font-medium transition active:scale-95 flex items-center gap-1 flex-shrink-0">
-              <i class="fa-regular fa-copy"></i>
+              class="w-full bg-transparent border-0 px-2 text-[11px] text-island-blue font-mono truncate select-all focus:outline-none">
+            <button onclick="copyLink('fastSubUrl', 'copyFastBtn')" class="bg-island-blue/15 hover:bg-island-blue/25 text-island-blue px-2.5 py-1 rounded-lg text-[11px] font-medium transition active:scale-95 flex items-center gap-1 flex-shrink-0">
+              <i class="fa-regular fa-copy text-[10px]"></i>
               <span id="copyFastBtn">Copy</span>
             </button>
           </div>
         </div>
 
-        <!-- PAT Key Input -->
-        <div class="space-y-1 pt-1">
-          <label class="text-[11px] text-mac-muted font-medium flex items-center gap-1.5">
-            <i class="fa-solid fa-key text-[10px]"></i> GitHub PAT Token
-          </label>
-          <div class="relative">
-            <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" 
-              class="w-full bg-mac-sub border border-mac-border rounded-lg pl-2.5 pr-8 py-1.5 text-xs text-white placeholder-mac-dim focus:outline-none focus:border-mac-blue font-mono">
-            <button type="button" onclick="toggleTokenVisibility()" class="absolute right-2.5 top-2 text-mac-dim hover:text-white">
-              <i id="eyeIcon" class="fa-regular fa-eye text-xs"></i>
-            </button>
-          </div>
-        </div>
+      </div>
 
-        <!-- Buttons Grid -->
-        <div class="grid grid-cols-2 gap-2 pt-1">
-          <button onclick="triggerGithubUpdate()" id="updateBtn"
-            class="bg-mac-sub hover:bg-white/10 border border-mac-border text-white font-medium py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 active:scale-95 transition">
-            <i id="btnIcon" class="fa-solid fa-rotate text-[11px]"></i>
-            <span>Action Scrape</span>
+      <!-- Token Input -->
+      <div class="space-y-1">
+        <label class="text-[11px] text-island-muted font-medium flex items-center gap-1.5">
+          <i class="fa-solid fa-key text-[10px]"></i> GitHub Token (PAT)
+        </label>
+        <div class="relative">
+          <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" 
+            class="w-full bg-island-cardSub border border-island-border rounded-xl pl-3 pr-8 py-2 text-xs text-white placeholder-island-dim focus:outline-none focus:border-island-blue font-mono transition">
+          <button type="button" onclick="toggleTokenVisibility()" class="absolute right-2.5 top-2.5 text-island-dim hover:text-white">
+            <i id="eyeIcon" class="fa-regular fa-eye text-xs"></i>
           </button>
-
-          <button onclick="runBenchmarkAll()" id="benchmarkBtn"
-            class="bg-mac-blue hover:bg-mac-blueHover text-white font-medium py-2 rounded-lg text-xs flex items-center justify-center gap-1.5 active:scale-95 transition">
-            <i id="testIcon" class="fa-solid fa-gauge text-[11px]"></i>
-            <span>Benchmark</span>
-          </button>
-        </div>
-
-        <!-- Save to fast-sub.txt -->
-        <button onclick="saveFastSubToGithub()" id="saveFastBtn"
-          class="w-full bg-mac-sub hover:bg-white/10 border border-mac-border text-white font-medium py-2 rounded-lg text-xs flex items-center justify-center gap-2 active:scale-95 transition">
-          <i id="saveFastIcon" class="fa-solid fa-cloud-arrow-up text-mac-blue text-[11px]"></i>
-          <span id="saveFastText">Save to fast-sub.txt</span>
-        </button>
-
-        <!-- Dynamic Status Bar -->
-        <div id="statusBox" class="hidden p-2 rounded-lg text-[11px] flex items-center gap-2 border">
-          <i id="statusIcon" class="fa-solid fa-info text-[10px]"></i>
-          <span id="statusMessage" class="truncate font-medium"></span>
         </div>
       </div>
 
+      <!-- Action Buttons Grid -->
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="triggerGithubUpdate()" id="updateBtn"
+          class="bg-island-cardSub hover:bg-white/10 border border-island-border text-white font-medium py-2 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+          <i id="btnIcon" class="fa-solid fa-rotate text-[11px]"></i>
+          <span>Scrape Actions</span>
+        </button>
+
+        <button onclick="runBenchmarkAll()" id="benchmarkBtn"
+          class="bg-island-blue hover:bg-island-blue/90 text-white font-medium py-2 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition shadow-sm">
+          <i id="testIcon" class="fa-solid fa-stopwatch text-[11px]"></i>
+          <span>Test Latency</span>
+        </button>
+      </div>
+
+      <!-- Save to fast-sub.txt -->
+      <button onclick="saveFastSubToGithub()" id="saveFastBtn"
+        class="w-full bg-island-cardSub hover:bg-white/10 border border-island-border text-white font-medium py-2 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+        <i id="saveFastIcon" class="fa-solid fa-cloud-arrow-up text-island-blue text-[11px]"></i>
+        <span id="saveFastText">Save Selected to fast-sub.txt</span>
+      </button>
+
+      <!-- Status Toast Message -->
+      <div id="statusBox" class="hidden p-2.5 rounded-xl text-xs flex items-center gap-2 border">
+        <i id="statusIcon" class="fa-solid fa-info text-[10px]"></i>
+        <span id="statusMessage" class="truncate font-medium text-[11px]"></span>
+      </div>
+
       <!-- External Key Input -->
-      <div class="pt-2 border-t border-mac-border space-y-1.5">
-        <span class="text-[10px] text-mac-muted font-medium">Add External VLESS Key</span>
-        <div class="flex gap-1.5">
+      <div class="pt-2 border-t border-island-border space-y-1">
+        <label class="text-[11px] text-island-muted font-medium">Add External VLESS Key</label>
+        <div class="flex gap-2">
           <input type="text" id="customNodeInput" placeholder="vless://..."
-            class="w-full bg-mac-sub border border-mac-border rounded-lg px-2 py-1.5 text-xs text-white placeholder-mac-dim focus:outline-none focus:border-mac-blue font-mono">
-          <button onclick="addCustomNode()" class="bg-mac-sub hover:bg-white/10 border border-mac-border text-white px-3 py-1.5 rounded-lg text-xs font-medium active:scale-95 transition">
+            class="w-full bg-island-cardSub border border-island-border rounded-xl px-2.5 py-1.5 text-xs text-white placeholder-island-dim focus:outline-none focus:border-island-blue font-mono transition">
+          <button onclick="addCustomNode()" class="bg-island-cardSub hover:bg-white/10 border border-island-border text-white px-3 py-1.5 rounded-xl text-xs font-medium active:scale-95 transition">
             Add
           </button>
         </div>
       </div>
 
-    </section>
+    </div>
 
-    <!-- Right Column: Node Selection Pool (Col Span 8) -->
-    <section class="lg:col-span-8 bg-mac-panel border border-mac-border rounded-xl p-3 flex flex-col overflow-hidden min-h-0">
+    <!-- VIEW 2: Node Selection List (Clean Compact List) -->
+    <div id="viewNodes" class="hidden space-y-3">
       
-      <!-- Toolbar -->
-      <div class="flex items-center justify-between pb-2.5 border-b border-mac-border flex-shrink-0">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-semibold text-white">Nodes Pool</span>
-          <span class="text-[10px] text-mac-dim font-mono">(Click icon to copy)</span>
-        </div>
+      <!-- List Toolbar -->
+      <div class="flex items-center justify-between pb-2 border-b border-island-border">
+        <span class="text-xs font-medium text-white">Active Nodes</span>
 
-        <!-- Apple Style Filter Pills -->
-        <div class="flex items-center gap-1 bg-mac-sub p-1 rounded-lg border border-mac-border text-[10px]">
+        <div class="flex items-center gap-1 bg-island-cardSub p-1 rounded-lg border border-island-border text-[10px]">
           <button onclick="selectPreset('all')" class="hover:bg-white/10 text-white px-2 py-0.5 rounded transition">All</button>
-          <button onclick="selectPreset('good')" class="hover:bg-white/10 text-mac-blue px-2 py-0.5 rounded transition">&lt; 350ms</button>
-          <button onclick="selectPreset('none')" class="hover:bg-white/10 text-mac-muted px-2 py-0.5 rounded transition">Clear</button>
-          <button onclick="fetchAndParseNodes()" title="Reload list" class="text-mac-muted hover:text-white px-1.5 py-0.5 rounded transition">
-            <i class="fa-solid fa-rotate-right text-[10px]"></i>
+          <button onclick="selectPreset('good')" class="hover:bg-white/10 text-island-blue px-2 py-0.5 rounded transition">&lt; 350ms</button>
+          <button onclick="selectPreset('none')" class="hover:bg-white/10 text-island-muted px-2 py-0.5 rounded transition">Clear</button>
+          <button onclick="fetchAndParseNodes()" title="Reload from GitHub" class="text-island-muted hover:text-white px-1.5 py-0.5 rounded transition">
+            <i class="fa-solid fa-arrow-rotate-right text-[10px]"></i>
           </button>
         </div>
       </div>
 
-      <!-- Internal Scrollable Node List (Main Page doesn't scroll) -->
-      <div id="nodeListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-2 overflow-y-auto panel-scroll flex-1 content-start pr-1">
-        <div class="col-span-full text-center py-24 text-xs text-mac-dim">
+      <!-- Nodes Scrollable Area -->
+      <div id="nodeListContainer" class="space-y-1.5 max-h-[380px] overflow-y-auto pr-1 custom-scroll">
+        <div class="text-center py-20 text-xs text-island-dim">
           <i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Loading active nodes...
         </div>
       </div>
 
-    </section>
+    </div>
 
-  </main>
+  </div>
 
   <script>
     const OWNER = "Thuzinheine";
@@ -228,6 +234,25 @@
     let parsedNodes = [];
 
     document.getElementById("tokenInput").value = localStorage.getItem("gh_token") || "";
+
+    function switchView(tab) {
+      const viewOverview = document.getElementById("viewOverview");
+      const viewNodes = document.getElementById("viewNodes");
+      const btnTabOverview = document.getElementById("btnTabOverview");
+      const btnTabNodes = document.getElementById("btnTabNodes");
+
+      if (tab === 'overview') {
+        viewOverview.classList.remove("hidden");
+        viewNodes.classList.add("hidden");
+        btnTabOverview.className = "py-1.5 rounded-lg bg-island-card text-white shadow-sm transition";
+        btnTabNodes.className = "py-1.5 rounded-lg text-island-muted hover:text-white transition";
+      } else {
+        viewOverview.classList.add("hidden");
+        viewNodes.classList.remove("hidden");
+        btnTabNodes.className = "py-1.5 rounded-lg bg-island-card text-white shadow-sm transition";
+        btnTabOverview.className = "py-1.5 rounded-lg text-island-muted hover:text-white transition";
+      }
+    }
 
     function toggleTokenVisibility() {
       const input = document.getElementById("tokenInput");
@@ -246,16 +271,16 @@
       const msg = document.getElementById("statusMessage");
       const icon = document.getElementById("statusIcon");
 
-      box.className = "p-2 rounded-lg text-[11px] flex items-center gap-2 border ";
+      box.className = "p-2.5 rounded-xl text-xs flex items-center gap-2 border ";
       if (type === "success") {
-        box.classList.add("bg-mac-sub", "border-mac-green/30", "text-mac-green");
-        icon.className = "fa-solid fa-check text-[10px] text-mac-green";
+        box.classList.add("bg-island-cardSub", "border-island-green/30", "text-island-green");
+        icon.className = "fa-solid fa-check text-[10px] text-island-green";
       } else if (type === "error") {
-        box.classList.add("bg-mac-sub", "border-rose-500/30", "text-rose-400");
+        box.classList.add("bg-island-cardSub", "border-rose-500/30", "text-rose-400");
         icon.className = "fa-solid fa-circle-exclamation text-[10px] text-rose-400";
       } else {
-        box.classList.add("bg-mac-sub", "border-mac-border", "text-mac-muted");
-        icon.className = "fa-solid fa-circle-notch fa-spin text-[10px] text-mac-blue";
+        box.classList.add("bg-island-cardSub", "border-island-border", "text-island-muted");
+        icon.className = "fa-solid fa-circle-notch fa-spin text-[10px] text-island-blue";
       }
       msg.innerText = message;
       box.classList.remove("hidden");
@@ -263,7 +288,7 @@
 
     async function fetchAndParseNodes() {
       const listEl = document.getElementById("nodeListContainer");
-      listEl.innerHTML = `<div class="col-span-full text-center py-24 text-xs text-mac-dim"><i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Loading sub.txt...</div>`;
+      listEl.innerHTML = `<div class="text-center py-20 text-xs text-island-dim"><i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Loading sub.txt...</div>`;
       
       try {
         const url = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/sub.txt?t=${Date.now()}`;
@@ -288,43 +313,43 @@
         document.getElementById("nodeCount").innerText = parsedNodes.length;
         renderNodes();
       } catch (e) {
-        listEl.innerHTML = `<div class="col-span-full text-center py-24 text-xs text-rose-400">Unable to load sub.txt</div>`;
+        listEl.innerHTML = `<div class="text-center py-20 text-xs text-rose-400">Failed to load sub.txt</div>`;
       }
     }
 
     function renderNodes() {
       const listEl = document.getElementById("nodeListContainer");
       if (parsedNodes.length === 0) {
-        listEl.innerHTML = `<div class="col-span-full text-center py-24 text-xs text-mac-dim">No nodes available.</div>`;
+        listEl.innerHTML = `<div class="text-center py-20 text-xs text-island-dim">No nodes available.</div>`;
         return;
       }
 
       listEl.innerHTML = parsedNodes.map((n, i) => `
-        <div class="bg-mac-sub border ${n.selected ? 'border-mac-blue/40' : 'border-mac-border'} hover:border-white/20 px-2.5 py-1.5 rounded-lg flex items-center justify-between gap-2 transition h-[48px]">
-          <div class="flex items-center gap-2 min-w-0 flex-1">
+        <div class="bg-island-cardSub border ${n.selected ? 'border-island-blue/40' : 'border-island-border'} hover:border-white/20 px-3 py-2 rounded-xl flex items-center justify-between gap-2.5 transition">
+          <div class="flex items-center gap-2.5 min-w-0 flex-1">
             <input type="checkbox" ${n.selected ? 'checked' : ''} onchange="toggleSelect(${i})"
-              class="w-3.5 h-3.5 rounded bg-mac-panel border-mac-border text-mac-blue focus:ring-0 cursor-pointer accent-mac-blue">
+              class="w-3.5 h-3.5 rounded bg-island-card border-island-border text-island-blue focus:ring-0 cursor-pointer accent-island-blue">
             
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${n.ping ? (n.ping < 250 ? 'bg-mac-green' : 'bg-mac-amber') : 'bg-mac-dim'}"></span>
-                <h3 class="text-xs font-medium ${n.selected ? 'text-white' : 'text-mac-muted'} truncate">${n.name}</h3>
+                <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${n.ping ? (n.ping < 250 ? 'bg-island-green' : 'bg-island-orange') : 'bg-island-dim'}"></span>
+                <h3 class="text-xs font-medium ${n.selected ? 'text-white' : 'text-island-muted'} truncate">${n.name}</h3>
               </div>
-              <p class="text-[10px] text-mac-dim font-mono mt-0.5 truncate pl-3">${n.host}</p>
+              <p class="text-[10px] text-island-dim font-mono mt-0.5 truncate pl-3">${n.host}</p>
             </div>
           </div>
 
           <div class="flex items-center gap-2 flex-shrink-0">
             <div class="text-right font-mono">
-              <div class="text-[11px] font-medium ${n.ping ? (n.ping < 250 ? 'text-mac-green' : 'text-mac-amber') : 'text-mac-dim'}">
+              <div class="text-[11px] font-medium ${n.ping ? (n.ping < 250 ? 'text-island-green' : 'text-island-orange') : 'text-island-dim'}">
                 ${n.ping !== null ? n.ping + ' ms' : '-- ms'}
               </div>
-              <div class="text-[9px] text-mac-dim">
+              <div class="text-[9px] text-island-dim">
                 ${n.speed !== null ? n.speed + ' MB/s' : '-- MB/s'}
               </div>
             </div>
-            <button onclick="copySingleNode(${i})" title="Copy key" class="bg-white/5 hover:bg-white/15 text-mac-muted hover:text-white p-1 rounded text-xs active:scale-95 transition">
-              <i class="fa-regular fa-copy text-[11px]"></i>
+            <button onclick="copySingleNode(${i})" title="Copy key" class="bg-white/5 hover:bg-white/15 text-island-muted hover:text-white p-1 rounded-lg text-xs active:scale-95 transition">
+              <i class="fa-regular fa-copy text-[10px]"></i>
             </button>
           </div>
         </div>
@@ -437,7 +462,7 @@
       document.getElementById("bestPing").innerText = best !== 9999 ? `${best} ms` : "--";
 
       btn.disabled = false;
-      icon.className = "fa-solid fa-gauge text-[11px]";
+      icon.className = "fa-solid fa-stopwatch text-[11px]";
       showStatus("Benchmark Complete", "success");
     }
 
@@ -508,8 +533,8 @@
         showStatus("Network connection error", "error");
       } finally {
         saveBtn.disabled = false;
-        saveIcon.className = "fa-solid fa-cloud-arrow-up text-[11px] text-mac-blue";
-        saveText.innerText = "Save to fast-sub.txt";
+        saveIcon.className = "fa-solid fa-cloud-arrow-up text-[11px] text-island-blue";
+        saveText.innerText = "Save Selected to fast-sub.txt";
       }
     }
 
