@@ -1,18 +1,27 @@
 /**
- * update.js - NiREvil/vless Specialized Aggregator (ES Module)
+ * update.js - Universal Multi-Protocol Aggregator (ES Module)
+ * Protocols: VLESS, VMess, Trojan, Shadowsocks, Hysteria 2
  */
 import fs from 'node:fs';
 import https from 'node:https';
 import http from 'node:http';
 import net from 'node:net';
 
-// NiREvil/vless ၏ အဓိက Sub Links များ
 const SOURCES = [
+  // NiREvil multi-protocol feeds
   'https://raw.githubusercontent.com/NiREvil/vless/main/sub/link',
   'https://raw.githubusercontent.com/NiREvil/vless/main/sub/base64',
-  'https://raw.githubusercontent.com/NiREvil/vless/main/sub/clash',
-  'https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/protocols/vless'
+  // Universal Top Mix Subscriptions
+  'https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/xray/normal/mix',
+  'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Sub1.txt',
+  'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Sub2.txt',
+  'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge.txt',
+  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria',
+  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/trojan',
+  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/shadowsocks'
 ];
+
+const SUPPORTED_PROTOCOLS = ['vless://', 'vmess://', 'trojan://', 'ss://', 'hy2://', 'hysteria2://'];
 
 function fetchUrl(url) {
   return new Promise((resolve) => {
@@ -66,23 +75,41 @@ function verifyNodeConnection(host, port, timeout = 1500) {
   });
 }
 
+// VMess (Base64 JSON), VLESS, Trojan, SS, Hy2 အားလုံးဆီမှ Host နှင့် Port ကို ထုတ်ယူခြင်း
 function extractHostPort(uri) {
   try {
-    const clean = uri.replace(/^vless:\/\//, '');
+    if (uri.startsWith('vmess://')) {
+      const b64 = uri.replace('vmess://', '').trim();
+      const json = JSON.parse(Buffer.from(b64, 'base64').toString('utf-8'));
+      return { host: json.add, port: parseInt(json.port, 10) || 443 };
+    }
+
+    if (uri.startsWith('ss://')) {
+      const clean = uri.replace('ss://', '').split('#')[0];
+      const atSplit = clean.split('@');
+      let hostPort = atSplit.length > 1 ? atSplit[1] : '';
+      if (!hostPort) {
+        const decoded = Buffer.from(atSplit[0], 'base64').toString('utf-8');
+        hostPort = decoded.split('@')[1] || decoded;
+      }
+      const parts = hostPort.split(':');
+      return { host: parts[0], port: parseInt(parts[1], 10) || 8388 };
+    }
+
+    // vless, trojan, hy2
+    const clean = uri.replace(/^[^:]+:\/\//, '');
     const mainPart = clean.split('?')[0].split('#')[0];
     const hostPort = mainPart.includes('@') ? mainPart.split('@')[1] : mainPart;
     const parts = hostPort.split(':');
-    const host = parts[0];
-    const port = parseInt(parts[1], 10) || 443;
-    return { host, port };
+    return { host: parts[0], port: parseInt(parts[1], 10) || 443 };
   } catch (e) {
     return null;
   }
 }
 
 async function main() {
-  console.log('--- Step 1: Digging NiREvil/vless Nodes ---');
-  let rawVless = [];
+  console.log('--- Step 1: Digging All Multi-Protocol Nodes ---');
+  let rawNodes = [];
 
   for (const src of SOURCES) {
     try {
@@ -94,20 +121,18 @@ async function main() {
       for (const line of lines) {
         const trimmed = line.trim();
         if (!trimmed) continue;
-        if (trimmed.startsWith('vless://')) {
-          rawVless.push(trimmed);
+        if (SUPPORTED_PROTOCOLS.some(proto => trimmed.startsWith(proto))) {
+          rawNodes.push(trimmed);
         }
       }
-    } catch (err) {
-      console.log(`Failed: ${src}`);
-    }
+    } catch (err) {}
   }
 
-  const unique = Array.from(new Set(rawVless));
-  console.log(`Discovered ${unique.length} candidate nodes from NiREvil/vless.`);
+  const unique = Array.from(new Set(rawNodes));
+  console.log(`Discovered ${unique.length} candidate nodes across all protocols.`);
 
   console.log('--- Step 2: Testing TCP Handshake ---');
-  const candidates = unique.slice(0, 150);
+  const candidates = unique.slice(0, 180);
   let aliveNodes = [];
 
   for (const uri of candidates) {
@@ -116,9 +141,9 @@ async function main() {
 
     const isAlive = await verifyNodeConnection(target.host, target.port, 1200);
     if (isAlive) {
-      console.log(`[PASS] ${target.host}:${target.port}`);
+      console.log(`[ALIVE] ${target.host}:${target.port}`);
       aliveNodes.push(uri);
-      if (aliveNodes.length >= 60) break;
+      if (aliveNodes.length >= 70) break;
     }
   }
 
@@ -129,7 +154,7 @@ async function main() {
 
   const base64Output = Buffer.from(aliveNodes.join('\n'), 'utf-8').toString('base64');
   fs.writeFileSync('sub.txt', base64Output, 'utf-8');
-  console.log(`Successfully updated sub.txt with ${aliveNodes.length} NiREvil nodes.`);
+  console.log(`Successfully updated sub.txt with ${aliveNodes.length} live verified nodes.`);
 }
 
 main();
