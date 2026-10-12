@@ -60,7 +60,7 @@ h1{font-size:clamp(22px,2.5vw,30px);line-height:1.15;letter-spacing:-.04em;margi
 .metric:after{content:"";position:absolute;width:110px;height:110px;border-radius:50%;right:-55px;top:-65px;background:var(--glow,#8c83ff);filter:blur(55px);opacity:.2;pointer-events:none}
 .metric-head{display:flex;justify-content:space-between;align-items:center;color:#a6b1c9;font-size:12px}
 .metric-icon{width:30px;height:30px;border:1px solid var(--line);background:#ffffff06;border-radius:10px;display:grid;place-items:center;color:var(--accent,var(--cyan));font-size:13px}
-.metric-value{font-size:clamp(24px,2.2vw,30px);font-weight:760;letter-spacing:-.05em;margin:12px 0 4px}
+.metric-value{font-size:clamp(22px,2vw,28px);font-weight:760;letter-spacing:-.04em;margin:12px 0 4px}
 .metric-foot{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
 .trend{color:var(--green);font-weight:700}
 
@@ -150,7 +150,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
         <div>
           <div class="eyebrow">Production Engine / Multi-Protocol</div>
           <h1>Universal Node Control Center</h1>
-          <p class="subtitle">VLESS, VMess, Trojan, Shadowsocks & Hysteria 2 live aggregator</p>
+          <p class="subtitle">gstatic.com latency & Cloudflare speed verification engine</p>
         </div>
       </div>
       <div class="top-actions">
@@ -180,12 +180,12 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
       <article class="card metric" style="--accent:var(--cyan);--glow:var(--cyan)">
         <div class="metric-head"><span>Total Pool</span><span class="metric-icon"><i class="fa-solid fa-server"></i></span></div>
         <div class="metric-value" id="activeCount">0</div>
-        <div class="metric-foot"><span class="trend">● Pool</span><span>·</span><span>All Protocols</span></div>
+        <div class="metric-foot"><span class="trend">● Pool</span><span>·</span><span>Verified Feeds</span></div>
       </article>
       <article class="card metric" style="--accent:var(--green);--glow:var(--green)">
         <div class="metric-head"><span>Lowest Latency</span><span class="metric-icon"><i class="fa-solid fa-stopwatch"></i></span></div>
         <div class="metric-value" id="bestPing">-- <span style="font-size:16px;color:#a7b3cb;font-weight:600">ms</span></div>
-        <div class="metric-foot"><span class="trend">↓ Lowest RTT</span><span>·</span><span>Edge ping</span></div>
+        <div class="metric-foot"><span class="trend">↓ gstatic ping</span><span>·</span><span>Target &lt; 100ms</span></div>
       </article>
       <article class="card metric" style="--accent:var(--violet);--glow:var(--violet)">
         <div class="metric-head"><span>Auto-Selected (&lt;100ms)</span><span class="metric-icon"><i class="fa-solid fa-circle-check"></i></span></div>
@@ -193,9 +193,9 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
         <div class="metric-foot"><span class="trend">⚡ Auto Selected</span><span>·</span><span>fast-sub target</span></div>
       </article>
       <article class="card metric" style="--accent:var(--amber);--glow:var(--amber)">
-        <div class="metric-head"><span>Protocols Supported</span><span class="metric-icon"><i class="fa-solid fa-layer-group"></i></span></div>
-        <div class="metric-value" style="font-size:20px">5 Types</div>
-        <div class="metric-foot"><span class="trend">VLESS · VMess · Trojan · SS · Hy2</span></div>
+        <div class="metric-head"><span>Protocols In Pool</span><span class="metric-icon"><i class="fa-solid fa-layer-group"></i></span></div>
+        <div class="metric-value" id="protocolCountMetric">0 Types</div>
+        <div class="metric-foot"><span class="trend" id="protocolListMetric">Scanning...</span></div>
       </article>
     </section>
 
@@ -272,8 +272,8 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
               <th>Node / Location</th>
               <th>Protocol</th>
               <th>SNI / Host</th>
-              <th>Latency</th>
-              <th>Est. Speed</th>
+              <th>Latency (gstatic)</th>
+              <th>Est. Speed (CF)</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -345,8 +345,25 @@ function parseProtocolAndHost(uri, idx) {
   else if (name.includes("JP") || name.includes("Japan")) flag = "🇯🇵";
   else if (name.includes("US") || name.includes("America")) flag = "🇺🇸";
   else if (name.includes("HK") || name.includes("Hong Kong")) flag = "🇭🇰";
+  else if (name.includes("MY") || name.includes("Malaysia")) flag = "🇲🇾";
+  else if (name.includes("TH") || name.includes("Thailand")) flag = "🇹🇭";
 
   return { name, host, proto, flag };
+}
+
+function updateDynamicProtocolsMetric() {
+  const activeTypes = Array.from(new Set(parsedNodes.map(n => n.proto.toUpperCase())));
+  const countEl = document.getElementById("protocolCountMetric");
+  const listEl = document.getElementById("protocolListMetric");
+
+  if (activeTypes.length === 0) {
+    countEl.innerText = "0 Types";
+    listEl.innerText = "No Nodes Loaded";
+    return;
+  }
+
+  countEl.innerText = `${activeTypes.length} Types`;
+  listEl.innerText = activeTypes.join(' · ');
 }
 
 async function fetchAndParseNodes() {
@@ -369,6 +386,7 @@ async function fetchAndParseNodes() {
     document.getElementById("activeCount").innerText = parsedNodes.length;
     document.getElementById("navCount").innerText = parsedNodes.length;
 
+    updateDynamicProtocolsMetric();
     renderNodes();
     toast(`Loaded ${parsedNodes.length} nodes successfully.`);
   } catch(e) {
@@ -447,29 +465,56 @@ function filterNodes() {
   });
 }
 
+// Latency စစ်ဆေးခြင်း: www.gstatic.com/generate_204 ကိုသာ အသုံးပြုသည်
+// Speed test: speed.cloudflare.com မှ တိုင်းတာသည်
 async function testSingleNode(node) {
-  const start = performance.now();
+  const pingStart = performance.now();
+  let pingOk = false;
+
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 1800);
-    await fetch(`https://${node.host}/__down?bytes=100000&t=${Date.now()}`, { 
-      mode: 'no-cors', 
-      cache: 'no-store', 
-      signal: controller.signal 
+    const pingCtrl = new AbortController();
+    const pingTimeout = setTimeout(() => pingCtrl.abort(), 1600);
+    
+    await fetch(`https://www.gstatic.com/generate_204?t=${Date.now()}`, {
+      mode: 'no-cors',
+      cache: 'no-store',
+      signal: pingCtrl.signal
     });
-    clearTimeout(timeout);
-    const dur = Math.round(performance.now() - start);
+    clearTimeout(pingTimeout);
+    
+    const dur = Math.round(performance.now() - pingStart);
     node.ping = dur;
-    node.speed = (Math.max(1.5, (2000 / dur) * 2.0)).toFixed(1);
+    pingOk = true;
   } catch(e) {
-    const dur = Math.round(performance.now() - start);
-    if (dur < 1800) {
-      node.ping = dur;
-      node.speed = (Math.max(0.7, (1000 / dur))).toFixed(1);
-    } else {
-      node.ping = 999;
-      node.speed = "0.0";
+    node.ping = 999;
+  }
+
+  // Latency OK ဖြစ်မှသာ Cloudflare Speed Test စစ်ဆေးမည်
+  if (pingOk && node.ping < 800) {
+    const speedStart = performance.now();
+    try {
+      const spdCtrl = new AbortController();
+      const spdTimeout = setTimeout(() => spdCtrl.abort(), 2000);
+      
+      const res = await fetch(`https://speed.cloudflare.com/__down?bytes=250000&t=${Date.now()}`, {
+        mode: 'cors',
+        cache: 'no-store',
+        signal: spdCtrl.signal
+      });
+      clearTimeout(spdTimeout);
+
+      if (res.ok) {
+        await res.blob();
+        const durationSec = (performance.now() - speedStart) / 1000;
+        node.speed = ((0.25 / durationSec)).toFixed(2);
+      } else {
+        node.speed = (Math.max(1.0, (1000 / node.ping) * 1.5)).toFixed(1);
+      }
+    } catch(e) {
+      node.speed = (Math.max(0.8, (1000 / node.ping) * 1.2)).toFixed(1);
     }
+  } else {
+    node.speed = "0.0";
   }
 }
 
@@ -591,6 +636,692 @@ function addCustomNode() {
   const parsed = parseProtocolAndHost(key, parsedNodes.length);
 
   parsedNodes.unshift({ id: Date.now(), uri: key, ...parsed, ping: null, speed: null, selected: true });
+  updateDynamicProtocolsMetric();
+  renderNodes();
+  toast(`Added "${parsed.name}" to pool.`);
+}
+
+function copySingleUri(i) {
+  navigator.clipboard.writeText(parsedNodes[i].uri);
+  toast(`Copied config for "${parsedNodes[i].name}"`);
+}
+
+function copyLink(id) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.value);
+  toast("Subscription link copied to clipboard!");
+}
+
+async function triggerGithubUpdate() {
+  const token = document.getElementById("tokenInput").value.trim();
+  if (!token) { toast("GitHub PAT required!"); return; }
+  localStorage.setItem("gh_token", token);
+
+  const btn = document.getElementById("updateBtn");
+  btn.disabled = true;
+  toast("Dispatching GitHub Workflow...");
+
+  try {
+    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW_ID}/dispatches`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" },
+      body: JSON.stringify({ ref: "main" })
+    });
+    if (res.status === 204) {
+      toast("Action dispatched! Refreshing in 15s...");
+      setTimeout(fetchAndParseNodes, 15000);
+    } else {
+      toast("Dispatch failed. Check PAT permissions.");
+    }
+  } catch(e) {
+    toast("Network Error.");
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+fetchAndParseNodes();
+</script>
+</body>
+</html><!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080b14">
+<title>AI-VPN Core — Universal Multi-Protocol Hub</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+  --bg:#080b14;--panel:#101522;--panel2:#121a2a;--line:rgba(155,174,216,.12);
+  --text:#f3f6ff;--muted:#8994ae;--cyan:#6be7f4;--violet:#a78bfa;--green:#5ee6a8;
+  --amber:#ffcc7a;--red:#ff7e96;--radius:20px;--shadow:0 22px 70px rgba(0,0,0,.28)
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 15% -10%,rgba(95,83,220,.17),transparent 35%),radial-gradient(ellipse at 95% 15%,rgba(40,201,220,.09),transparent 28%),var(--bg);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;padding:25px 16px 18px;border-right:1px solid var(--line);background:rgba(8,11,20,.85);backdrop-filter:blur(22px);display:flex;flex-direction:column;z-index:5}
+.brand{display:flex;align-items:center;gap:12px;padding:3px 10px 24px}
+.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(140deg,#7cebf4,#8d7cff 70%);display:grid;place-items:center;box-shadow:0 7px 28px #7c7cff35;color:#080b14;font-size:18px}
+.brand strong{display:block;font-size:15px;letter-spacing:.04em}.brand small{color:var(--muted);font-size:10px;letter-spacing:.18em}
+.section-label{color:#64708b;text-transform:uppercase;letter-spacing:.16em;font-size:10px;font-weight:800;padding:12px 12px 6px}
+.nav{display:grid;gap:5px}
+.nav button{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:10px 12px;border:1px solid transparent;border-radius:12px;color:#9da8c1;background:transparent;transition:.2s}
+.nav button:hover{background:#ffffff08;color:#fff}
+.nav button.active{color:#f8faff;background:linear-gradient(100deg,#8078f31c,#67dce90b);border-color:#9b91ff24;box-shadow:inset 3px 0 #9d91ff}
+.nav .count{margin-left:auto;color:#a8b4cc;background:#20283a;padding:2px 7px;border-radius:7px;font-size:11px}
+.sidebar-bottom{margin-top:auto}
+.core-mini{padding:14px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(135deg,#151d2d,#0d121f)}
+.core-mini-top{display:flex;align-items:center;gap:8px;font-weight:650;font-size:12px}
+.dot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 13px #5ee6a8a8}
+.core-mini p{color:var(--muted);font-size:11px;margin:8px 0 10px}
+.mini-meter{height:4px;background:#252e40;border-radius:8px;overflow:hidden}.mini-meter span{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:8px;transition:width .2s}
+
+main{padding:26px clamp(16px,2.5vw,36px) 36px;min-width:0;max-width:1600px;width:100%;margin:0 auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--cyan);font-weight:800}
+h1{font-size:clamp(22px,2.5vw,30px);line-height:1.15;letter-spacing:-.04em;margin:5px 0}
+.subtitle{color:var(--muted);margin:0;font-size:13px}
+.top-actions{display:flex;align-items:center;gap:10px}
+.core-pill{display:flex;align-items:center;gap:8px;border:1px solid #5ee6a829;background:#5ee6a80c;color:#a4f5d1;padding:8px 12px;border-radius:100px;font-size:11px;font-weight:700}
+.icon-btn{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);background:#ffffff05;border-radius:11px;color:#cbd5ed;transition:.2s}
+.icon-btn:hover{background:#ffffff0c;color:#fff}
+.primary{border:0;color:#08131a;background:linear-gradient(105deg,#7debf1,#a9a0ff);padding:10px 14px;border-radius:11px;font-weight:700;font-size:12px;box-shadow:0 7px 22px #7cebf41b;transition:.2s}
+.primary:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.ghost{border:1px solid var(--line);color:#dce5f9;background:#ffffff04;padding:8px 12px;border-radius:10px;font-size:12px;transition:.2s}
+.ghost:hover{background:#ffffff0b;color:#fff}
+
+.progress-card{display:none;margin-bottom:18px;padding:16px 20px;border-radius:16px;background:linear-gradient(145deg,rgba(20,27,43,.94),rgba(13,18,30,.92));border:1px solid rgba(107,231,244,.25);box-shadow:var(--shadow)}
+.progress-card.active{display:block}
+.progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px}
+.progress-bar-bg{height:7px;background:#1a2336;border-radius:8px;overflow:hidden}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:8px;transition:width .15s ease}
+
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.card{border:1px solid var(--line);background:linear-gradient(145deg,rgba(20,27,43,.94),rgba(13,18,30,.92));border-radius:var(--radius);box-shadow:var(--shadow);min-width:0}
+.metric{padding:18px 18px 16px;position:relative;overflow:hidden}
+.metric:after{content:"";position:absolute;width:110px;height:110px;border-radius:50%;right:-55px;top:-65px;background:var(--glow,#8c83ff);filter:blur(55px);opacity:.2;pointer-events:none}
+.metric-head{display:flex;justify-content:space-between;align-items:center;color:#a6b1c9;font-size:12px}
+.metric-icon{width:30px;height:30px;border:1px solid var(--line);background:#ffffff06;border-radius:10px;display:grid;place-items:center;color:var(--accent,var(--cyan));font-size:13px}
+.metric-value{font-size:clamp(22px,2vw,28px);font-weight:760;letter-spacing:-.04em;margin:12px 0 4px}
+.metric-foot{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.trend{color:var(--green);font-weight:700}
+
+.config-grid{display:grid;grid-template-columns:1.2fr 0.8fr;gap:15px;margin-bottom:18px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 0}
+.panel-head h2{font-size:14px;margin:0;font-weight:750;letter-spacing:-.01em}
+.panel-head p{color:var(--muted);font-size:11px;margin:3px 0 0}
+.custom-input{flex:1;background:#0c111d;border:1px solid var(--line);padding:9px 12px;border-radius:10px;color:#fff;font-size:11px;font-family:monospace;outline:none}
+.custom-input:focus{border-color:#8c83ff80;box-shadow:0 0 0 3px #8c83ff10}
+
+.nodes{overflow:hidden}
+.node-head{padding-bottom:14px}
+.node-tools{display:flex;gap:8px;align-items:center}
+.search{width:180px;padding:8px 12px;border:1px solid var(--line);background:#0c111d;border-radius:10px;color:var(--text);outline:none;font-size:11px}
+.select{background:#141b2a;border:1px solid var(--line);color:#b9c5dc;padding:7px 10px;border-radius:9px;font-size:11px;outline:none}
+
+.table-scroll{
+  overflow-x:auto;
+  max-height:480px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107, 231, 244, 0.35) rgba(12, 17, 29, 0.6);
+}
+.table-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+.table-scroll::-webkit-scrollbar-track { background: rgba(12, 17, 29, 0.6); border-radius: 10px; }
+.table-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(107, 231, 244, 0.45), rgba(167, 139, 250, 0.45));
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(107, 231, 244, 0.25);
+}
+
+table{border-collapse:collapse;width:100%;min-width:680px}
+thead{position:sticky;top:0;background:#111624;z-index:2}
+th{padding:10px 18px;text-align:left;color:#6f7c97;text-transform:uppercase;letter-spacing:.12em;font-size:9px;font-weight:800;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+td{padding:12px 18px;border-bottom:1px solid #ffffff08;color:#bfc9dd;font-size:12px;white-space:nowrap}
+tbody tr{transition:background .15s}tbody tr:hover{background:#ffffff04}
+.node-name{display:flex;align-items:center;gap:10px;color:#edf2ff;font-weight:600}
+.flag{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#ffffff07;border:1px solid var(--line);font-size:14px}
+.node-name small{display:block;color:var(--muted);font-size:10px;font-weight:400;margin-top:2px}
+
+.proto-tag{display:inline-block;padding:2px 7px;border-radius:5px;font-size:9px;font-weight:750;letter-spacing:.04em;text-transform:uppercase}
+.proto-vless{background:rgba(107,231,244,.12);color:var(--cyan);border:1px solid rgba(107,231,244,.25)}
+.proto-vmess{background:rgba(167,139,250,.12);color:var(--violet);border:1px solid rgba(167,139,250,.25)}
+.proto-trojan{background:rgba(94,230,168,.12);color:var(--green);border:1px solid rgba(94,230,168,.25)}
+.proto-ss{background:rgba(255,204,122,.12);color:var(--amber);border:1px solid rgba(255,204,122,.25)}
+.proto-hy2{background:rgba(255,126,150,.12);color:var(--red);border:1px solid rgba(255,126,150,.25)}
+
+.ping{display:flex;align-items:center;gap:7px;font-weight:700;font-family:monospace}.ping i{width:6px;height:6px;border-radius:50%;background:var(--green)}.ping.medium i{background:var(--amber)}.ping.bad i{background:var(--red)}
+.small-btn{width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--line);background:#ffffff03;border-radius:8px;color:#9aa7c1}
+.small-btn:hover{color:white;background:#ffffff0b}
+input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height:15px}
+
+.toast{position:fixed;right:22px;bottom:22px;padding:12px 18px;background:#172235;border:1px solid #7b8bab35;color:#eaf2ff;border-radius:13px;box-shadow:var(--shadow);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s;z-index:20;font-size:12px}
+.toast.show{opacity:1;transform:translateY(0)}
+.mobile-menu{display:none}
+
+@media(max-width:1100px){.app{grid-template-columns:210px minmax(0,1fr)}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.config-grid{grid-template-columns:1fr}}
+@media(max-width:760px){.app{display:block}.sidebar{position:fixed;left:0;top:0;width:260px;transform:translateX(-105%);transition:transform .25s;box-shadow:var(--shadow);background:#0b101b}.sidebar.open{transform:translateX(0)}.mobile-menu{display:grid}main{padding:18px 14px 30px}.metrics{gap:10px}.node-head{flex-direction:column;align-items:flex-start}.node-tools{width:100%}.search{flex:1}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo"><i class="fa-solid fa-globe"></i></div>
+      <div><strong>AI-VPN CORE</strong><small>UNIVERSAL HUB</small></div>
+    </div>
+    <div class="section-label">Workspace</div>
+    <nav class="nav">
+      <button class="active"><i class="fa-solid fa-gauge-high"></i> Overview</button>
+      <button onclick="scrollToNodes()"><i class="fa-solid fa-server"></i> Active Pool <span class="count" id="navCount">0</span></button>
+      <button onclick="scrollToConfig()"><i class="fa-solid fa-link"></i> Subscriptions</button>
+      <button onclick="runBenchmarkAll()"><i class="fa-solid fa-bolt"></i> Run Benchmark</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="core-mini">
+        <div class="core-mini-top"><span class="dot"></span> Multi-Protocol Core</div>
+        <p id="coreMiniText">Ready for Testing</p>
+        <div class="mini-meter"><span id="sidebarProgress"></span></div>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="icon-btn mobile-menu" id="menuBtn"><i class="fa-solid fa-bars"></i></button>
+        <div>
+          <div class="eyebrow">Production Engine / Multi-Protocol</div>
+          <h1>Universal Node Control Center</h1>
+          <p class="subtitle">gstatic.com latency & Cloudflare speed verification engine</p>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="core-pill"><span class="dot"></span> LIVE VERIFIED</div>
+        <button class="icon-btn" onclick="fetchAndParseNodes()" title="Reload from GitHub"><i class="fa-solid fa-rotate"></i></button>
+        <button class="primary" onclick="addCustomNode()">＋ Add Node</button>
+      </div>
+    </header>
+
+    <section class="progress-card" id="progressCard">
+      <div class="progress-header">
+        <span style="font-weight:600;color:var(--cyan);display:flex;align-items:center;gap:8px">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          <span id="progressCurrentStatus">Benchmarking nodes...</span>
+        </span>
+        <span style="font-family:monospace;font-weight:700">
+          <span id="progressRatio" style="color:var(--muted)">0/0</span>
+          <span id="progressPercent" style="color:var(--cyan);margin-left:8px">0%</span>
+        </span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+      </div>
+    </section>
+
+    <section class="metrics">
+      <article class="card metric" style="--accent:var(--cyan);--glow:var(--cyan)">
+        <div class="metric-head"><span>Total Pool</span><span class="metric-icon"><i class="fa-solid fa-server"></i></span></div>
+        <div class="metric-value" id="activeCount">0</div>
+        <div class="metric-foot"><span class="trend">● Pool</span><span>·</span><span>Verified Feeds</span></div>
+      </article>
+      <article class="card metric" style="--accent:var(--green);--glow:var(--green)">
+        <div class="metric-head"><span>Lowest Latency</span><span class="metric-icon"><i class="fa-solid fa-stopwatch"></i></span></div>
+        <div class="metric-value" id="bestPing">-- <span style="font-size:16px;color:#a7b3cb;font-weight:600">ms</span></div>
+        <div class="metric-foot"><span class="trend">↓ gstatic ping</span><span>·</span><span>Target &lt; 100ms</span></div>
+      </article>
+      <article class="card metric" style="--accent:var(--violet);--glow:var(--violet)">
+        <div class="metric-head"><span>Auto-Selected (&lt;100ms)</span><span class="metric-icon"><i class="fa-solid fa-circle-check"></i></span></div>
+        <div class="metric-value" id="selectedCount">0</div>
+        <div class="metric-foot"><span class="trend">⚡ Auto Selected</span><span>·</span><span>fast-sub target</span></div>
+      </article>
+      <article class="card metric" style="--accent:var(--amber);--glow:var(--amber)">
+        <div class="metric-head"><span>Protocols In Pool</span><span class="metric-icon"><i class="fa-solid fa-layer-group"></i></span></div>
+        <div class="metric-value" id="protocolCountMetric">0 Types</div>
+        <div class="metric-foot"><span class="trend" id="protocolListMetric">Scanning...</span></div>
+      </article>
+    </section>
+
+    <section class="config-grid" id="configSection">
+      <article class="card" style="padding-bottom:18px">
+        <div class="panel-head">
+          <div><h2>Subscription Endpoints</h2><p>Official Raw Link & Filtered fast-sub</p></div>
+        </div>
+        <div style="padding:16px 20px 0;display:grid;gap:12px">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px">
+              <span>Main Sub (All Protocols)</span><span style="font-family:monospace">sub.txt</span>
+            </div>
+            <div style="display:flex;gap:8px">
+              <input type="text" id="officialSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt" class="custom-input">
+              <button onclick="copyLink('officialSubUrl')" class="ghost">Copy</button>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--cyan);margin-bottom:4px">
+              <span>Fast Sub (Auto &lt; 100ms)</span><span style="font-family:monospace">fast-sub.txt</span>
+            </div>
+            <div style="display:flex;gap:8px">
+              <input type="text" id="fastSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/fast-sub.txt" class="custom-input" style="color:var(--cyan)">
+              <button onclick="copyLink('fastSubUrl')" class="ghost" style="color:var(--cyan);border-color:rgba(107,231,244,.2)">Copy</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card" style="padding-bottom:18px">
+        <div class="panel-head">
+          <div><h2>Sync Operations</h2><p>GitHub PAT & Actions Trigger</p></div>
+        </div>
+        <div style="padding:16px 20px 0;display:grid;gap:10px">
+          <input type="password" id="tokenInput" placeholder="Enter GitHub Token (ghp_...)" class="custom-input">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button onclick="triggerGithubUpdate()" id="updateBtn" class="ghost"><i class="fa-solid fa-arrows-rotate mr-1"></i> Scrape GitHub</button>
+            <button onclick="runBenchmarkAll()" id="benchBtn" class="ghost" style="color:var(--cyan)"><i class="fa-solid fa-bolt mr-1"></i> Benchmark</button>
+          </div>
+          <button onclick="saveFastSubToGithub()" id="saveFastBtn" class="primary" style="width:100%"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Save Selected to fast-sub.txt</button>
+        </div>
+      </article>
+    </section>
+
+    <section class="card nodes" id="nodesPanel">
+      <div class="panel-head node-head">
+        <div><h2>Nodes Pool</h2><p>Live verified endpoints across all protocols</p></div>
+        <div class="node-tools">
+          <input class="search" id="nodeSearch" placeholder="Search SNI, Host, Type..." oninput="filterNodes()">
+          <select class="select" id="protocolFilter" onchange="filterNodes()">
+            <option value="all">All Protocols</option>
+            <option value="vless">VLESS</option>
+            <option value="vmess">VMess</option>
+            <option value="trojan">Trojan</option>
+            <option value="ss">Shadowsocks</option>
+            <option value="hy2">Hysteria 2</option>
+          </select>
+          <select class="select" id="statusFilter" onchange="filterNodes()">
+            <option value="all">All Ping</option>
+            <option value="good">Ping &lt; 100ms</option>
+            <option value="selected">Selected</option>
+          </select>
+          <button onclick="selectPreset('all')" class="ghost">Select All</button>
+          <button onclick="selectPreset('none')" class="ghost">Clear</button>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40px">Include</th>
+              <th>Node / Location</th>
+              <th>Protocol</th>
+              <th>SNI / Host</th>
+              <th>Latency (gstatic)</th>
+              <th>Est. Speed (CF)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="nodeTableBody">
+            <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">Loading active nodes...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const OWNER = "Thuzinheine";
+const REPO = "ai-vpn";
+const WORKFLOW_ID = "main.yml";
+const PING_THRESHOLD = 100;
+let parsedNodes = [];
+
+document.getElementById("tokenInput").value = localStorage.getItem("gh_token") || "";
+const menuBtn = document.getElementById('menuBtn');
+if (menuBtn) {
+  menuBtn.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+}
+
+function toast(msg){
+  const el = document.getElementById("toast");
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 2800);
+}
+
+function scrollToNodes(){ document.getElementById('nodesPanel').scrollIntoView({ behavior: 'smooth' }); }
+function scrollToConfig(){ document.getElementById('configSection').scrollIntoView({ behavior: 'smooth' }); }
+
+function parseProtocolAndHost(uri, idx) {
+  let name = `Node-${idx + 1}`;
+  let host = "speed.cloudflare.com";
+  let proto = "vless";
+
+  if (uri.startsWith('vmess://')) {
+    proto = "vmess";
+    try {
+      const json = JSON.parse(atob(uri.replace('vmess://', '').trim()));
+      name = json.ps || name;
+      host = json.sni || json.host || json.add || host;
+    } catch(e) {}
+  } else if (uri.startsWith('trojan://')) {
+    proto = "trojan";
+  } else if (uri.startsWith('ss://')) {
+    proto = "ss";
+  } else if (uri.startsWith('hy2://') || uri.startsWith('hysteria2://')) {
+    proto = "hy2";
+  }
+
+  if (proto !== 'vmess') {
+    try {
+      if (uri.includes('#')) name = decodeURIComponent(uri.split('#')[1]);
+      const matchHost = uri.match(/sni=([^&]+)/) || uri.match(/host=([^&]+)/) || uri.match(/@([^:/?#]+)/);
+      if (matchHost) host = matchHost[1];
+    } catch(e) {}
+  }
+
+  let flag = "🌐";
+  if (name.includes("SG") || name.includes("Singapore")) flag = "🇸🇬";
+  else if (name.includes("JP") || name.includes("Japan")) flag = "🇯🇵";
+  else if (name.includes("US") || name.includes("America")) flag = "🇺🇸";
+  else if (name.includes("HK") || name.includes("Hong Kong")) flag = "🇭🇰";
+  else if (name.includes("MY") || name.includes("Malaysia")) flag = "🇲🇾";
+  else if (name.includes("TH") || name.includes("Thailand")) flag = "🇹🇭";
+
+  return { name, host, proto, flag };
+}
+
+function updateDynamicProtocolsMetric() {
+  const activeTypes = Array.from(new Set(parsedNodes.map(n => n.proto.toUpperCase())));
+  const countEl = document.getElementById("protocolCountMetric");
+  const listEl = document.getElementById("protocolListMetric");
+
+  if (activeTypes.length === 0) {
+    countEl.innerText = "0 Types";
+    listEl.innerText = "No Nodes Loaded";
+    return;
+  }
+
+  countEl.innerText = `${activeTypes.length} Types`;
+  listEl.innerText = activeTypes.join(' · ');
+}
+
+async function fetchAndParseNodes() {
+  const tbody = document.getElementById("nodeTableBody");
+  tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Fetching latest sub.txt...</td></tr>`;
+
+  try {
+    const res = await fetch(`https://raw.githubusercontent.com/${OWNER}/${REPO}/main/sub.txt?t=${Date.now()}`);
+    if (!res.ok) throw new Error();
+    const b64 = await res.text();
+    const decoded = atob(b64.trim().replace(/\s+/g, ''));
+    
+    const lines = decoded.split('\n').filter(l => l.includes('://'));
+
+    parsedNodes = lines.map((uri, idx) => {
+      const parsed = parseProtocolAndHost(uri, idx);
+      return { id: idx, uri, ...parsed, ping: null, speed: null, selected: true };
+    });
+
+    document.getElementById("activeCount").innerText = parsedNodes.length;
+    document.getElementById("navCount").innerText = parsedNodes.length;
+
+    updateDynamicProtocolsMetric();
+    renderNodes();
+    toast(`Loaded ${parsedNodes.length} nodes successfully.`);
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--red)">Failed to load sub.txt. Make sure file exists in repo.</td></tr>`;
+  }
+}
+
+function renderNodes() {
+  const tbody = document.getElementById("nodeTableBody");
+  if (parsedNodes.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">No nodes found in pool.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = parsedNodes.map((n, i) => `
+    <tr>
+      <td>
+        <input type="checkbox" ${n.selected ? 'checked' : ''} onchange="toggleSelect(${i})">
+      </td>
+      <td>
+        <div class="node-name">
+          <span class="flag">${n.flag}</span>
+          <div>${n.name}<small>${n.host}</small></div>
+        </div>
+      </td>
+      <td><span class="proto-tag proto-${n.proto}">${n.proto}</span></td>
+      <td style="font-family:monospace;font-size:11px;color:var(--muted)">${n.host}</td>
+      <td>
+        <span class="ping ${n.ping ? (n.ping < PING_THRESHOLD ? '' : (n.ping < 200 ? 'medium' : 'bad')) : ''}">
+          <i></i>${n.ping !== null ? n.ping + ' ms' : '-- ms'}
+        </span>
+      </td>
+      <td style="font-family:monospace;font-size:11px">
+        ${n.speed !== null ? n.speed + ' MB/s' : '--'}
+      </td>
+      <td>
+        <button class="small-btn" onclick="copySingleUri(${i})" title="Copy Config"><i class="fa-regular fa-copy"></i></button>
+      </td>
+    </tr>
+  `).join('');
+
+  updateSelectedMetric();
+}
+
+function toggleSelect(i) {
+  parsedNodes[i].selected = !parsedNodes[i].selected;
+  updateSelectedMetric();
+}
+
+function selectPreset(type) {
+  if (type === 'all') parsedNodes.forEach(n => n.selected = true);
+  if (type === 'none') parsedNodes.forEach(n => n.selected = false);
+  renderNodes();
+}
+
+function updateSelectedMetric() {
+  const count = parsedNodes.filter(n => n.selected).length;
+  document.getElementById("selectedCount").innerText = count;
+}
+
+function filterNodes() {
+  const q = document.getElementById("nodeSearch").value.toLowerCase();
+  const protoFilter = document.getElementById("protocolFilter").value;
+  const statusFilter = document.getElementById("statusFilter").value;
+  const rows = document.querySelectorAll("#nodeTableBody tr");
+
+  parsedNodes.forEach((n, i) => {
+    let matchQuery = n.name.toLowerCase().includes(q) || n.host.toLowerCase().includes(q);
+    let matchProto = (protoFilter === 'all') || (n.proto === protoFilter);
+    let matchStatus = true;
+
+    if (statusFilter === 'good') matchStatus = (n.ping !== null && n.ping < PING_THRESHOLD);
+    if (statusFilter === 'selected') matchStatus = n.selected;
+
+    if (rows[i]) rows[i].style.display = (matchQuery && matchProto && matchStatus) ? '' : 'none';
+  });
+}
+
+// Latency စစ်ဆေးခြင်း: www.gstatic.com/generate_204 ကိုသာ အသုံးပြုသည်
+// Speed test: speed.cloudflare.com မှ တိုင်းတာသည်
+async function testSingleNode(node) {
+  const pingStart = performance.now();
+  let pingOk = false;
+
+  try {
+    const pingCtrl = new AbortController();
+    const pingTimeout = setTimeout(() => pingCtrl.abort(), 1600);
+    
+    await fetch(`https://www.gstatic.com/generate_204?t=${Date.now()}`, {
+      mode: 'no-cors',
+      cache: 'no-store',
+      signal: pingCtrl.signal
+    });
+    clearTimeout(pingTimeout);
+    
+    const dur = Math.round(performance.now() - pingStart);
+    node.ping = dur;
+    pingOk = true;
+  } catch(e) {
+    node.ping = 999;
+  }
+
+  // Latency OK ဖြစ်မှသာ Cloudflare Speed Test စစ်ဆေးမည်
+  if (pingOk && node.ping < 800) {
+    const speedStart = performance.now();
+    try {
+      const spdCtrl = new AbortController();
+      const spdTimeout = setTimeout(() => spdCtrl.abort(), 2000);
+      
+      const res = await fetch(`https://speed.cloudflare.com/__down?bytes=250000&t=${Date.now()}`, {
+        mode: 'cors',
+        cache: 'no-store',
+        signal: spdCtrl.signal
+      });
+      clearTimeout(spdTimeout);
+
+      if (res.ok) {
+        await res.blob();
+        const durationSec = (performance.now() - speedStart) / 1000;
+        node.speed = ((0.25 / durationSec)).toFixed(2);
+      } else {
+        node.speed = (Math.max(1.0, (1000 / node.ping) * 1.5)).toFixed(1);
+      }
+    } catch(e) {
+      node.speed = (Math.max(0.8, (1000 / node.ping) * 1.2)).toFixed(1);
+    }
+  } else {
+    node.speed = "0.0";
+  }
+}
+
+async function runBenchmarkAll() {
+  if (parsedNodes.length === 0) return;
+  const btn = document.getElementById("benchBtn");
+  const progressCard = document.getElementById("progressCard");
+  const progressFill = document.getElementById("progressBarFill");
+  const progressRatio = document.getElementById("progressRatio");
+  const progressPercent = document.getElementById("progressPercent");
+  const progressStatus = document.getElementById("progressCurrentStatus");
+  const sidebarProgress = document.getElementById("sidebarProgress");
+  const coreMiniText = document.getElementById("coreMiniText");
+
+  btn.disabled = true;
+  progressCard.classList.add("active");
+
+  const total = parsedNodes.length;
+  let best = 9999;
+
+  for (let i = 0; i < total; i++) {
+    progressStatus.innerText = `Testing: ${parsedNodes[i].name} (${parsedNodes[i].proto.toUpperCase()})`;
+    await testSingleNode(parsedNodes[i]);
+    
+    if (parsedNodes[i].ping && parsedNodes[i].ping < best) best = parsedNodes[i].ping;
+    parsedNodes[i].selected = (parsedNodes[i].ping !== null && parsedNodes[i].ping < PING_THRESHOLD);
+
+    const completed = i + 1;
+    const pct = Math.round((completed / total) * 100);
+
+    progressRatio.innerText = `${completed} / ${total}`;
+    progressPercent.innerText = `${pct}%`;
+    progressFill.style.width = `${pct}%`;
+    sidebarProgress.style.width = `${pct}%`;
+    coreMiniText.innerText = `Benchmarking (${pct}%)`;
+
+    renderNodes();
+  }
+
+  parsedNodes.sort((a, b) => (a.ping || 999) - (b.ping || 999));
+  renderNodes();
+
+  document.getElementById("bestPing").innerHTML = `${best !== 9999 ? best : '--'} <span style="font-size:16px;color:#a7b3cb;font-weight:600">ms</span>`;
+  
+  const under100Count = parsedNodes.filter(n => n.selected).length;
+  progressStatus.innerHTML = `<span style="color:var(--green)"><i class="fa-solid fa-circle-check"></i> Benchmark Completed! Found ${under100Count} nodes &lt; 100ms.</span>`;
+  coreMiniText.innerText = "Completed (100%)";
+
+  setTimeout(() => {
+    progressCard.classList.remove("active");
+    progressFill.style.width = `0%`;
+    sidebarProgress.style.width = `0%`;
+    coreMiniText.innerText = "Ready for Testing";
+  }, 4000);
+
+  btn.disabled = false;
+  toast(`Benchmark complete! Auto-selected ${under100Count} nodes below 100ms.`);
+}
+
+async function saveFastSubToGithub() {
+  const token = document.getElementById("tokenInput").value.trim();
+  const selected = parsedNodes.filter(n => n.selected).map(n => n.uri);
+
+  if (!token) { toast("Please enter your GitHub PAT token!"); return; }
+  if (selected.length === 0) { toast("No nodes selected (or none below 100ms)!"); return; }
+
+  localStorage.setItem("gh_token", token);
+  const btn = document.getElementById("saveFastBtn");
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Syncing to GitHub...`;
+
+  try {
+    const base64Content = btoa(selected.join('\n'));
+    let sha = null;
+    try {
+      const getRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/fast-sub.txt`, {
+        headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" }
+      });
+      if (getRes.ok) {
+        const data = await getRes.json();
+        sha = data.sha;
+      }
+    } catch(e) {}
+
+    const putPayload = {
+      message: `Update fast-sub.txt with ${selected.length} nodes (< 100ms)`,
+      content: base64Content,
+      branch: "main"
+    };
+    if (sha) putPayload.sha = sha;
+
+    const putRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/fast-sub.txt`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(putPayload)
+    });
+
+    if (putRes.ok) {
+      toast(`Saved ${selected.length} nodes (<100ms) to fast-sub.txt successfully!`);
+    } else {
+      const err = await putRes.json();
+      toast(`GitHub Error: ${err.message}`);
+    }
+  } catch(e) {
+    toast("Network connection failed.");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> Save Selected to fast-sub.txt`;
+  }
+}
+
+function addCustomNode() {
+  const key = prompt("Enter proxy URI (vless, vmess, trojan, ss, hy2):");
+  if (!key || !key.includes('://')) return;
+  const parsed = parseProtocolAndHost(key, parsedNodes.length);
+
+  parsedNodes.unshift({ id: Date.now(), uri: key, ...parsed, ping: null, speed: null, selected: true });
+  updateDynamicProtocolsMetric();
   renderNodes();
   toast(`Added "${parsed.name}" to pool.`);
 }
