@@ -1,19 +1,20 @@
 /**
- * update.js - AI-VPN Core Aggregator (ES Module)
- * Target: Hysteria 2 & VLESS Reality (Live Socket Verified)
+ * update.js - AI-VPN Core VLESS Aggregator (ES Module)
+ * Protocol: VLESS Only (Live Handshake Verified)
  */
 import fs from 'node:fs';
 import https from 'node:https';
 import http from 'node:http';
 import net from 'node:net';
 
+// အရည်အသွေးမြင့် VLESS nodes ပေါများသော သီးသန့် Feeds များ
 const SOURCES = [
-  'https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/protocols/hysteria2',
-  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria',
-  'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/hysteria2.txt',
-  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/reality',
-  'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/reality.txt',
-  'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Sub1.txt'
+  'https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/protocols/vless',
+  'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Sub1.txt',
+  'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Sub2.txt',
+  'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/vless.txt',
+  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/vless',
+  'https://raw.githubusercontent.com/LalatinaHub/Mineral/master/result/nodes'
 ];
 
 function fetchUrl(url) {
@@ -46,7 +47,7 @@ function decodeRecursive(content) {
   return content;
 }
 
-function verifyNodeConnection(host, port, timeout = 2000) {
+function verifyNodeConnection(host, port, timeout = 1800) {
   return new Promise((resolve) => {
     const socket = new net.Socket();
     socket.setTimeout(timeout);
@@ -70,7 +71,7 @@ function verifyNodeConnection(host, port, timeout = 2000) {
 
 function extractHostPort(uri) {
   try {
-    const clean = uri.replace(/^(vless|hy2|hysteria2):\/\//, '');
+    const clean = uri.replace(/^vless:\/\//, '');
     const mainPart = clean.split('?')[0].split('#')[0];
     const hostPort = mainPart.includes('@') ? mainPart.split('@')[1] : mainPart;
     const parts = hostPort.split(':');
@@ -83,9 +84,8 @@ function extractHostPort(uri) {
 }
 
 async function main() {
-  console.log('--- Step 1: Digging Reality & Hysteria 2 Edge Nodes ---');
-  let hy2List = [];
-  let realityList = [];
+  console.log('--- Step 1: Digging Public VLESS Nodes ---');
+  let rawVless = [];
 
   for (const src of SOURCES) {
     try {
@@ -96,33 +96,29 @@ async function main() {
       for (const line of lines) {
         const trimmed = line.trim();
         if (!trimmed) continue;
-
-        if (trimmed.startsWith('hy2://') || trimmed.startsWith('hysteria2://')) {
-          hy2List.push(trimmed);
-        } else if (trimmed.startsWith('vless://') && trimmed.includes('security=reality')) {
-          realityList.push(trimmed);
+        if (trimmed.startsWith('vless://')) {
+          rawVless.push(trimmed);
         }
       }
     } catch (err) {}
   }
 
-  const uniqueHy2 = Array.from(new Set(hy2List));
-  const uniqueReality = Array.from(new Set(realityList));
-  console.log(`Discovered raw candidates: ${uniqueHy2.length} Hy2, ${uniqueReality.length} Reality`);
+  const unique = Array.from(new Set(rawVless));
+  console.log(`Discovered ${unique.length} candidate VLESS nodes.`);
 
-  console.log('--- Step 2: Live Socket Handshake Verification ---');
-  const candidatePool = [...uniqueHy2.slice(0, 70), ...uniqueReality.slice(0, 70)];
+  console.log('--- Step 2: Live Socket Verification ---');
+  const candidates = unique.slice(0, 120);
   let aliveNodes = [];
 
-  for (const uri of candidatePool) {
+  for (const uri of candidates) {
     const target = extractHostPort(uri);
     if (!target || !target.host) continue;
 
-    const isAlive = await verifyNodeConnection(target.host, target.port, 1800);
+    const isAlive = await verifyNodeConnection(target.host, target.port, 1500);
     if (isAlive) {
       console.log(`[ALIVE] ${target.host}:${target.port}`);
       aliveNodes.push(uri);
-      if (aliveNodes.length >= 40) break;
+      if (aliveNodes.length >= 50) break;
     }
   }
 
@@ -133,7 +129,7 @@ async function main() {
 
   const base64Output = Buffer.from(aliveNodes.join('\n'), 'utf-8').toString('base64');
   fs.writeFileSync('sub.txt', base64Output, 'utf-8');
-  console.log(`Successfully verified and saved ${aliveNodes.length} low-latency nodes to sub.txt.`);
+  console.log(`Successfully verified and updated sub.txt with ${aliveNodes.length} VLESS nodes.`);
 }
 
 main();
