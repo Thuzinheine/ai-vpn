@@ -1,599 +1,535 @@
-<!DOCTYPE html>
-<html lang="my" class="dark">
+<!doctype html>
+<html lang="my">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VPN Console</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080b14">
+<title>AI-VPN Core — Control Center</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+  --bg:#080b14;--panel:#101522;--panel2:#121a2a;--line:rgba(155,174,216,.12);
+  --text:#f3f6ff;--muted:#8994ae;--cyan:#6be7f4;--violet:#a78bfa;--green:#5ee6a8;
+  --amber:#ffcc7a;--red:#ff7e96;--radius:20px;--shadow:0 22px 70px rgba(0,0,0,.28)
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 15% -10%,rgba(95,83,220,.17),transparent 35%),radial-gradient(ellipse at 95% 15%,rgba(40,201,220,.09),transparent 28%),var(--bg);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+.sidebar{position:sticky;top:0;height:100vh;padding:25px 16px 18px;border-right:1px solid var(--line);background:rgba(8,11,20,.85);backdrop-filter:blur(22px);display:flex;flex-direction:column;z-index:5}
+.brand{display:flex;align-items:center;gap:12px;padding:3px 10px 24px}
+.logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(140deg,#7cebf4,#8d7cff 70%);display:grid;place-items:center;box-shadow:0 7px 28px #7c7cff35;color:#080b14;font-size:18px}
+.brand strong{display:block;font-size:15px;letter-spacing:.04em}.brand small{color:var(--muted);font-size:10px;letter-spacing:.18em}
+.section-label{color:#64708b;text-transform:uppercase;letter-spacing:.16em;font-size:10px;font-weight:800;padding:12px 12px 6px}
+.nav{display:grid;gap:5px}
+.nav button{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:10px 12px;border:1px solid transparent;border-radius:12px;color:#9da8c1;background:transparent;transition:.2s}
+.nav button:hover{background:#ffffff08;color:#fff}
+.nav button.active{color:#f8faff;background:linear-gradient(100deg,#8078f31c,#67dce90b);border-color:#9b91ff24;box-shadow:inset 3px 0 #9d91ff}
+.nav .count{margin-left:auto;color:#a8b4cc;background:#20283a;padding:2px 7px;border-radius:7px;font-size:11px}
+.sidebar-bottom{margin-top:auto}
+.core-mini{padding:14px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(135deg,#151d2d,#0d121f)}
+.core-mini-top{display:flex;align-items:center;gap:8px;font-weight:650;font-size:12px}
+.dot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 13px #5ee6a8a8}
+.core-mini p{color:var(--muted);font-size:11px;margin:8px 0 10px}
+.mini-meter{height:4px;background:#252e40;border-radius:8px;overflow:hidden}.mini-meter span{display:block;height:100%;width:65%;background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:8px}
 
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'SF Pro Text', 'Helvetica Neue', 'sans-serif'],
-            mono: ['JetBrains Mono', 'SF Mono', 'monospace'],
-          },
-          colors: {
-            apple: {
-              canvas: '#000000',
-              panel: '#161618',
-              card: '#1f1f22',
-              cardHover: '#28282c',
-              border: '#2c2c30',
-              borderSubtle: '#222225',
-              blue: '#0a84ff',
-              blueHover: '#0071e3',
-              green: '#30d158',
-              orange: '#ff9f0a',
-              textPrimary: '#f5f5f7',
-              textSecondary: '#86868b',
-              textTertiary: '#545458'
-            }
-          }
-        }
-      }
-    }
-  </script>
+main{padding:26px clamp(16px,2.5vw,36px) 36px;min-width:0;max-width:1600px;width:100%;margin:0 auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:var(--cyan);font-weight:800}
+h1{font-size:clamp(22px,2.5vw,30px);line-height:1.15;letter-spacing:-.04em;margin:5px 0}
+.subtitle{color:var(--muted);margin:0;font-size:13px}
+.top-actions{display:flex;align-items:center;gap:10px}
+.core-pill{display:flex;align-items:center;gap:8px;border:1px solid #5ee6a829;background:#5ee6a80c;color:#a4f5d1;padding:8px 12px;border-radius:100px;font-size:11px;font-weight:700}
+.icon-btn{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);background:#ffffff05;border-radius:11px;color:#cbd5ed;transition:.2s}
+.icon-btn:hover{background:#ffffff0c;color:#fff}
+.primary{border:0;color:#08131a;background:linear-gradient(105deg,#7debf1,#a9a0ff);padding:10px 14px;border-radius:11px;font-weight:700;font-size:12px;box-shadow:0 7px 22px #7cebf41b;transition:.2s}
+.primary:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.ghost{border:1px solid var(--line);color:#dce5f9;background:#ffffff04;padding:8px 12px;border-radius:10px;font-size:12px;transition:.2s}
+.ghost:hover{background:#ffffff0b;color:#fff}
 
-  <style>
-    body {
-      background-color: #000000;
-      color: #f5f5f7;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    .custom-scroll::-webkit-scrollbar {
-      width: 5px;
-    }
-    .custom-scroll::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: #333338;
-      border-radius: 9999px;
-    }
-    .custom-scroll::-webkit-scrollbar-thumb:hover {
-      background: #48484f;
-    }
-  </style>
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.card{border:1px solid var(--line);background:linear-gradient(145deg,rgba(20,27,43,.94),rgba(13,18,30,.92));border-radius:var(--radius);box-shadow:var(--shadow);min-width:0}
+.metric{padding:18px 18px 16px;position:relative;overflow:hidden}
+.metric:after{content:"";position:absolute;width:110px;height:110px;border-radius:50%;right:-55px;top:-65px;background:var(--glow,#8c83ff);filter:blur(55px);opacity:.2;pointer-events:none}
+.metric-head{display:flex;justify-content:space-between;align-items:center;color:#a6b1c9;font-size:12px}
+.metric-icon{width:30px;height:30px;border:1px solid var(--line);background:#ffffff06;border-radius:10px;display:grid;place-items:center;color:var(--accent,var(--cyan));font-size:13px}
+.metric-value{font-size:clamp(24px,2.2vw,30px);font-weight:760;letter-spacing:-.05em;margin:12px 0 4px}
+.metric-foot{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.trend{color:var(--green);font-weight:700}
+
+/* Sub Link Hub & Settings Grid */
+.config-grid{display:grid;grid-template-columns:1.2fr 0.8fr;gap:15px;margin-bottom:18px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 0}
+.panel-head h2{font-size:14px;margin:0;font-weight:750;letter-spacing:-.01em}
+.panel-head p{color:var(--muted);font-size:11px;margin:3px 0 0}
+.input-row{display:flex;gap:8px;padding:12px 20px 0}
+.custom-input{flex:1;background:#0c111d;border:1px solid var(--line);padding:9px 12px;border-radius:10px;color:#fff;font-size:11px;font-family:monospace;outline:none}
+.custom-input:focus{border-color:#8c83ff80;box-shadow:0 0 0 3px #8c83ff10}
+
+.nodes{overflow:hidden}
+.node-head{padding-bottom:14px}
+.node-tools{display:flex;gap:8px;align-items:center}
+.search{width:180px;padding:8px 12px;border:1px solid var(--line);background:#0c111d;border-radius:10px;color:var(--text);outline:none;font-size:11px}
+.search:focus,.select:focus{border-color:#8c83ff80;box-shadow:0 0 0 3px #8c83ff10}
+.select{background:#141b2a;border:1px solid var(--line);color:#b9c5dc;padding:7px 10px;border-radius:9px;font-size:11px;outline:none}
+.table-scroll{overflow-x:auto;max-height:480px}
+table{border-collapse:collapse;width:100%;min-width:680px}
+thead{position:sticky;top:0;background:#111624;z-index:2}
+th{padding:10px 18px;text-align:left;color:#6f7c97;text-transform:uppercase;letter-spacing:.12em;font-size:9px;font-weight:800;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+td{padding:12px 18px;border-bottom:1px solid #ffffff08;color:#bfc9dd;font-size:12px;white-space:nowrap}
+tbody tr{transition:background .15s}tbody tr:hover{background:#ffffff04}
+.node-name{display:flex;align-items:center;gap:10px;color:#edf2ff;font-weight:600}
+.flag{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#ffffff07;border:1px solid var(--line);font-size:14px}
+.node-name small{display:block;color:var(--muted);font-size:10px;font-weight:400;margin-top:2px}
+.ping{display:flex;align-items:center;gap:7px;font-weight:700;font-family:monospace}.ping i{width:6px;height:6px;border-radius:50%;background:var(--green)}.ping.medium i{background:var(--amber)}.ping.bad i{background:var(--red)}
+.state{display:inline-flex;align-items:center;gap:6px;color:#8de9bf;background:#5ee6a80d;border:1px solid #5ee6a81c;border-radius:7px;padding:4px 8px;font-size:10px;font-weight:700}
+.state i{width:5px;height:5px;border-radius:50%;background:currentColor}
+.small-btn{width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--line);background:#ffffff03;border-radius:8px;color:#9aa7c1}
+.small-btn:hover{color:white;background:#ffffff0b}
+input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height:15px}
+
+.toast{position:fixed;right:22px;bottom:22px;padding:12px 18px;background:#172235;border:1px solid #7b8bab35;color:#eaf2ff;border-radius:13px;box-shadow:var(--shadow);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s;z-index:20;font-size:12px}
+.toast.show{opacity:1;transform:translateY(0)}
+.mobile-menu{display:none}
+
+@media(max-width:1100px){.app{grid-template-columns:210px minmax(0,1fr)}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.config-grid{grid-template-columns:1fr}}
+@media(max-width:760px){.app{display:block}.sidebar{position:fixed;left:0;top:0;width:260px;transform:translateX(-105%);transition:transform .25s;box-shadow:var(--shadow);background:#0b101b}.sidebar.open{transform:translateX(0)}.mobile-menu{display:grid}main{padding:18px 14px 30px}.metrics{gap:10px}.node-head{flex-direction:column;align-items:flex-start}.node-tools{width:100%}.search{flex:1}}
+</style>
 </head>
-<body class="min-h-screen flex flex-col justify-between p-4 sm:p-6 lg:p-8 selection:bg-apple-blue/30 selection:text-white">
+<body>
+<div class="app">
+  <!-- Modern Left Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo"><i class="fa-solid fa-shield-halved"></i></div>
+      <div><strong>AI-VPN CORE</strong><small>CONTROL CENTER</small></div>
+    </div>
+    <div class="section-label">Workspace</div>
+    <nav class="nav">
+      <button class="active"><i class="fa-solid fa-gauge-high"></i> Overview</button>
+      <button onclick="scrollToNodes()"><i class="fa-solid fa-network-wired"></i> VPN Nodes <span class="count" id="navCount">0</span></button>
+      <button onclick="scrollToConfig()"><i class="fa-solid fa-link"></i> Subscriptions</button>
+      <button onclick="runBenchmarkAll()"><i class="fa-solid fa-bolt"></i> Run Benchmark</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="core-mini">
+        <div class="core-mini-top"><span class="dot"></span> Core Online</div>
+        <p>Live GitHub API Connection Ready</p>
+        <div class="mini-meter"><span></span></div>
+      </div>
+    </div>
+  </aside>
 
-  <!-- Main Viewport Shell -->
-  <div class="max-w-[1240px] w-full mx-auto flex-1 flex flex-col space-y-4">
-
-    <!-- Top Status Bar -->
-    <header class="bg-apple-panel border border-apple-border rounded-2xl px-5 py-3.5 flex flex-wrap items-center justify-between gap-4 flex-shrink-0">
-      <div class="flex items-center gap-3.5">
-        <div class="w-8 h-8 rounded-xl bg-apple-card border border-apple-border flex items-center justify-center text-apple-blue">
-          <i class="fa-solid fa-layer-group text-xs"></i>
-        </div>
+  <!-- Main Viewport -->
+  <main>
+    <header class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="icon-btn mobile-menu" id="menuBtn" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
         <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-sm font-semibold tracking-tight text-white">AI-VPN Core</h1>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-apple-card text-apple-textSecondary border border-apple-border">Production</span>
-          </div>
-          <p class="text-[11px] text-apple-textSecondary mt-0.5">Automated Node Aggregation, Benchmark & Custom Subscriptions</p>
+          <div class="eyebrow">Production Engine / v3.5</div>
+          <h1>VPN Control Center</h1>
+          <p class="subtitle">Real-time latency monitoring & dual subscription management</p>
         </div>
       </div>
-
-      <!-- Quick Status Badges -->
-      <div class="flex items-center gap-2.5 text-xs font-mono">
-        <div class="bg-apple-card border border-apple-border px-3.5 py-1.5 rounded-xl flex items-center gap-2">
-          <span class="text-apple-textSecondary text-[11px] font-sans">Active Selection</span>
-          <span id="selectedCount" class="font-bold text-apple-blue font-mono">0</span>
-          <span class="text-apple-textTertiary">/</span>
-          <span id="nodeCount" class="font-medium text-apple-textSecondary font-mono">0</span>
-        </div>
-        <div class="bg-apple-card border border-apple-border px-3.5 py-1.5 rounded-xl flex items-center gap-2">
-          <span class="text-apple-textSecondary text-[11px] font-sans">Lowest Ping</span>
-          <span id="bestPing" class="font-bold text-apple-green font-mono">-- ms</span>
-        </div>
+      <div class="top-actions">
+        <div class="core-pill"><span class="dot"></span> EDGE READY</div>
+        <button class="icon-btn" onclick="fetchAndParseNodes()" title="Reload from GitHub"><i class="fa-solid fa-rotate"></i></button>
+        <button class="primary" onclick="addCustomNode()">＋ Add Node</button>
       </div>
     </header>
 
-    <!-- Main Workspace (Proportionally Balanced Two-Column Split) -->
-    <main class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 items-stretch">
-      
-      <!-- Left Column: Settings, Endpoints & Controls (5 Columns) -->
-      <section class="lg:col-span-5 flex flex-col justify-between space-y-4">
-        
-        <div class="bg-apple-panel border border-apple-border rounded-2xl p-5 space-y-4 flex-1">
-          
-          <!-- Endpoints Section -->
-          <div class="space-y-3 pb-3 border-b border-apple-border">
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-apple-textSecondary block">Subscription Endpoints</span>
-            
-            <!-- sub.txt -->
-            <div class="space-y-1">
-              <div class="flex justify-between items-center text-xs">
-                <span class="text-white font-medium flex items-center gap-1.5">
-                  <i class="fa-solid fa-globe text-[11px] text-apple-textSecondary"></i> Main Sub (All 50 Nodes)
-                </span>
-                <span class="text-[10px] text-apple-textTertiary font-mono">sub.txt</span>
-              </div>
-              <div class="flex items-center gap-2 bg-apple-card border border-apple-border rounded-xl p-1.5 focus-within:border-apple-blue transition">
-                <input type="text" id="officialSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt"
-                  class="w-full bg-transparent border-0 px-2.5 text-xs text-apple-textSecondary font-mono truncate select-all focus:outline-none">
-                <button onclick="copyLink('officialSubUrl', 'copyOfficialBtn')" class="bg-apple-panel hover:bg-apple-border text-white px-3 py-1.5 rounded-lg text-xs font-medium transition active:scale-95 flex items-center gap-1 flex-shrink-0">
-                  <i class="fa-regular fa-copy text-[10px]"></i>
-                  <span id="copyOfficialBtn">Copy</span>
-                </button>
-              </div>
-            </div>
+    <!-- Top 4 Modern Metric Cards -->
+    <section class="metrics">
+      <article class="card metric" style="--accent:var(--cyan);--glow:var(--cyan)">
+        <div class="metric-head"><span>Active Nodes</span><span class="metric-icon"><i class="fa-solid fa-server"></i></span></div>
+        <div class="metric-value" id="activeCount">0</div>
+        <div class="metric-foot"><span class="trend">● Pool</span><span>·</span><span>Raw 50 Feed</span></div>
+      </article>
+      <article class="card metric" style="--accent:var(--violet);--glow:var(--violet)">
+        <div class="metric-head"><span>Fast Selected</span><span class="metric-icon"><i class="fa-solid fa-circle-check"></i></span></div>
+        <div class="metric-value" id="selectedCount">0</div>
+        <div class="metric-foot"><span class="trend">⚡ Curated</span><span>·</span><span>Ready to sync</span></div>
+      </article>
+      <article class="card metric" style="--accent:var(--green);--glow:var(--green)">
+        <div class="metric-head"><span>Lowest Latency</span><span class="metric-icon"><i class="fa-solid fa-stopwatch"></i></span></div>
+        <div class="metric-value" id="bestPing">-- <span style="font-size:16px;color:#a7b3cb;font-weight:600">ms</span></div>
+        <div class="metric-foot"><span class="trend">↓ Real-time</span><span>·</span><span>Edge ping</span></div>
+      </article>
+      <article class="card metric" style="--accent:var(--amber);--glow:var(--amber)">
+        <div class="metric-head"><span>Status</span><span class="metric-icon"><i class="fa-solid fa-shield-halved"></i></span></div>
+        <div class="metric-value">Operational</div>
+        <div class="metric-foot"><span class="trend">● Verified</span><span>·</span><span>GitHub connected</span></div>
+      </article>
+    </section>
 
-            <!-- fast-sub.txt -->
-            <div class="space-y-1">
-              <div class="flex justify-between items-center text-xs">
-                <span class="text-apple-blue font-medium flex items-center gap-1.5">
-                  <i class="fa-solid fa-bolt text-[11px]"></i> Fast Sub (Custom Benchmarked)
-                </span>
-                <span class="text-[10px] text-apple-blue/60 font-mono">fast-sub.txt</span>
-              </div>
-              <div class="flex items-center gap-2 bg-apple-card border border-apple-border rounded-xl p-1.5 focus-within:border-apple-blue transition">
-                <input type="text" id="fastSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/fast-sub.txt"
-                  class="w-full bg-transparent border-0 px-2.5 text-xs text-apple-blue font-mono truncate select-all focus:outline-none">
-                <button onclick="copyLink('fastSubUrl', 'copyFastBtn')" class="bg-apple-blue/15 hover:bg-apple-blue/25 text-apple-blue px-3 py-1.5 rounded-lg text-xs font-semibold transition active:scale-95 flex items-center gap-1 flex-shrink-0">
-                  <i class="fa-regular fa-copy text-[10px]"></i>
-                  <span id="copyFastBtn">Copy</span>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- PAT Key Input -->
-          <div class="space-y-1.5">
-            <div class="flex justify-between items-center text-xs">
-              <label class="text-white font-medium flex items-center gap-1.5">
-                <i class="fa-solid fa-key text-[11px] text-apple-textSecondary"></i> GitHub Access Token (PAT)
-              </label>
-              <span class="text-[10px] text-apple-textTertiary">Browser Memory</span>
-            </div>
-            <div class="relative">
-              <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" 
-                class="w-full bg-apple-card border border-apple-border rounded-xl pl-3.5 pr-9 py-2.5 text-xs text-white placeholder-apple-textTertiary focus:outline-none focus:border-apple-blue font-mono transition">
-              <button type="button" onclick="toggleTokenVisibility()" class="absolute right-3 top-2.5 text-apple-textSecondary hover:text-white">
-                <i id="eyeIcon" class="fa-regular fa-eye text-xs"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Actions Toolbar -->
-          <div class="space-y-2 pt-1">
-            <div class="grid grid-cols-2 gap-2.5">
-              <button onclick="triggerGithubUpdate()" id="updateBtn"
-                class="bg-apple-card hover:bg-apple-cardHover border border-apple-border text-white font-medium py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-98 transition">
-                <i id="btnIcon" class="fa-solid fa-arrows-rotate text-[11px]"></i>
-                <span>Action Scrape</span>
-              </button>
-
-              <button onclick="runBenchmarkAll()" id="benchmarkBtn"
-                class="bg-apple-blue hover:bg-apple-blueHover text-white font-medium py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-98 transition shadow-sm">
-                <i id="testIcon" class="fa-solid fa-stopwatch text-[11px]"></i>
-                <span>Test Ping All</span>
-              </button>
-            </div>
-
-            <button onclick="saveFastSubToGithub()" id="saveFastBtn"
-              class="w-full bg-apple-card hover:bg-apple-cardHover border border-apple-border hover:border-apple-blue/50 text-white font-medium py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-98 transition">
-              <i id="saveFastIcon" class="fa-solid fa-cloud-arrow-up text-apple-blue text-xs"></i>
-              <span id="saveFastText">Save Selected to fast-sub.txt</span>
-            </button>
-          </div>
-
-          <!-- Status Message Toast -->
-          <div id="statusBox" class="hidden p-3 rounded-xl text-xs flex items-center gap-2.5 border transition-all">
-            <i id="statusIcon" class="fa-solid fa-circle-info text-xs"></i>
-            <span id="statusMessage" class="font-medium leading-tight"></span>
-          </div>
-
+    <!-- Subscription & Controls Grid -->
+    <section class="config-grid" id="configSection">
+      <!-- Subscriptions Card -->
+      <article class="card" style="padding-bottom:18px">
+        <div class="panel-head">
+          <div><h2>Subscription Endpoints</h2><p>Official Raw Link & Benchmark Subset</p></div>
         </div>
 
-        <!-- Add External Node Box -->
-        <div class="bg-apple-panel border border-apple-border rounded-2xl p-4.5 space-y-2 flex-shrink-0">
-          <span class="text-xs font-medium text-white flex items-center gap-1.5">
-            <i class="fa-solid fa-plus text-[10px] text-apple-textSecondary"></i> Add External VLESS Key
-          </span>
-          <div class="flex gap-2">
-            <input type="text" id="customNodeInput" placeholder="vless://..."
-              class="w-full bg-apple-card border border-apple-border rounded-xl px-3 py-2 text-xs text-white placeholder-apple-textTertiary focus:outline-none focus:border-apple-blue font-mono transition">
-            <button onclick="addCustomNode()" class="bg-apple-card hover:bg-apple-cardHover border border-apple-border text-white px-4 py-2 rounded-xl text-xs font-medium active:scale-95 transition">
-              Add
-            </button>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- Right Column: Node Selection Matrix (7 Columns) -->
-      <section class="lg:col-span-7 bg-apple-panel border border-apple-border rounded-2xl p-5 flex flex-col justify-between">
-        
-        <!-- Header & Filter Bar -->
-        <div class="flex items-center justify-between pb-3.5 border-b border-apple-border flex-shrink-0">
+        <div style="padding:16px 20px 0;display:grid;gap:12px">
+          <!-- sub.txt -->
           <div>
-            <h2 class="text-xs font-semibold text-white tracking-wide uppercase">Node Pool Explorer</h2>
-            <p class="text-[11px] text-apple-textSecondary">Check to tailor your fast-sub.txt</p>
-          </div>
-
-          <!-- Quick Filters -->
-          <div class="flex items-center gap-1 bg-apple-card p-1 rounded-xl border border-apple-border text-xs">
-            <button onclick="selectPreset('all')" class="hover:bg-apple-border text-white px-2.5 py-1 rounded-lg transition text-[11px] font-medium">All</button>
-            <button onclick="selectPreset('good')" class="hover:bg-apple-border text-apple-blue px-2.5 py-1 rounded-lg transition text-[11px] font-medium">&lt; 350ms</button>
-            <button onclick="selectPreset('none')" class="hover:bg-apple-border text-apple-textSecondary px-2.5 py-1 rounded-lg transition text-[11px] font-medium">Clear</button>
-            <button onclick="fetchAndParseNodes()" title="Reload" class="text-apple-textSecondary hover:text-white px-2 py-1 rounded-lg transition">
-              <i class="fa-solid fa-arrow-rotate-right text-[10px]"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Node Cards Grid Container -->
-        <div id="nodeListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3 overflow-y-auto custom-scroll flex-1 max-h-[580px] content-start pr-1">
-          <div class="col-span-full text-center py-28 text-xs text-apple-textTertiary">
-            <i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Loading active node pool...
-          </div>
-        </div>
-
-      </section>
-
-    </main>
-
-  </div>
-
-  <script>
-    const OWNER = "Thuzinheine";
-    const REPO = "ai-vpn";
-    const WORKFLOW_ID = "main.yml";
-    let parsedNodes = [];
-
-    document.getElementById("tokenInput").value = localStorage.getItem("gh_token") || "";
-
-    function toggleTokenVisibility() {
-      const input = document.getElementById("tokenInput");
-      const icon = document.getElementById("eyeIcon");
-      if (input.type === "password") {
-        input.type = "text";
-        icon.classList.replace("fa-eye", "fa-eye-slash");
-      } else {
-        input.type = "password";
-        icon.classList.replace("fa-eye-slash", "fa-eye");
-      }
-    }
-
-    function showStatus(message, type = "info") {
-      const box = document.getElementById("statusBox");
-      const msg = document.getElementById("statusMessage");
-      const icon = document.getElementById("statusIcon");
-
-      box.className = "p-3 rounded-xl text-xs flex items-center gap-2.5 border transition-all ";
-      if (type === "success") {
-        box.classList.add("bg-apple-card", "border-apple-green/40", "text-apple-green");
-        icon.className = "fa-solid fa-check text-xs text-apple-green";
-      } else if (type === "error") {
-        box.classList.add("bg-apple-card", "border-rose-500/40", "text-rose-400");
-        icon.className = "fa-solid fa-triangle-exclamation text-xs text-rose-400";
-      } else {
-        box.classList.add("bg-apple-card", "border-apple-border", "text-apple-textSecondary");
-        icon.className = "fa-solid fa-circle-notch fa-spin text-xs text-apple-blue";
-      }
-      msg.innerText = message;
-      box.classList.remove("hidden");
-    }
-
-    async function fetchAndParseNodes() {
-      const listEl = document.getElementById("nodeListContainer");
-      listEl.innerHTML = `<div class="col-span-full text-center py-28 text-xs text-apple-textTertiary"><i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Loading sub.txt...</div>`;
-      
-      try {
-        const url = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/sub.txt?t=${Date.now()}`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error("Could not fetch sub.txt");
-        
-        const b64 = await res.text();
-        const decoded = atob(b64.trim().replace(/\s+/g, ''));
-        const lines = decoded.split('\n').filter(l => l.startsWith('vless://'));
-        
-        parsedNodes = lines.map((uri, idx) => {
-          let name = `Node-${idx + 1}`;
-          let host = "speed.cloudflare.com";
-          try {
-            if (uri.includes('#')) name = decodeURIComponent(uri.split('#')[1]);
-            const matchHost = uri.match(/sni=([^&]+)/) || uri.match(/host=([^&]+)/) || uri.match(/@([^:]+)/);
-            if (matchHost) host = matchHost[1];
-          } catch(e) {}
-          return { id: idx, uri, name, host, ping: null, speed: null, selected: true };
-        });
-
-        document.getElementById("nodeCount").innerText = parsedNodes.length;
-        renderNodes();
-      } catch (e) {
-        listEl.innerHTML = `<div class="col-span-full text-center py-28 text-xs text-rose-400">Failed to load sub.txt. Make sure file exists.</div>`;
-      }
-    }
-
-    function renderNodes() {
-      const listEl = document.getElementById("nodeListContainer");
-      if (parsedNodes.length === 0) {
-        listEl.innerHTML = `<div class="col-span-full text-center py-28 text-xs text-apple-textTertiary">No nodes in pool.</div>`;
-        return;
-      }
-
-      listEl.innerHTML = parsedNodes.map((n, i) => `
-        <div class="bg-apple-card border ${n.selected ? 'border-apple-blue/50 bg-apple-cardHover' : 'border-apple-border'} hover:border-apple-border p-2.5 rounded-xl flex items-center justify-between gap-2.5 transition">
-          <div class="flex items-center gap-2.5 min-w-0 flex-1">
-            <input type="checkbox" ${n.selected ? 'checked' : ''} onchange="toggleSelect(${i})"
-              class="w-3.5 h-3.5 rounded bg-apple-panel border-apple-border text-apple-blue focus:ring-0 cursor-pointer accent-apple-blue">
-            
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${n.ping ? (n.ping < 250 ? 'bg-apple-green' : 'bg-apple-orange') : 'bg-apple-textTertiary'}"></span>
-                <h3 class="text-xs font-medium ${n.selected ? 'text-white' : 'text-apple-textSecondary'} truncate">${n.name}</h3>
-              </div>
-              <p class="text-[10px] text-apple-textTertiary font-mono mt-0.5 truncate pl-3">${n.host}</p>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px">
+              <span>Main Sub (50 Nodes Auto)</span><span style="font-family:monospace">sub.txt</span>
+            </div>
+            <div style="display:flex;gap:8px">
+              <input type="text" id="officialSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt" class="custom-input">
+              <button onclick="copyLink('officialSubUrl')" class="ghost">Copy</button>
             </div>
           </div>
 
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <div class="text-right font-mono">
-              <div class="text-[11px] font-medium ${n.ping ? (n.ping < 250 ? 'text-apple-green' : 'text-apple-orange') : 'text-apple-textTertiary'}">
-                ${n.ping !== null ? n.ping + ' ms' : '-- ms'}
-              </div>
-              <div class="text-[9px] text-apple-textTertiary">
-                ${n.speed !== null ? n.speed + ' MB/s' : '-- MB/s'}
-              </div>
+          <!-- fast-sub.txt -->
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--cyan);margin-bottom:4px">
+              <span>Fast Sub (Custom Benchmarked)</span><span style="font-family:monospace">fast-sub.txt</span>
             </div>
-            <button onclick="copySingleNode(${i})" title="Copy URI" class="bg-apple-panel hover:bg-apple-border text-apple-textSecondary hover:text-white p-1.5 rounded-lg text-xs active:scale-95 transition">
-              <i class="fa-regular fa-copy text-[10px]"></i>
-            </button>
+            <div style="display:flex;gap:8px">
+              <input type="text" id="fastSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/fast-sub.txt" class="custom-input" style="color:var(--cyan)">
+              <button onclick="copyLink('fastSubUrl')" class="ghost" style="color:var(--cyan);border-color:rgba(107,231,244,.2)">Copy</button>
+            </div>
           </div>
         </div>
-      `).join('');
+      </article>
 
-      updateSelectionCount();
-    }
+      <!-- GitHub API & Engine Control -->
+      <article class="card" style="padding-bottom:18px">
+        <div class="panel-head">
+          <div><h2>Engine Operations</h2><p>GitHub PAT & Sync Actions</p></div>
+        </div>
 
-    function toggleSelect(index) {
-      parsedNodes[index].selected = !parsedNodes[index].selected;
-      renderNodes();
-    }
+        <div style="padding:16px 20px 0;display:grid;gap:10px">
+          <input type="password" id="tokenInput" placeholder="Enter GitHub Token (ghp_...)" class="custom-input">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button onclick="triggerGithubUpdate()" id="updateBtn" class="ghost"><i class="fa-solid fa-arrows-rotate mr-1"></i> Scrape GitHub</button>
+            <button onclick="runBenchmarkAll()" id="benchBtn" class="ghost" style="color:var(--cyan)"><i class="fa-solid fa-bolt mr-1"></i> Benchmark</button>
+          </div>
+          <button onclick="saveFastSubToGithub()" id="saveFastBtn" class="primary" style="width:100%"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Save Selected to fast-sub.txt</button>
+        </div>
+      </article>
+    </section>
 
-    function selectPreset(type) {
-      if (type === 'all') {
-        parsedNodes.forEach(n => n.selected = true);
-      } else if (type === 'none') {
-        parsedNodes.forEach(n => n.selected = false);
-      } else if (type === 'good') {
-        parsedNodes.forEach(n => {
-          n.selected = (n.ping !== null && n.ping < 350);
-        });
-      }
-      renderNodes();
-    }
+    <!-- Interactive Nodes Table -->
+    <section class="card nodes" id="nodesPanel">
+      <div class="panel-head node-head">
+        <div><h2>VPN Nodes Pool</h2><p>Real-time tested nodes from sub.txt. Check boxes to include in fast-sub.txt</p></div>
+        <div class="node-tools">
+          <input class="search" id="nodeSearch" placeholder="Search nodes or SNI..." oninput="filterNodes()">
+          <select class="select" id="statusFilter" onchange="filterNodes()">
+            <option value="all">All Nodes</option>
+            <option value="good">Ping &lt; 350ms</option>
+            <option value="selected">Selected Only</option>
+          </select>
+          <button onclick="selectPreset('all')" class="ghost">Select All</button>
+          <button onclick="selectPreset('none')" class="ghost">Clear</button>
+        </div>
+      </div>
 
-    function updateSelectionCount() {
-      const selected = parsedNodes.filter(n => n.selected).length;
-      document.getElementById("selectedCount").innerText = selected;
-    }
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40px">Include</th>
+              <th>Node / Location</th>
+              <th>SNI / Host</th>
+              <th>Latency</th>
+              <th>Est. Speed</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="nodeTableBody">
+            <tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">Loading active nodes from sub.txt...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
 
-    function addCustomNode() {
-      const input = document.getElementById("customNodeInput");
-      const val = input.value.trim();
+<div class="toast" id="toast"></div>
 
-      if (!val || !val.startsWith("vless://")) {
-        showStatus("Invalid vless:// key format", "error");
-        return;
-      }
+<script>
+const OWNER = "Thuzinheine";
+const REPO = "ai-vpn";
+const WORKFLOW_ID = "main.yml";
+let parsedNodes = [];
 
-      let name = `Custom-${parsedNodes.length + 1}`;
-      let host = "custom.edge";
+document.getElementById("tokenInput").value = localStorage.getItem("gh_token") || "";
+document.getElementById('menuBtn').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), 2800);
+}
+
+function scrollToNodes(){ document.getElementById('nodesPanel').scrollIntoView({behavior:'smooth'}); }
+function scrollToConfig(){ document.getElementById('configSection').scrollIntoView({behavior:'smooth'}); }
+
+async function fetchAndParseNodes() {
+  const tbody = document.getElementById("nodeTableBody");
+  tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Fetching latest sub.txt...</td></tr>`;
+
+  try {
+    const res = await fetch(`https://raw.githubusercontent.com/${OWNER}/${REPO}/main/sub.txt?t=${Date.now()}`);
+    if (!res.ok) throw new Error();
+    const b64 = await res.text();
+    const decoded = atob(b64.trim().replace(/\s+/g, ''));
+    const lines = decoded.split('\n').filter(l => l.startsWith('vless://'));
+
+    parsedNodes = lines.map((uri, idx) => {
+      let name = `Node-${idx + 1}`;
+      let host = "speed.cloudflare.com";
+      let flag = "🌐";
       try {
-        if (val.includes('#')) name = decodeURIComponent(val.split('#')[1]);
-        const matchHost = val.match(/sni=([^&]+)/) || val.match(/host=([^&]+)/) || val.match(/@([^:]+)/);
+        if (uri.includes('#')) name = decodeURIComponent(uri.split('#')[1]);
+        const matchHost = uri.match(/sni=([^&]+)/) || uri.match(/host=([^&]+)/) || uri.match(/@([^:]+)/);
         if (matchHost) host = matchHost[1];
+        if (name.includes("SG") || name.includes("Singapore")) flag = "🇸🇬";
+        else if (name.includes("JP") || name.includes("Japan")) flag = "🇯🇵";
+        else if (name.includes("US") || name.includes("America")) flag = "🇺🇸";
+        else if (name.includes("HK") || name.includes("Hong Kong")) flag = "🇭🇰";
       } catch(e) {}
+      return { id: idx, uri, name, host, flag, ping: null, speed: null, selected: true };
+    });
 
-      parsedNodes.unshift({
-        id: Date.now(),
-        uri: val,
-        name: name,
-        host: host,
-        ping: null,
-        speed: null,
-        selected: true
+    document.getElementById("activeCount").innerText = parsedNodes.length;
+    document.getElementById("navCount").innerText = parsedNodes.length;
+    renderNodes();
+    toast(`Loaded ${parsedNodes.length} nodes successfully.`);
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--red)">Failed to load sub.txt. Make sure file exists in repo.</td></tr>`;
+  }
+}
+
+function renderNodes() {
+  const tbody = document.getElementById("nodeTableBody");
+  if(parsedNodes.length === 0){
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">No nodes found.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = parsedNodes.map((n, i) => `
+    <tr data-name="${n.name.toLowerCase()}" data-host="${n.host.toLowerCase()}">
+      <td>
+        <input type="checkbox" ${n.selected ? 'checked' : ''} onchange="toggleSelect(${i})">
+      </td>
+      <td>
+        <div class="node-name">
+          <span class="flag">${n.flag}</span>
+          <div>${n.name}<small>VLESS Protocol</small></div>
+        </div>
+      </td>
+      <td style="font-family:monospace;font-size:11px;color:var(--muted)">${n.host}</td>
+      <td>
+        <span class="ping ${n.ping ? (n.ping < 250 ? '' : (n.ping < 450 ? 'medium' : 'bad')) : ''}">
+          <i></i>${n.ping !== null ? n.ping + ' ms' : '-- ms'}
+        </span>
+      </td>
+      <td style="font-family:monospace;font-size:11px">
+        ${n.speed !== null ? n.speed + ' MB/s' : '--'}
+      </td>
+      <td>
+        <button class="small-btn" onclick="copySingleUri(${i})" title="Copy VLESS key"><i class="fa-regular fa-copy"></i></button>
+      </td>
+    </tr>
+  `).join('');
+
+  updateSelectedMetric();
+}
+
+function toggleSelect(i){
+  parsedNodes[i].selected = !parsedNodes[i].selected;
+  updateSelectedMetric();
+}
+
+function selectPreset(type){
+  if(type === 'all') parsedNodes.forEach(n => n.selected = true);
+  if(type === 'none') parsedNodes.forEach(n => n.selected = false);
+  renderNodes();
+}
+
+function updateSelectedMetric(){
+  const count = parsedNodes.filter(n => n.selected).length;
+  document.getElementById("selectedCount").innerText = count;
+}
+
+function filterNodes(){
+  const q = document.getElementById("nodeSearch").value.toLowerCase();
+  const f = document.getElementById("statusFilter").value;
+  const rows = document.querySelectorAll("#nodeTableBody tr");
+
+  parsedNodes.forEach((n, i) => {
+    let matchQuery = n.name.toLowerCase().includes(q) || n.host.toLowerCase().includes(q);
+    let matchFilter = true;
+    if(f === 'good') matchFilter = (n.ping !== null && n.ping < 350);
+    if(f === 'selected') matchFilter = n.selected;
+
+    if(rows[i]) rows[i].style.display = (matchQuery && matchFilter) ? '' : 'none';
+  });
+}
+
+async function testSingleNode(node) {
+  const start = performance.now();
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 2000);
+    await fetch(`https://${node.host}/__down?bytes=100000&t=${Date.now()}`, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
+    clearTimeout(timeout);
+    const dur = Math.round(performance.now() - start);
+    node.ping = dur;
+    node.speed = (Math.max(1.2, (2000 / dur) * 1.5)).toFixed(1);
+  } catch(e) {
+    const dur = Math.round(performance.now() - start);
+    if(dur < 2000){
+      node.ping = dur;
+      node.speed = (Math.max(0.5, (1000 / dur))).toFixed(1);
+    } else {
+      node.ping = 999;
+      node.speed = "0.0";
+    }
+  }
+}
+
+async function runBenchmarkAll(){
+  if(parsedNodes.length === 0) return;
+  const btn = document.getElementById("benchBtn");
+  btn.disabled = true;
+  toast("Running real latency benchmark across all nodes...");
+
+  let best = 9999;
+  for(let i=0; i<parsedNodes.length; i++){
+    await testSingleNode(parsedNodes[i]);
+    if(parsedNodes[i].ping && parsedNodes[i].ping < best) best = parsedNodes[i].ping;
+    parsedNodes[i].selected = (parsedNodes[i].ping !== null && parsedNodes[i].ping < 450);
+    renderNodes();
+  }
+
+  parsedNodes.sort((a,b) => (a.ping || 999) - (b.ping || 999));
+  renderNodes();
+
+  document.getElementById("bestPing").innerHTML = `${best !== 9999 ? best : '--'} <span style="font-size:16px;color:#a7b3cb;font-weight:600">ms</span>`;
+  btn.disabled = false;
+  toast("Benchmark complete! Best nodes auto-selected.");
+}
+
+async function saveFastSubToGithub(){
+  const token = document.getElementById("tokenInput").value.trim();
+  const selected = parsedNodes.filter(n => n.selected).map(n => n.uri);
+
+  if(!token){ toast("Please enter your GitHub PAT token!"); return; }
+  if(selected.length === 0){ toast("Please select at least 1 node!"); return; }
+
+  localStorage.setItem("gh_token", token);
+  const btn = document.getElementById("saveFastBtn");
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Syncing to GitHub...`;
+
+  try {
+    const base64Content = btoa(selected.join('\n'));
+    let sha = null;
+    try {
+      const getRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/fast-sub.txt`, {
+        headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" }
       });
-
-      input.value = "";
-      document.getElementById("nodeCount").innerText = parsedNodes.length;
-      renderNodes();
-      showStatus(`Node "${name}" added`, "success");
-    }
-
-    async function testSingleNode(node) {
-      const start = performance.now();
-      try {
-        const testTarget = `https://${node.host}/__down?bytes=100000&t=${Date.now()}`;
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 2000);
-
-        await fetch(testTarget, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
-        clearTimeout(timeoutId);
-        
-        const duration = Math.round(performance.now() - start);
-        node.ping = duration;
-        node.speed = (Math.max(1.2, (2000 / duration) * 1.5)).toFixed(1);
-      } catch (err) {
-        const duration = Math.round(performance.now() - start);
-        if (duration < 2000) {
-          node.ping = duration;
-          node.speed = (Math.max(0.5, (1000 / duration))).toFixed(1);
-        } else {
-          node.ping = 999;
-          node.speed = "0.0";
-        }
+      if(getRes.ok){
+        const data = await getRes.json();
+        sha = data.sha;
       }
+    } catch(e){}
+
+    const putPayload = {
+      message: `Update fast-sub.txt (${selected.length} nodes)`,
+      content: base64Content,
+      branch: "main"
+    };
+    if(sha) putPayload.sha = sha;
+
+    const putRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/fast-sub.txt`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(putPayload)
+    });
+
+    if(putRes.ok){
+      toast(`Saved ${selected.length} nodes to fast-sub.txt successfully!`);
+    } else {
+      const err = await putRes.json();
+      toast(`GitHub Error: ${err.message}`);
     }
+  } catch(e){
+    toast("Network connection failed.");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> Save Selected to fast-sub.txt`;
+  }
+}
 
-    async function runBenchmarkAll() {
-      if (parsedNodes.length === 0) return;
-      const btn = document.getElementById("benchmarkBtn");
-      const icon = document.getElementById("testIcon");
-      btn.disabled = true;
-      icon.className = "fa-solid fa-spinner fa-spin text-[11px]";
-      showStatus("Testing latency across endpoints...", "loading");
+function addCustomNode(){
+  const key = prompt("Enter full vless:// key:");
+  if(!key || !key.startsWith("vless://")) return;
+  let name = `Custom-${parsedNodes.length+1}`;
+  let host = "custom.edge";
+  try {
+    if(key.includes('#')) name = decodeURIComponent(key.split('#')[1]);
+    const match = key.match(/sni=([^&]+)/) || key.match(/host=([^&]+)/) || key.match(/@([^:]+)/);
+    if(match) host = match[1];
+  } catch(e){}
 
-      let best = 9999;
+  parsedNodes.unshift({ id: Date.now(), uri: key, name, host, flag: "🌐", ping: null, speed: null, selected: true });
+  renderNodes();
+  toast(`Added "${name}" to list.`);
+}
 
-      for (let i = 0; i < parsedNodes.length; i++) {
-        await testSingleNode(parsedNodes[i]);
-        if (parsedNodes[i].ping && parsedNodes[i].ping < best) best = parsedNodes[i].ping;
-        parsedNodes[i].selected = (parsedNodes[i].ping !== null && parsedNodes[i].ping < 450);
-        renderNodes();
-      }
+function copySingleUri(i){
+  navigator.clipboard.writeText(parsedNodes[i].uri);
+  toast(`Copied key for "${parsedNodes[i].name}"`);
+}
 
-      parsedNodes.sort((a, b) => (a.ping || 999) - (b.ping || 999));
-      renderNodes();
+function copyLink(id){
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.value);
+  toast("Subscription link copied to clipboard!");
+}
 
-      document.getElementById("bestPing").innerText = best !== 9999 ? `${best} ms` : "--";
+async function triggerGithubUpdate(){
+  const token = document.getElementById("tokenInput").value.trim();
+  if(!token){ toast("GitHub PAT required!"); return; }
+  localStorage.setItem("gh_token", token);
 
-      btn.disabled = false;
-      icon.className = "fa-solid fa-stopwatch text-[11px]";
-      showStatus("Benchmark Complete", "success");
+  const btn = document.getElementById("updateBtn");
+  btn.disabled = true;
+  toast("Dispatching GitHub Workflow...");
+
+  try {
+    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW_ID}/dispatches`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" },
+      body: JSON.stringify({ ref: "main" })
+    });
+    if(res.status === 204){
+      toast("Action dispatched! Refreshing nodes in 15s...");
+      setTimeout(fetchAndParseNodes, 15000);
+    } else {
+      toast("Dispatch failed. Check PAT permissions.");
     }
+  } catch(e){
+    toast("Network Error.");
+  } finally {
+    btn.disabled = false;
+  }
+}
 
-    async function saveFastSubToGithub() {
-      const token = document.getElementById("tokenInput").value.trim();
-      const selectedUris = parsedNodes.filter(n => n.selected).map(n => n.uri);
-
-      if (!token) {
-        showStatus("GitHub PAT required", "error");
-        return;
-      }
-
-      if (selectedUris.length === 0) {
-        showStatus("Select at least 1 node", "error");
-        return;
-      }
-
-      const saveBtn = document.getElementById("saveFastBtn");
-      const saveIcon = document.getElementById("saveFastIcon");
-      const saveText = document.getElementById("saveFastText");
-
-      saveBtn.disabled = true;
-      saveIcon.className = "fa-solid fa-spinner fa-spin text-[11px]";
-      saveText.innerText = "Syncing...";
-      showStatus("Saving to fast-sub.txt...", "loading");
-
-      try {
-        const base64Content = btoa(selectedUris.join('\n'));
-        let sha = null;
-        try {
-          const fileRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/fast-sub.txt`, {
-            headers: {
-              "Accept": "application/vnd.github+json",
-              "Authorization": `Bearer ${token}`
-            }
-          });
-          if (fileRes.ok) {
-            const fileData = await fileRes.json();
-            sha = fileData.sha;
-          }
-        } catch (e) {}
-
-        const putPayload = {
-          message: `Update fast-sub.txt (${selectedUris.length} nodes)`,
-          content: base64Content,
-          branch: "main"
-        };
-        if (sha) putPayload.sha = sha;
-
-        const updateRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/fast-sub.txt`, {
-          method: "PUT",
-          headers: {
-            "Accept": "application/vnd.github+json",
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(putPayload)
-        });
-
-        if (updateRes.ok) {
-          showStatus(`Saved ${selectedUris.length} nodes to fast-sub.txt`, "success");
-          document.getElementById("fastSubUrl").value = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/fast-sub.txt?t=${Date.now()}`;
-        } else {
-          const err = await updateRes.json();
-          showStatus(`Error: ${err.message}`, "error");
-        }
-      } catch (err) {
-        showStatus("Network connection error", "error");
-      } finally {
-        saveBtn.disabled = false;
-        saveIcon.className = "fa-solid fa-cloud-arrow-up text-apple-blue text-xs";
-        saveText.innerText = "Save Selected to fast-sub.txt";
-      }
-    }
-
-    function copyLink(inputId, btnId) {
-      const input = document.getElementById(inputId);
-      input.select();
-      navigator.clipboard.writeText(input.value);
-      const btn = document.getElementById(btnId);
-      btn.innerText = "Copied";
-      setTimeout(() => btn.innerText = "Copy", 2000);
-      showStatus("Link copied to clipboard", "success");
-    }
-
-    function copySingleNode(index) {
-      const node = parsedNodes[index];
-      navigator.clipboard.writeText(node.uri);
-      showStatus(`Copied "${node.name}" key`, "success");
-    }
-
-    async function triggerGithubUpdate() {
-      const token = document.getElementById("tokenInput").value.trim();
-      const btn = document.getElementById("updateBtn");
-      const icon = document.getElementById("btnIcon");
-
-      if (!token) {
-        showStatus("PAT Token required", "error");
-        return;
-      }
-
-      localStorage.setItem("gh_token", token);
-      btn.disabled = true;
-      icon.className = "fa-solid fa-spinner fa-spin text-[11px]";
-      showStatus("Dispatching Action...", "loading");
-
-      try {
-        const response = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW_ID}/dispatches`, {
-          method: "POST",
-          headers: {
-            "Accept": "application/vnd.github+json",
-            "Authorization": `Bearer ${token}`,
-            "X-GitHub-Api-Version": "2022-11-28"
-          },
-          body: JSON.stringify({ ref: "main" })
-        });
-
-        if (response.status === 204) {
-          showStatus("Action dispatched! Refreshing in ~15s", "success");
-          setTimeout(() => fetchAndParseNodes(), 15000);
-        } else {
-          showStatus("Trigger failed. Verify PAT permissions.", "error");
-        }
-      } catch (err) {
-        showStatus("Network Error", "error");
-      } finally {
-        btn.disabled = false;
-        icon.className = "fa-solid fa-arrows-rotate text-[11px]";
-      }
-    }
-
-    fetchAndParseNodes();
-  </script>
+fetchAndParseNodes();
+</script>
 </body>
 </html>
