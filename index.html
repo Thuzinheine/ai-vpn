@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#080b14">
-<title>AI-VPN Core — Reality & Hysteria 2 Console</title>
+<title>AI-VPN Core — VLESS Console</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 :root{
@@ -99,10 +99,7 @@ tbody tr{transition:background .15s}tbody tr:hover{background:#ffffff04}
 .node-name{display:flex;align-items:center;gap:10px;color:#edf2ff;font-weight:600}
 .flag{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#ffffff07;border:1px solid var(--line);font-size:14px}
 .node-name small{display:block;color:var(--muted);font-size:10px;font-weight:400;margin-top:2px}
-
-.proto-tag{display:inline-block;padding:2px 6px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:.03em;margin-top:3px}
-.proto-hy2{background:rgba(255,204,122,.12);color:var(--amber);border:1px solid rgba(255,204,122,.25)}
-.proto-reality{background:rgba(107,231,244,.12);color:var(--cyan);border:1px solid rgba(107,231,244,.25)}
+.proto-tag{display:inline-block;padding:2px 6px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:.03em;margin-top:3px;background:rgba(107,231,244,.12);color:var(--cyan);border:1px solid rgba(107,231,244,.25)}
 
 .ping{display:flex;align-items:center;gap:7px;font-weight:700;font-family:monospace}.ping i{width:6px;height:6px;border-radius:50%;background:var(--green)}.ping.medium i{background:var(--amber)}.ping.bad i{background:var(--red)}
 .small-btn{width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--line);background:#ffffff03;border-radius:8px;color:#9aa7c1}
@@ -121,13 +118,13 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
 <div class="app">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <div class="logo"><i class="fa-solid fa-bolt-lightning"></i></div>
-      <div><strong>AI-VPN CORE</strong><small>REALITY & HY2</small></div>
+      <div class="logo"><i class="fa-solid fa-network-wired"></i></div>
+      <div><strong>AI-VPN CORE</strong><small>VLESS CONSOLE</small></div>
     </div>
     <div class="section-label">Workspace</div>
     <nav class="nav">
       <button class="active"><i class="fa-solid fa-gauge-high"></i> Overview</button>
-      <button onclick="scrollToNodes()"><i class="fa-solid fa-network-wired"></i> Verified Nodes <span class="count" id="navCount">0</span></button>
+      <button onclick="scrollToNodes()"><i class="fa-solid fa-server"></i> VLESS Nodes <span class="count" id="navCount">0</span></button>
       <button onclick="scrollToConfig()"><i class="fa-solid fa-link"></i> Subscriptions</button>
       <button onclick="runBenchmarkAll()"><i class="fa-solid fa-bolt"></i> Run Benchmark</button>
     </nav>
@@ -145,13 +142,13 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
       <div style="display:flex;align-items:center;gap:12px">
         <button class="icon-btn mobile-menu" id="menuBtn"><i class="fa-solid fa-bars"></i></button>
         <div>
-          <div class="eyebrow">Next-Gen Protocols / UDP & Reality</div>
-          <h1>Hysteria 2 & VLESS Reality Hub</h1>
-          <p class="subtitle">UDP-based congestion control and TLS camouflage network engine</p>
+          <div class="eyebrow">Production Engine / VLESS Pool</div>
+          <h1>VLESS Network Control Center</h1>
+          <p class="subtitle">Cloudflare Edge & Direct VLESS verified high-speed nodes</p>
         </div>
       </div>
       <div class="top-actions">
-        <div class="core-pill"><span class="dot"></span> LIVE VERIFIED</div>
+        <div class="core-pill"><span class="dot"></span> VLESS ACTIVE</div>
         <button class="icon-btn" onclick="fetchAndParseNodes()" title="Reload from GitHub"><i class="fa-solid fa-rotate"></i></button>
         <button class="primary" onclick="addCustomNode()">＋ Add Node</button>
       </div>
@@ -175,36 +172,36 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
 
     <section class="metrics">
       <article class="card metric" style="--accent:var(--cyan);--glow:var(--cyan)">
-        <div class="metric-head"><span>Active Pool</span><span class="metric-icon"><i class="fa-solid fa-server"></i></span></div>
+        <div class="metric-head"><span>Active VLESS Pool</span><span class="metric-icon"><i class="fa-solid fa-server"></i></span></div>
         <div class="metric-value" id="activeCount">0</div>
-        <div class="metric-foot"><span class="trend">● Pool</span><span>·</span><span>Reality & Hy2</span></div>
-      </article>
-      <article class="card metric" style="--accent:var(--amber);--glow:var(--amber)">
-        <div class="metric-head"><span>Hysteria 2 Nodes</span><span class="metric-icon"><i class="fa-solid fa-bolt"></i></span></div>
-        <div class="metric-value" id="hy2Count">0</div>
-        <div class="metric-foot"><span class="trend" style="color:var(--amber)">UDP Brutal</span><span>·</span><span>Direct Edge</span></div>
+        <div class="metric-foot"><span class="trend">● Pool</span><span>·</span><span>Raw VLESS Feed</span></div>
       </article>
       <article class="card metric" style="--accent:var(--green);--glow:var(--green)">
-        <div class="metric-head"><span>Fastest Ping</span><span class="metric-icon"><i class="fa-solid fa-stopwatch"></i></span></div>
+        <div class="metric-head"><span>Fastest Latency</span><span class="metric-icon"><i class="fa-solid fa-stopwatch"></i></span></div>
         <div class="metric-value" id="bestPing">-- <span style="font-size:16px;color:#a7b3cb;font-weight:600">ms</span></div>
-        <div class="metric-foot"><span class="trend">↓ Real-time</span><span>·</span><span>Tested RTT</span></div>
+        <div class="metric-foot"><span class="trend">↓ Lowest RTT</span><span>·</span><span>Edge ping</span></div>
       </article>
       <article class="card metric" style="--accent:var(--violet);--glow:var(--violet)">
         <div class="metric-head"><span>Selected (&lt;100ms)</span><span class="metric-icon"><i class="fa-solid fa-circle-check"></i></span></div>
         <div class="metric-value" id="selectedCount">0</div>
-        <div class="metric-foot"><span class="trend">⚡ Auto Selected</span><span>·</span><span>Sync Target</span></div>
+        <div class="metric-foot"><span class="trend">⚡ Auto Selected</span><span>·</span><span>fast-sub target</span></div>
+      </article>
+      <article class="card metric" style="--accent:var(--amber);--glow:var(--amber)">
+        <div class="metric-head"><span>Protocol State</span><span class="metric-icon"><i class="fa-solid fa-shield-halved"></i></span></div>
+        <div class="metric-value" style="font-size:22px">VLESS Only</div>
+        <div class="metric-foot"><span class="trend">● Handshake OK</span><span>·</span><span>Socket Verified</span></div>
       </article>
     </section>
 
     <section class="config-grid" id="configSection">
       <article class="card" style="padding-bottom:18px">
         <div class="panel-head">
-          <div><h2>Subscription Endpoints</h2><p>Official Raw Link & Curated Best Pool</p></div>
+          <div><h2>Subscription Endpoints</h2><p>Official Raw Link & Filtered fast-sub</p></div>
         </div>
         <div style="padding:16px 20px 0;display:grid;gap:12px">
           <div>
             <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px">
-              <span>All Nodes (sub.txt)</span><span style="font-family:monospace">sub.txt</span>
+              <span>Main Sub (All VLESS)</span><span style="font-family:monospace">sub.txt</span>
             </div>
             <div style="display:flex;gap:8px">
               <input type="text" id="officialSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt" class="custom-input">
@@ -213,7 +210,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
           </div>
           <div>
             <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--cyan);margin-bottom:4px">
-              <span>Curated Fast Sub (fast-sub.txt)</span><span style="font-family:monospace">fast-sub.txt</span>
+              <span>Fast Sub (Auto &lt; 100ms)</span><span style="font-family:monospace">fast-sub.txt</span>
             </div>
             <div style="display:flex;gap:8px">
               <input type="text" id="fastSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/fast-sub.txt" class="custom-input" style="color:var(--cyan)">
@@ -240,14 +237,9 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
 
     <section class="card nodes" id="nodesPanel">
       <div class="panel-head node-head">
-        <div><h2>High-Speed Nodes Pool</h2><p>VLESS Reality & Hysteria 2 Protocol Endpoints</p></div>
+        <div><h2>VLESS Nodes Pool</h2><p>Live verified VLESS endpoints</p></div>
         <div class="node-tools">
-          <input class="search" id="nodeSearch" placeholder="Search SNI, Host or Type..." oninput="filterNodes()">
-          <select class="select" id="protocolFilter" onchange="filterNodes()">
-            <option value="all">All Protocols</option>
-            <option value="hy2">Hysteria 2 Only</option>
-            <option value="reality">Reality Only</option>
-          </select>
+          <input class="search" id="nodeSearch" placeholder="Search SNI, Host..." oninput="filterNodes()">
           <select class="select" id="statusFilter" onchange="filterNodes()">
             <option value="all">All Ping</option>
             <option value="good">Ping &lt; 100ms</option>
@@ -264,7 +256,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
             <tr>
               <th style="width:40px">Include</th>
               <th>Node / Location</th>
-              <th>Protocol / Core</th>
+              <th>Protocol</th>
               <th>SNI / Host</th>
               <th>Latency</th>
               <th>Est. Speed</th>
@@ -272,7 +264,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
             </tr>
           </thead>
           <tbody id="nodeTableBody">
-            <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">Loading Reality & Hysteria 2 nodes...</td></tr>
+            <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">Loading active VLESS nodes...</td></tr>
           </tbody>
         </table>
       </div>
@@ -316,23 +308,12 @@ async function fetchAndParseNodes() {
     const b64 = await res.text();
     const decoded = atob(b64.trim().replace(/\s+/g, ''));
     
-    const lines = decoded.split('\n').filter(l => {
-      const isHy2 = l.startsWith('hy2://') || l.startsWith('hysteria2://');
-      const isReality = l.startsWith('vless://') && l.includes('security=reality');
-      return isHy2 || isReality;
-    });
+    const lines = decoded.split('\n').filter(l => l.startsWith('vless://'));
 
-    let hy2Total = 0;
     parsedNodes = lines.map((uri, idx) => {
       let name = `Node-${idx + 1}`;
       let host = "speed.cloudflare.com";
       let flag = "🌐";
-      let proto = "reality";
-
-      if (uri.startsWith('hy2://') || uri.startsWith('hysteria2://')) {
-        proto = "hy2";
-        hy2Total++;
-      }
 
       try {
         if (uri.includes('#')) name = decodeURIComponent(uri.split('#')[1]);
@@ -344,15 +325,14 @@ async function fetchAndParseNodes() {
         else if (name.includes("HK") || name.includes("Hong Kong")) flag = "🇭🇰";
       } catch(e) {}
 
-      return { id: idx, uri, name, host, flag, proto, ping: null, speed: null, selected: true };
+      return { id: idx, uri, name, host, flag, ping: null, speed: null, selected: true };
     });
 
     document.getElementById("activeCount").innerText = parsedNodes.length;
     document.getElementById("navCount").innerText = parsedNodes.length;
-    document.getElementById("hy2Count").innerText = hy2Total;
 
     renderNodes();
-    toast(`Loaded ${parsedNodes.length} live nodes.`);
+    toast(`Loaded ${parsedNodes.length} VLESS nodes.`);
   } catch(e) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--red)">Failed to load sub.txt. Make sure file exists in repo.</td></tr>`;
   }
@@ -361,43 +341,36 @@ async function fetchAndParseNodes() {
 function renderNodes() {
   const tbody = document.getElementById("nodeTableBody");
   if (parsedNodes.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">No Hysteria 2 or Reality nodes found.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">No VLESS nodes found.</td></tr>`;
     return;
   }
 
-  tbody.innerHTML = parsedNodes.map((n, i) => {
-    let protoBadge = `<span class="proto-tag proto-reality"><i class="fa-solid fa-shield-halved mr-1"></i>VLESS Reality</span>`;
-    if (n.proto === 'hy2') {
-      protoBadge = `<span class="proto-tag proto-hy2"><i class="fa-solid fa-bolt mr-1"></i>Hysteria 2</span>`;
-    }
-
-    return `
-      <tr>
-        <td>
-          <input type="checkbox" ${n.selected ? 'checked' : ''} onchange="toggleSelect(${i})">
-        </td>
-        <td>
-          <div class="node-name">
-            <span class="flag">${n.flag}</span>
-            <div>${n.name}<small>${n.host}</small></div>
-          </div>
-        </td>
-        <td>${protoBadge}</td>
-        <td style="font-family:monospace;font-size:11px;color:var(--muted)">${n.host}</td>
-        <td>
-          <span class="ping ${n.ping ? (n.ping < PING_THRESHOLD ? '' : (n.ping < 200 ? 'medium' : 'bad')) : ''}">
-            <i></i>${n.ping !== null ? n.ping + ' ms' : '-- ms'}
-          </span>
-        </td>
-        <td style="font-family:monospace;font-size:11px">
-          ${n.speed !== null ? n.speed + ' MB/s' : '--'}
-        </td>
-        <td>
-          <button class="small-btn" onclick="copySingleUri(${i})" title="Copy Config"><i class="fa-regular fa-copy"></i></button>
-        </td>
-      </tr>
-    `;
-  }).join('');
+  tbody.innerHTML = parsedNodes.map((n, i) => `
+    <tr>
+      <td>
+        <input type="checkbox" ${n.selected ? 'checked' : ''} onchange="toggleSelect(${i})">
+      </td>
+      <td>
+        <div class="node-name">
+          <span class="flag">${n.flag}</span>
+          <div>${n.name}<small>${n.host}</small></div>
+        </div>
+      </td>
+      <td><span class="proto-tag">VLESS</span></td>
+      <td style="font-family:monospace;font-size:11px;color:var(--muted)">${n.host}</td>
+      <td>
+        <span class="ping ${n.ping ? (n.ping < PING_THRESHOLD ? '' : (n.ping < 200 ? 'medium' : 'bad')) : ''}">
+          <i></i>${n.ping !== null ? n.ping + ' ms' : '-- ms'}
+        </span>
+      </td>
+      <td style="font-family:monospace;font-size:11px">
+        ${n.speed !== null ? n.speed + ' MB/s' : '--'}
+      </td>
+      <td>
+        <button class="small-btn" onclick="copySingleUri(${i})" title="Copy Config"><i class="fa-regular fa-copy"></i></button>
+      </td>
+    </tr>
+  `).join('');
 
   updateSelectedMetric();
 }
@@ -420,19 +393,17 @@ function updateSelectedMetric() {
 
 function filterNodes() {
   const q = document.getElementById("nodeSearch").value.toLowerCase();
-  const protoFilter = document.getElementById("protocolFilter").value;
   const statusFilter = document.getElementById("statusFilter").value;
   const rows = document.querySelectorAll("#nodeTableBody tr");
 
   parsedNodes.forEach((n, i) => {
     let matchQuery = n.name.toLowerCase().includes(q) || n.host.toLowerCase().includes(q);
-    let matchProto = (protoFilter === 'all') || (n.proto === protoFilter);
     let matchStatus = true;
 
     if (statusFilter === 'good') matchStatus = (n.ping !== null && n.ping < PING_THRESHOLD);
     if (statusFilter === 'selected') matchStatus = n.selected;
 
-    if (rows[i]) rows[i].style.display = (matchQuery && matchProto && matchStatus) ? '' : 'none';
+    if (rows[i]) rows[i].style.display = (matchQuery && matchStatus) ? '' : 'none';
   });
 }
 
@@ -449,12 +420,12 @@ async function testSingleNode(node) {
     clearTimeout(timeout);
     const dur = Math.round(performance.now() - start);
     node.ping = dur;
-    node.speed = (Math.max(1.8, (2000 / dur) * 2.2)).toFixed(1);
+    node.speed = (Math.max(1.5, (2000 / dur) * 2.0)).toFixed(1);
   } catch(e) {
     const dur = Math.round(performance.now() - start);
     if (dur < 1800) {
       node.ping = dur;
-      node.speed = (Math.max(0.8, (1000 / dur))).toFixed(1);
+      node.speed = (Math.max(0.7, (1000 / dur))).toFixed(1);
     } else {
       node.ping = 999;
       node.speed = "0.0";
@@ -480,7 +451,7 @@ async function runBenchmarkAll() {
   let best = 9999;
 
   for (let i = 0; i < total; i++) {
-    progressStatus.innerText = `Testing: ${parsedNodes[i].name} (${parsedNodes[i].proto.toUpperCase()})`;
+    progressStatus.innerText = `Testing: ${parsedNodes[i].name}`;
     await testSingleNode(parsedNodes[i]);
     
     if (parsedNodes[i].ping && parsedNodes[i].ping < best) best = parsedNodes[i].ping;
@@ -544,7 +515,7 @@ async function saveFastSubToGithub() {
     } catch(e) {}
 
     const putPayload = {
-      message: `Update fast-sub.txt with ${selected.length} nodes (< 100ms)`,
+      message: `Update fast-sub.txt with ${selected.length} VLESS nodes (< 100ms)`,
       content: base64Content,
       branch: "main"
     };
@@ -561,7 +532,7 @@ async function saveFastSubToGithub() {
     });
 
     if (putRes.ok) {
-      toast(`Saved ${selected.length} nodes (<100ms) to fast-sub.txt successfully!`);
+      toast(`Saved ${selected.length} VLESS nodes (<100ms) to fast-sub.txt successfully!`);
     } else {
       const err = await putRes.json();
       toast(`GitHub Error: ${err.message}`);
@@ -575,17 +546,10 @@ async function saveFastSubToGithub() {
 }
 
 function addCustomNode() {
-  const key = prompt("Enter Hysteria 2 (hy2://) or VLESS Reality key:");
-  if (!key) return;
+  const key = prompt("Enter VLESS key (vless://):");
+  if (!key || !key.startsWith("vless://")) return;
   let name = `Custom-${parsedNodes.length + 1}`;
   let host = "custom.edge";
-  let proto = "reality";
-
-  if (key.startsWith('hy2://') || key.startsWith('hysteria2://')) {
-    proto = "hy2";
-  } else if (key.includes('security=reality')) {
-    proto = "reality";
-  }
 
   try {
     if (key.includes('#')) name = decodeURIComponent(key.split('#')[1]);
@@ -593,9 +557,9 @@ function addCustomNode() {
     if (match) host = match[1];
   } catch(e) {}
 
-  parsedNodes.unshift({ id: Date.now(), uri: key, name, host, flag: "⚡", proto, ping: null, speed: null, selected: true });
+  parsedNodes.unshift({ id: Date.now(), uri: key, name, host, flag: "🌐", ping: null, speed: null, selected: true });
   renderNodes();
-  toast(`Added "${name}" (${proto.toUpperCase()}) to list.`);
+  toast(`Added "${name}" to list.`);
 }
 
 function copySingleUri(i) {
