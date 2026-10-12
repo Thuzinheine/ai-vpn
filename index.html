@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI VPN Core | Grid Dashboard</title>
+  <title>AI VPN Core | Calm Slate Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -20,11 +20,15 @@
             mono: ['JetBrains Mono', 'monospace'],
           },
           colors: {
-            mint: {
-              300: '#6ee7b7',
-              400: '#34d399',
-              500: '#10b981',
-              neon: '#00ff9d',
+            slate: {
+              850: '#151e2e',
+              900: '#0f172a',
+              950: '#090d16',
+            },
+            calm: {
+              accent: '#38bdf8', /* Soft Sky Blue */
+              soft: '#7dd3fc',
+              subtle: '#0284c7',
             }
           }
         }
@@ -34,127 +38,126 @@
 
   <style>
     body {
-      background-color: #060b09;
+      background-color: #0b0f19;
       background-image: 
-        radial-gradient(circle at 10% 20%, rgba(0, 255, 157, 0.07) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 45%);
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.04) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.04) 0px, transparent 50%);
     }
-    .neon-panel {
-      background: rgba(10, 18, 14, 0.85);
-      backdrop-filter: blur(24px);
-      border: 1px solid rgba(52, 211, 153, 0.18);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    .calm-panel {
+      background: rgba(18, 24, 38, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
     .custom-scroll::-webkit-scrollbar {
       width: 4px;
     }
     .custom-scroll::-webkit-scrollbar-track {
-      background: rgba(8, 19, 14, 0.5);
+      background: rgba(15, 23, 42, 0.6);
     }
     .custom-scroll::-webkit-scrollbar-thumb {
-      background: rgba(52, 211, 153, 0.25);
+      background: rgba(148, 163, 184, 0.2);
       border-radius: 8px;
     }
   </style>
 </head>
-<body class="text-slate-100 min-h-screen p-3 sm:p-5 flex flex-col justify-between selection:bg-mint-neon selection:text-black">
+<body class="text-slate-200 min-h-screen p-3 sm:p-5 flex flex-col justify-between selection:bg-sky-500 selection:text-white">
 
   <!-- Full Width Main Dashboard Container -->
   <div class="max-w-7xl w-full mx-auto space-y-4">
 
-    <!-- Top Full-Width Navbar -->
-    <header class="neon-panel rounded-2xl px-5 py-3.5 flex flex-wrap items-center justify-between gap-3">
+    <!-- Top Navbar -->
+    <header class="calm-panel rounded-2xl px-5 py-3.5 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 via-mint-neon to-emerald-600 p-[1px] flex-shrink-0">
-          <div class="w-full h-full bg-[#08120d] rounded-xl flex items-center justify-center">
-            <i class="fa-solid fa-bolt-lightning text-mint-neon text-lg drop-shadow-[0_0_8px_rgba(0,255,157,0.8)]"></i>
-          </div>
+        <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700/80 flex items-center justify-center text-sky-400 shadow-sm">
+          <i class="fa-solid fa-shield-halved text-lg"></i>
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-base font-bold text-white tracking-tight">AI-VPN Core Hub</h1>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-mint-neon border border-emerald-500/30">Auto-Edge</span>
+            <h1 class="text-base font-semibold text-slate-100 tracking-tight">AI-VPN Sub Hub</h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-sky-500/10 text-sky-300 border border-sky-500/20">
+              Edge Pool
+            </span>
           </div>
-          <p class="text-[11px] text-emerald-200/50">High-Performance VLESS Auto Scraping & Real-time Benchmark</p>
+          <p class="text-[11px] text-slate-400">VLESS Subscription Engine & Latency Monitor</p>
         </div>
       </div>
 
       <!-- Quick Metrics Counters -->
       <div class="flex items-center gap-2 text-xs">
-        <div class="bg-[#09150f] border border-emerald-500/20 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
-          <span class="text-emerald-400/60 text-[10px] uppercase font-semibold">Total Nodes</span>
-          <span id="nodeCount" class="font-bold font-mono text-mint-neon">0</span>
+        <div class="bg-slate-900/80 border border-slate-800 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
+          <span class="text-slate-400 text-[10px] uppercase font-medium">Nodes</span>
+          <span id="nodeCount" class="font-semibold font-mono text-slate-200">0</span>
         </div>
-        <div class="bg-[#09150f] border border-emerald-500/20 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
-          <span class="text-emerald-400/60 text-[10px] uppercase font-semibold">Fastest Latency</span>
-          <span id="bestPing" class="font-bold font-mono text-mint-neon">-- ms</span>
+        <div class="bg-slate-900/80 border border-slate-800 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
+          <span class="text-slate-400 text-[10px] uppercase font-medium">Best Ping</span>
+          <span id="bestPing" class="font-semibold font-mono text-sky-400">-- ms</span>
         </div>
-        <div class="bg-[#09150f] border border-emerald-500/20 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
-          <span class="text-emerald-400/60 text-[10px] uppercase font-semibold">Est. Speed</span>
-          <span id="avgSpeed" class="font-bold font-mono text-emerald-300">-- MB/s</span>
+        <div class="bg-slate-900/80 border border-slate-800 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
+          <span class="text-slate-400 text-[10px] uppercase font-medium">Est. Speed</span>
+          <span id="avgSpeed" class="font-semibold font-mono text-indigo-300">-- MB/s</span>
         </div>
       </div>
     </header>
 
-    <!-- Main 2-Column Grid (No Empty Spaces) -->
+    <!-- Main 2-Column Grid -->
     <main class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
       
-      <!-- Left Column: Settings, Control & Sub Link (Col Span 4) -->
+      <!-- Left Column: Controls (Col Span 4) -->
       <section class="lg:col-span-4 space-y-4">
         
-        <!-- Controls Panel -->
-        <div class="neon-panel rounded-2xl p-5 space-y-4">
-          <div class="flex justify-between items-center pb-2 border-b border-emerald-500/15">
-            <span class="text-xs font-bold uppercase tracking-wider text-emerald-300/80 flex items-center gap-1.5">
-              <i class="fa-solid fa-sliders text-mint-neon"></i> Control Engine
+        <div class="calm-panel rounded-2xl p-5 space-y-4">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-800">
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-sliders text-sky-400"></i> Settings & Control
             </span>
-            <span class="text-[10px] text-emerald-400/50">Actions Trigger</span>
+            <span class="text-[10px] text-slate-500">API Trigger</span>
           </div>
 
           <!-- Token Input -->
           <div class="space-y-1.5">
-            <label class="text-[11px] font-medium text-emerald-200/80 flex items-center gap-1.5">
-              <i class="fa-solid fa-key text-emerald-400"></i> GitHub Token (PAT)
+            <label class="text-[11px] font-medium text-slate-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-key text-slate-400"></i> GitHub Token (PAT)
             </label>
             <div class="relative">
               <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" 
-                class="w-full bg-[#08130e] border border-emerald-500/25 rounded-xl pl-3 pr-9 py-2 text-xs text-emerald-100 placeholder-emerald-900/50 focus:outline-none focus:border-mint-neon font-mono">
-              <button type="button" onclick="toggleTokenVisibility()" class="absolute right-3 top-2.5 text-emerald-500/60 hover:text-mint-neon">
+                class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-3 pr-9 py-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500 font-mono">
+              <button type="button" onclick="toggleTokenVisibility()" class="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300">
                 <i id="eyeIcon" class="fa-regular fa-eye text-xs"></i>
               </button>
             </div>
           </div>
 
-          <!-- Action Buttons -->
+          <!-- Buttons -->
           <div class="space-y-2 pt-1">
             <button onclick="triggerGithubUpdate()" id="updateBtn"
-              class="w-full bg-gradient-to-r from-emerald-500 to-mint-neon text-slate-950 font-bold py-2.5 rounded-xl text-xs uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/20 active:scale-95 transition">
-              <i id="btnIcon" class="fa-solid fa-cloud-arrow-down text-sm"></i>
-              <span>Scrape Fresh Nodes</span>
+              class="w-full bg-sky-600 hover:bg-sky-500 text-white font-medium py-2.5 rounded-xl text-xs uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-sky-900/20 active:scale-95 transition">
+              <i id="btnIcon" class="fa-solid fa-arrows-rotate text-sm"></i>
+              <span>Refresh GitHub Nodes</span>
             </button>
 
             <button onclick="runBenchmarkAll()" id="benchmarkBtn"
-              class="w-full bg-[#0d1e15] hover:bg-[#132c1f] border border-mint-neon/40 text-mint-neon font-bold py-2.5 rounded-xl text-xs uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition">
-              <i id="testIcon" class="fa-solid fa-bolt text-sm"></i>
-              <span>Test All Latency & Speed</span>
+              class="w-full bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-slate-200 font-medium py-2.5 rounded-xl text-xs uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition">
+              <i id="testIcon" class="fa-solid fa-gauge-simple-high text-sm text-sky-400"></i>
+              <span>Test Latency & Speed</span>
             </button>
           </div>
 
-          <!-- Feedback Status Toast -->
+          <!-- Toast Message -->
           <div id="statusBox" class="hidden p-3 rounded-xl text-xs flex items-center gap-2.5 border transition-all">
             <i id="statusIcon" class="fa-solid fa-circle-notch fa-spin text-sm"></i>
             <span id="statusMessage" class="text-[11px] leading-tight"></span>
           </div>
 
-          <!-- Active Subscription Link -->
-          <div class="space-y-1.5 pt-2 border-t border-emerald-500/15">
-            <label class="text-[11px] font-medium text-emerald-200/80 flex items-center gap-1.5">
-              <i class="fa-solid fa-link text-mint-neon"></i> Subscription URL (Raw)
+          <!-- Sub Link URL -->
+          <div class="space-y-1.5 pt-2 border-t border-slate-800">
+            <label class="text-[11px] font-medium text-slate-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-link text-sky-400"></i> Raw Subscription Link
             </label>
-            <div class="flex items-center gap-1.5 bg-[#08130e] border border-emerald-500/25 rounded-xl p-1.5">
+            <div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-800 rounded-xl p-1.5">
               <input type="text" id="subUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt"
-                class="w-full bg-transparent border-0 px-2 text-[11px] text-mint-neon font-mono truncate select-all focus:outline-none">
-              <button onclick="copySubLink()" id="copyBtn" class="bg-emerald-500/15 hover:bg-emerald-500/25 active:scale-95 text-mint-neon border border-emerald-500/30 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1">
+                class="w-full bg-transparent border-0 px-2 text-[11px] text-sky-300 font-mono truncate select-all focus:outline-none">
+              <button onclick="copySubLink()" id="copyBtn" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1">
                 <i class="fa-regular fa-copy"></i>
                 <span id="copyText">Copy</span>
               </button>
@@ -162,34 +165,33 @@
           </div>
         </div>
 
-        <!-- Help Card -->
-        <div class="neon-panel rounded-2xl p-4 text-[11px] text-emerald-300/60 space-y-1">
-          <p class="flex items-center gap-1.5 text-emerald-200 font-semibold">
-            <i class="fa-solid fa-circle-info text-mint-neon"></i> အသုံးပြုပုံ အကြံပြုချက်
+        <div class="calm-panel rounded-2xl p-4 text-[11px] text-slate-400 space-y-1">
+          <p class="flex items-center gap-1.5 text-slate-300 font-medium">
+            <i class="fa-solid fa-circle-info text-sky-400"></i> အသုံးပြုနည်း
           </p>
-          <p>NekoBox သို့မဟုတ် v2rayNG တွင် Subscription Link အဖြစ် တိုက်ရိုက်ထည့်သွင်း၍ ဖြစ်စေ၊ ညာဘက်မှ အကောင်းဆုံး Node တစ်ခုချင်းစီကို Copy ကူး၍ ဖြစ်စေ အသုံးပြုနိုင်ပါသည်။</p>
+          <p class="leading-relaxed">Subscription Link တစ်ခုလုံးကို NekoBox / v2rayNG ထဲ ထည့်သုံးနိုင်သလို၊ ညာဘက်ခြမ်းမှ မိမိကြိုက်နှစ်သက်ရာ Node တစ်ခုချင်းစီ၏ Copy ခလုတ်ကို နှိပ်၍လည်း တိုက်ရိုက် ထည့်သွင်းနိုင်ပါသည်။</p>
         </div>
       </section>
 
-      <!-- Right Column: Node Benchmark Grid (Col Span 8) -->
-      <section class="lg:col-span-8 neon-panel rounded-2xl p-5 space-y-3">
-        <div class="flex items-center justify-between pb-2 border-b border-emerald-500/15">
+      <!-- Right Column: Nodes Grid (Col Span 8) -->
+      <section class="lg:col-span-8 calm-panel rounded-2xl p-5 space-y-3">
+        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
           <div class="flex items-center gap-2">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
-              <i class="fa-solid fa-network-wired text-mint-neon"></i> Active Node Pool
+            <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
+              <i class="fa-solid fa-server text-sky-400"></i> Available Node Pool
             </h2>
-            <span class="text-[10px] text-emerald-400/60 font-mono">(Click icon to copy key)</span>
+            <span class="text-[10px] text-slate-500 font-mono">(Sorted by ping)</span>
           </div>
-          <button onclick="fetchAndParseNodes()" class="text-[11px] text-mint-neon hover:text-emerald-300 flex items-center gap-1.5 transition">
+          <button onclick="fetchAndParseNodes()" class="text-[11px] text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition">
             <i class="fa-solid fa-rotate-right"></i>
-            <span>Refresh</span>
+            <span>Reload</span>
           </button>
         </div>
 
-        <!-- Scrollable 2-Column Responsive Node Cards -->
-        <div id="nodeListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[600px] overflow-y-auto pr-1 custom-scroll">
-          <div class="col-span-full text-center py-12 text-xs text-emerald-400/50">
-            <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading active nodes from GitHub...
+        <!-- 2-Column Responsive Node Cards -->
+        <div id="nodeListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[580px] overflow-y-auto pr-1 custom-scroll">
+          <div class="col-span-full text-center py-12 text-xs text-slate-500">
+            <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading active nodes...
           </div>
         </div>
       </section>
@@ -225,14 +227,14 @@
 
       box.className = "p-3 rounded-xl text-xs flex items-center gap-2.5 border transition-all ";
       if (type === "success") {
-        box.classList.add("bg-emerald-500/15", "border-emerald-500/40", "text-mint-neon");
-        icon.className = "fa-solid fa-circle-check text-sm text-mint-neon";
+        box.classList.add("bg-emerald-500/10", "border-emerald-500/20", "text-emerald-300");
+        icon.className = "fa-solid fa-circle-check text-sm text-emerald-400";
       } else if (type === "error") {
-        box.classList.add("bg-rose-500/15", "border-rose-500/40", "text-rose-300");
+        box.classList.add("bg-rose-500/10", "border-rose-500/20", "text-rose-300");
         icon.className = "fa-solid fa-circle-exclamation text-sm text-rose-400";
       } else {
-        box.classList.add("bg-emerald-500/10", "border-emerald-500/30", "text-emerald-200");
-        icon.className = "fa-solid fa-circle-notch fa-spin text-sm text-mint-neon";
+        box.classList.add("bg-sky-500/10", "border-sky-500/20", "text-sky-300");
+        icon.className = "fa-solid fa-circle-notch fa-spin text-sm text-sky-400";
       }
       msg.innerText = message;
       box.classList.remove("hidden");
@@ -240,7 +242,7 @@
 
     async function fetchAndParseNodes() {
       const listEl = document.getElementById("nodeListContainer");
-      listEl.innerHTML = `<div class="col-span-full text-center py-12 text-xs text-emerald-400/50"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Fetching latest sub.txt...</div>`;
+      listEl.innerHTML = `<div class="col-span-full text-center py-12 text-xs text-slate-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Fetching latest sub.txt...</div>`;
       
       try {
         const url = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/sub.txt?t=${Date.now()}`;
@@ -277,24 +279,24 @@
       }
 
       listEl.innerHTML = parsedNodes.map((n, i) => `
-        <div class="bg-[#08130e]/95 border border-emerald-500/15 hover:border-emerald-500/40 p-2.5 rounded-xl flex items-center justify-between gap-2 transition group">
+        <div class="bg-slate-900/70 border border-slate-800 hover:border-slate-700 p-2.5 rounded-xl flex items-center justify-between gap-2 transition group">
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-1.5">
-              <span class="w-2 h-2 rounded-full flex-shrink-0 ${n.ping ? (n.ping < 250 ? 'bg-mint-neon' : 'bg-amber-400') : 'bg-slate-600'}"></span>
-              <h3 class="text-xs font-bold text-white truncate group-hover:text-mint-neon transition">${n.name}</h3>
+              <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${n.ping ? (n.ping < 250 ? 'bg-emerald-400' : 'bg-amber-400') : 'bg-slate-600'}"></span>
+              <h3 class="text-xs font-medium text-slate-200 truncate group-hover:text-sky-300 transition">${n.name}</h3>
             </div>
-            <p class="text-[10px] text-emerald-400/40 font-mono mt-0.5 truncate pl-3.5">${n.host}</p>
+            <p class="text-[10px] text-slate-500 font-mono mt-0.5 truncate pl-3">${n.host}</p>
           </div>
           <div class="flex items-center gap-2 flex-shrink-0">
             <div class="text-right">
-              <div class="text-[11px] font-mono font-bold ${n.ping ? (n.ping < 250 ? 'text-mint-neon' : 'text-amber-300') : 'text-slate-500'}">
+              <div class="text-[11px] font-mono font-medium ${n.ping ? (n.ping < 250 ? 'text-emerald-400' : 'text-amber-300') : 'text-slate-500'}">
                 ${n.ping !== null ? n.ping + ' ms' : '-- ms'}
               </div>
-              <div class="text-[9px] text-emerald-300/50 font-mono">
+              <div class="text-[9px] text-slate-500 font-mono">
                 ${n.speed !== null ? n.speed + ' MB/s' : '-- MB/s'}
               </div>
             </div>
-            <button onclick="copySingleNode('${i}')" title="Copy Single Key" class="bg-emerald-500/10 hover:bg-emerald-500/20 text-mint-neon border border-emerald-500/30 p-1.5 rounded-lg text-xs active:scale-95 transition">
+            <button onclick="copySingleNode('${i}')" title="Copy Single Key" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 p-1.5 rounded-lg text-xs active:scale-95 transition">
               <i class="fa-regular fa-copy"></i>
             </button>
           </div>
@@ -332,7 +334,7 @@
       const btn = document.getElementById("benchmarkBtn");
       const icon = document.getElementById("testIcon");
       btn.disabled = true;
-      icon.className = "fa-solid fa-spinner fa-spin text-sm";
+      icon.className = "fa-solid fa-spinner fa-spin text-sm text-sky-400";
       showStatus("Testing latency & speed for all nodes...", "loading");
 
       let best = 9999;
@@ -356,7 +358,7 @@
       document.getElementById("avgSpeed").innerText = count > 0 ? `${(totalSpeed / count).toFixed(1)} MB/s` : "--";
 
       btn.disabled = false;
-      icon.className = "fa-solid fa-bolt text-sm";
+      icon.className = "fa-solid fa-gauge-simple-high text-sm text-sky-400";
       showStatus("Benchmark Complete!", "success");
     }
 
@@ -411,7 +413,7 @@
         showStatus("Network Error.", "error");
       } finally {
         btn.disabled = false;
-        icon.className = "fa-solid fa-cloud-arrow-down text-sm";
+        icon.className = "fa-solid fa-arrows-rotate text-sm";
       }
     }
 
