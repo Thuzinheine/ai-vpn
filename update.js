@@ -1,5 +1,7 @@
 /**
- * update.js - True GeoIP Verified Multi-Protocol Aggregator (ES Module)
+ * update.js - Universal Multi-Protocol Verified Aggregator (ES Module)
+ * Protocols: VLESS, VMess, Trojan, Shadowsocks, Hysteria 2
+ * Features: True GeoIP Lookup + TCP Handshake Verification
  */
 import fs from 'node:fs';
 import https from 'node:https';
@@ -7,26 +9,39 @@ import http from 'node:http';
 import net from 'node:net';
 import dns from 'node:dns/promises';
 
+// Protocol အစုံ သီးသန့် ထုတ်ပေးထားသော Direct Feeds များ
 const SOURCES = [
-  // 10ium Country Asia Feeds (Clean IPs)
-  'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/singapore',
-  'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/japan',
-  'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/hong%20kong',
-  'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/malaysia',
-  // Dedicated Multi-Protocol Mix Feeds
+  // 1. VLESS Dedicated
   'https://raw.githubusercontent.com/NiREvil/vless/main/sub/link',
   'https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/protocols/vless',
+  'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/vless.txt',
+  
+  // 2. VMess Dedicated
   'https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/protocols/vmess',
+  'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/vmess.txt',
+
+  // 3. Hysteria 2 Dedicated
   'https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/protocols/hysteria2',
-  'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Sub1.txt'
+  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria',
+  'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/splitted/hysteria2.txt',
+
+  // 4. Trojan & Shadowsocks Dedicated
+  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/trojan',
+  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/shadowsocks',
+  'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/singapore',
+  'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/japan'
 ];
 
 const SUPPORTED_PROTOCOLS = ['vless://', 'vmess://', 'trojan://', 'ss://', 'hy2://', 'hysteria2://'];
 
+// Helper: HTTP/HTTPS URL များဆီမှ Data ဆွဲယူခြင်း (Redirect handling အပြည့်အစုံ)
 function fetchUrl(url) {
   return new Promise((resolve) => {
     const client = url.startsWith('https') ? https : http;
-    const req = client.get(url, { headers: { 'User-Agent': 'v2rayNG/1.8.5' }, timeout: 10000 }, (res) => {
+    const req = client.get(url, { 
+      headers: { 'User-Agent': 'v2rayNG/1.8.5' }, 
+      timeout: 10000 
+    }, (res) => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         return resolve(fetchUrl(res.headers.location));
       }
@@ -34,11 +49,16 @@ function fetchUrl(url) {
       res.on('data', chunk => data += chunk);
       res.on('end', () => resolve(data));
     });
+
     req.on('error', () => resolve(''));
-    req.on('timeout', () => { req.destroy(); resolve(''); });
+    req.on('timeout', () => { 
+      req.destroy(); 
+      resolve(''); 
+    });
   });
 }
 
+// Helper: Nested Base64 Decode ပြုလုပ်ခြင်း
 function decodeRecursive(content) {
   if (!content) return '';
   content = content.trim();
@@ -46,13 +66,19 @@ function decodeRecursive(content) {
     try {
       const buff = Buffer.from(content.replace(/\s+/g, ''), 'base64');
       const decoded = buff.toString('utf-8');
-      if (decoded.includes('://')) content = decoded;
-      else break;
-    } catch (e) { break; }
+      if (decoded.includes('://')) {
+        content = decoded;
+      } else {
+        break;
+      }
+    } catch (e) {
+      break;
+    }
   }
   return content;
 }
 
+// Helper: TCP Socket အစစ်အမှန်ဖြင့် Handshake စစ်ဆေးခြင်း
 function verifyNodeConnection(host, port, timeout = 1500) {
   return new Promise((resolve) => {
     const socket = new net.Socket();
@@ -75,17 +101,21 @@ function verifyNodeConnection(host, port, timeout = 1500) {
   });
 }
 
-// Host & Port ခွဲထုတ်ခြင်း
+// Helper: Protocol အမျိုးမျိုးမှ Host နှင့် Port ကို အမှားအယွင်းမရှိ ခွဲထုတ်ခြင်း
 function extractHostPort(uri) {
   try {
+    // 1. VMess (Base64 JSON)
     if (uri.startsWith('vmess://')) {
-      const b64 = uri.replace('vmess://', '').trim();
-      const json = JSON.parse(Buffer.from(b64, 'base64').toString('utf-8'));
-      return { host: json.add, port: parseInt(json.port, 10) || 443 };
+      const rawB64 = uri.replace(/^vmess:\/\//i, '').trim();
+      const json = JSON.parse(Buffer.from(rawB64, 'base64').toString('utf-8'));
+      const host = json.add || json.host || json.sni;
+      const port = parseInt(json.port, 10) || 443;
+      if (host) return { host, port };
     }
 
+    // 2. Shadowsocks
     if (uri.startsWith('ss://')) {
-      const clean = uri.replace('ss://', '').split('#')[0];
+      const clean = uri.replace(/^ss:\/\//i, '').split('#')[0];
       const atSplit = clean.split('@');
       let hostPort = atSplit.length > 1 ? atSplit[1] : '';
       if (!hostPort) {
@@ -93,27 +123,33 @@ function extractHostPort(uri) {
         hostPort = decoded.split('@')[1] || decoded;
       }
       const parts = hostPort.split(':');
-      return { host: parts[0], port: parseInt(parts[1], 10) || 8388 };
+      const host = parts[0];
+      const port = parseInt(parts[1], 10) || 8388;
+      if (host) return { host, port };
     }
 
-    // vless, trojan, hy2
-    const parsedUrl = new URL(uri);
-    const host = parsedUrl.hostname;
-    const port = parseInt(parsedUrl.port, 10) || 443;
-    if (host) return { host, port };
-  } catch (e) {
+    // 3. VLESS, Trojan, Hysteria 2
     try {
+      const parsedUrl = new URL(uri);
+      const host = parsedUrl.hostname;
+      const port = parseInt(parsedUrl.port, 10) || 443;
+      if (host) return { host, port };
+    } catch (urlErr) {
       const clean = uri.replace(/^[^:]+:\/\//, '');
       const mainPart = clean.split('?')[0].split('#')[0];
       const hostPort = mainPart.includes('@') ? mainPart.split('@')[1] : mainPart;
       const parts = hostPort.split(':');
-      return { host: parts[0], port: parseInt(parts[1], 10) || 443 };
-    } catch (err) {}
+      const host = parts[0];
+      const port = parseInt(parts[1], 10) || 443;
+      if (host) return { host, port };
+    }
+  } catch (e) {
+    return null;
   }
   return null;
 }
 
-// Real IP & Country Lookup စစ်ဆေးခြင်း
+// Helper: Real Server IP ရှာဖွေပြီး နိုင်ငံအမည်နှင့် Code စစ်ဆေးခြင်း
 async function resolveTrueCountry(host) {
   try {
     let targetIp = host;
@@ -130,13 +166,13 @@ async function resolveTrueCountry(host) {
   return { code: 'UN', name: 'Global Edge' };
 }
 
-// Config ၏ နာမည် (#hash သို့မဟုတ် vmess ps) တွင် တကယ့် Country Tag ထည့်ခြင်း
+// Helper: Node နာမည်ထဲတွင် တကယ့် GeoIP Tag ထည့်သွင်းပေးခြင်း
 function injectCountryToUri(uri, countryCode, countryName, index) {
   const label = `[${countryCode}] ${countryName} - Node ${index}`;
   try {
     if (uri.startsWith('vmess://')) {
-      const b64 = uri.replace('vmess://', '').trim();
-      const json = JSON.parse(Buffer.from(b64, 'base64').toString('utf-8'));
+      const rawB64 = uri.replace(/^vmess:\/\//i, '').trim();
+      const json = JSON.parse(Buffer.from(rawB64, 'base64').toString('utf-8'));
       json.ps = label;
       return 'vmess://' + Buffer.from(JSON.stringify(json)).toString('base64');
     }
@@ -148,11 +184,12 @@ function injectCountryToUri(uri, countryCode, countryName, index) {
 }
 
 async function main() {
-  console.log('--- Step 1: Digging Raw Feeds ---');
+  console.log('--- Step 1: Digging Multi-Protocol Candidates ---');
   let rawNodes = [];
 
   for (const src of SOURCES) {
     try {
+      console.log(`Fetching: ${src}`);
       const raw = await fetchUrl(src);
       const text = decodeRecursive(raw);
       const lines = text.split(/[\r\n]+/);
@@ -160,58 +197,75 @@ async function main() {
       for (const line of lines) {
         const trimmed = line.trim();
         if (!trimmed) continue;
-        if (SUPPORTED_PROTOCOLS.some(proto => trimmed.startsWith(proto))) {
+        if (SUPPORTED_PROTOCOLS.some(proto => trimmed.toLowerCase().startsWith(proto))) {
           rawNodes.push(trimmed);
         }
       }
-    } catch (err) {}
+    } catch (err) {
+      console.log(`Failed to fetch from ${src}`);
+    }
   }
 
   const unique = Array.from(new Set(rawNodes));
-  console.log(`Discovered ${unique.length} candidate nodes.`);
+  console.log(`Discovered ${unique.length} candidate nodes across all protocols.`);
 
-  console.log('--- Step 2: Protocol-Balanced Verification & GeoIP Lookup ---');
-  const buckets = { vless: [], vmess: [], trojan: [], ss: [], hy2: [] };
-  
+  console.log('--- Step 2: Protocol-Balanced Verification & GeoIP Tagging ---');
+  // Protocol တစ်မျိုးတည်း မကြီးစိုးစေရန် Bucket ၅ ခု ခွဲခြားခြင်း
+  const buckets = {
+    vless: [],
+    vmess: [],
+    trojan: [],
+    ss: [],
+    hy2: []
+  };
+
   unique.forEach(uri => {
-    if (uri.startsWith('vless://')) buckets.vless.push(uri);
-    else if (uri.startsWith('vmess://')) buckets.vmess.push(uri);
-    else if (uri.startsWith('trojan://')) buckets.trojan.push(uri);
-    else if (uri.startsWith('ss://')) buckets.ss.push(uri);
-    else if (uri.startsWith('hy2://') || uri.startsWith('hysteria2://')) buckets.hy2.push(uri);
+    const lower = uri.toLowerCase();
+    if (lower.startsWith('vless://')) buckets.vless.push(uri);
+    else if (lower.startsWith('vmess://')) buckets.vmess.push(uri);
+    else if (lower.startsWith('trojan://')) buckets.trojan.push(uri);
+    else if (lower.startsWith('ss://')) buckets.ss.push(uri);
+    else if (lower.startsWith('hy2://') || lower.startsWith('hysteria2://')) buckets.hy2.push(uri);
   });
+
+  console.log(`[Bucket Pool] VLESS: ${buckets.vless.length} | VMess: ${buckets.vmess.length} | Trojan: ${buckets.trojan.length} | SS: ${buckets.ss.length} | Hy2: ${buckets.hy2.length}`);
 
   let aliveNodes = [];
   let globalIndex = 1;
 
+  // Protocol တစ်မျိုးချင်းစီမှ အသက်ရှင်သော node များကို ညီမျှစွာ စစ်ထုတ်ခြင်း (အမျိုးအစားတစ်ခုလျှင် ၁၀ ခုစီ)
   for (const [proto, list] of Object.entries(buckets)) {
+    console.log(`Testing protocol: ${proto.toUpperCase()} (${list.length} candidate nodes)`);
     let count = 0;
-    for (const uri of list.slice(0, 35)) {
+
+    for (const uri of list.slice(0, 40)) {
       const target = extractHostPort(uri);
       if (!target || !target.host) continue;
 
-      const isAlive = await verifyNodeConnection(target.host, target.port, 1200);
+      const isAlive = await verifyNodeConnection(target.host, target.port, 1400);
       if (isAlive) {
         // True GeoIP ရှာဖွေခြင်း
         const country = await resolveTrueCountry(target.host);
-        console.log(`[ALIVE] ${target.host}:${target.port} -> Real Country: ${country.code} (${country.name})`);
+        console.log(`[ALIVE] ${proto.toUpperCase()} -> ${target.host}:${target.port} (${country.code})`);
         
         const taggedUri = injectCountryToUri(uri, country.code, country.name, globalIndex++);
         aliveNodes.push(taggedUri);
         count++;
-        if (count >= 12) break;
+
+        if (count >= 10) break; // protocol တစ်ခုစီမှ ၁၀ ခုစီသာ ကန့်သတ်ယူမည်
       }
     }
   }
 
   if (aliveNodes.length === 0) {
-    console.log('No alive nodes found.');
+    console.log('No alive nodes passed handshake test. sub.txt remains unchanged.');
     return;
   }
 
+  // Base64 encode ပြုလုပ်ပြီး sub.txt ထဲသို့ ရေးသားခြင်း
   const base64Output = Buffer.from(aliveNodes.join('\n'), 'utf-8').toString('base64');
   fs.writeFileSync('sub.txt', base64Output, 'utf-8');
-  console.log(`Successfully generated sub.txt with ${aliveNodes.length} Verified GeoIP Nodes.`);
+  console.log(`Successfully compiled sub.txt with ${aliveNodes.length} balanced nodes across all protocols!`);
 }
 
 main();
