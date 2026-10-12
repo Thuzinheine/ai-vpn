@@ -1,23 +1,25 @@
 /**
  * update.js - 10ium Country Feeds Dedicated Aggregator (ES Module)
  * Upstream Source: https://github.com/10ium/telegram-configs-collector
+ * Included: SG (Prioritized), HK, JP, MY, TH, VN, ID, IN, PK, PH
  */
 import fs from 'node:fs';
 import https from 'node:https';
 import http from 'node:http';
 import net from 'node:net';
 
-// သတ်မှတ်ထားသော 10ium Asia Country Links များသာ သီးသန့် အသုံးပြုသည်
+// 10ium Country Feeds သီးသန့် (Singapore ကို အဓိကထား ထိပ်ဆုံးတင်ထားသည်)
 const SOURCES = [
+  { code: 'SG', name: 'Singapore', url: 'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/sg/mixed' },
   { code: 'HK', name: 'Hong Kong', url: 'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/hk/mixed' },
-  { code: 'IN', name: 'India', url: 'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/in/mixed' },
-  { code: 'ID', name: 'Indonesia', url: 'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/id/mixed' },
   { code: 'JP', name: 'Japan', url: 'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/jp/mixed' },
   { code: 'MY', name: 'Malaysia', url: 'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/my/mixed' },
-  { code: 'PK', name: 'Pakistan', url: 'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/pk/mixed' },
-  { code: 'PH', name: 'Philippines', url: 'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/ph/mixed' },
   { code: 'TH', name: 'Thailand', url: 'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/th/mixed' },
-  { code: 'VN', name: 'Vietnam', url: 'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/vn/mixed' }
+  { code: 'VN', name: 'Vietnam', url: 'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/vn/mixed' },
+  { code: 'ID', name: 'Indonesia', url: 'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/id/mixed' },
+  { code: 'IN', name: 'India', url: 'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/in/mixed' },
+  { code: 'PH', name: 'Philippines', url: 'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/ph/mixed' },
+  { code: 'PK', name: 'Pakistan', url: 'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/pk/mixed' }
 ];
 
 const SUPPORTED_PROTOCOLS = ['vless://', 'vmess://', 'trojan://', 'ss://', 'hy2://', 'hysteria2://'];
@@ -170,8 +172,10 @@ async function main() {
       const uniqueCandidates = Array.from(new Set(candidateList));
       console.log(`-> Found ${uniqueCandidates.length} raw nodes for ${src.code}. Running handshake...`);
 
+      // Singapore (SG) ဖြစ်ပါက အလုံး ၂၀ ထိ ယူမည်၊ အခြားနိုင်ငံများကို ၇ လုံးစီ ယူမည်
+      const maxLimit = (src.code === 'SG') ? 20 : 7;
       let passedCount = 0;
-      // နိုင်ငံတစ်ခုစီမှ အမြန်ဆုံး အလုပ်လုပ်သော node ၆ ခုစီ ညီမျှစွာ စစ်ထုတ်ယူခြင်း
+
       for (const uri of uniqueCandidates) {
         const target = extractHostPort(uri);
         if (!target || !target.host) continue;
@@ -181,7 +185,7 @@ async function main() {
           const tagged = tagCountryNode(uri, src.code, src.name, nodeCounter++);
           verifiedPool.push(tagged);
           passedCount++;
-          if (passedCount >= 6) break;
+          if (passedCount >= maxLimit) break;
         }
       }
       console.log(`-> Verified ${passedCount} live nodes for ${src.code}`);
@@ -193,13 +197,13 @@ async function main() {
   console.log(`Total live verified nodes collected: ${verifiedPool.length}`);
 
   if (verifiedPool.length === 0) {
-    console.log('No live nodes detected. sub.txt remains unchanged.');
+    console.log('No live nodes detected. sub.txt remains untouched.');
     return;
   }
 
   const base64Output = Buffer.from(verifiedPool.join('\n'), 'utf-8').toString('base64');
   fs.writeFileSync('sub.txt', base64Output, 'utf-8');
-  console.log('Successfully written active country nodes to sub.txt');
+  console.log('Successfully written active country nodes to sub.txt (SG prioritized)');
 }
 
 main();
