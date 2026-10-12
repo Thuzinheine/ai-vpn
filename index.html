@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI VPN Core | Custom Sub Builder</title>
+  <title>AI VPN Core | Dual Sub Engine</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -61,12 +61,12 @@
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-base font-semibold text-slate-100 tracking-tight">AI-VPN Custom Studio</h1>
+            <h1 class="text-base font-semibold text-slate-100 tracking-tight">AI-VPN Dual Sub Engine</h1>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-sky-500/10 text-sky-300 border border-sky-500/20">
-              Interactive Sub Builder
+              Live Hub
             </span>
           </div>
-          <p class="text-[11px] text-slate-400">Auto Benchmark, Custom Selection & Tailored Sub Export</p>
+          <p class="text-[11px] text-slate-400">All Nodes Sub (50) + Custom Fastest Sub (fast-sub.txt)</p>
         </div>
       </div>
 
@@ -88,19 +88,50 @@
     <!-- Main Grid -->
     <main class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
       
-      <!-- Left Column: Controls & Dynamic Subscription Link (Col Span 5) -->
+      <!-- Left Column: Links & Controls (Col Span 5) -->
       <section class="lg:col-span-5 space-y-4">
         
         <div class="calm-panel rounded-2xl p-5 space-y-4">
-          <div class="flex justify-between items-center pb-2 border-b border-slate-800">
-            <span class="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-              <i class="fa-solid fa-sliders text-sky-400"></i> Automation & Triggers
-            </span>
-            <span class="text-[10px] text-slate-500">Actions Engine</span>
+          
+          <!-- 1. OFFICIAL GITHUB 50 NODES SUB LINK -->
+          <div class="space-y-1.5 pb-3 border-b border-slate-800">
+            <div class="flex justify-between items-center">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-list-check text-sky-400"></i> Main Sub Link (50 Nodes Pool)
+              </span>
+              <span class="text-[10px] text-sky-400 font-mono">sub.txt</span>
+            </div>
+            <div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-800 rounded-xl p-1.5">
+              <input type="text" id="officialSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt"
+                class="w-full bg-transparent border-0 px-2 text-[11px] text-sky-300 font-mono truncate select-all focus:outline-none">
+              <button onclick="copyLink('officialSubUrl', 'copyOfficialBtn')" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1">
+                <i class="fa-regular fa-copy"></i>
+                <span id="copyOfficialBtn">Copy</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. FAST-SUB.TXT (BENCHMARK စစ်ပြီးရွေးထားသော SUB LINK) -->
+          <div class="space-y-1.5 pb-3 border-b border-slate-800">
+            <div class="flex justify-between items-center">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-bolt text-emerald-400"></i> Fast Sub Link (Custom Best Only)
+              </span>
+              <span class="text-[10px] text-emerald-400 font-mono">fast-sub.txt</span>
+            </div>
+            <div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-800 rounded-xl p-1.5">
+              <input type="text" id="fastSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/fast-sub.txt"
+                class="w-full bg-transparent border-0 px-2 text-[11px] text-emerald-400 font-mono truncate select-all focus:outline-none">
+              <button onclick="copyLink('fastSubUrl', 'copyFastBtn')" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1">
+                <i class="fa-regular fa-copy"></i>
+                <span id="copyFastBtn">Copy</span>
+              </button>
+            </div>
+            <p class="text-[10px] text-slate-400">Benchmark စစ်ပြီး မိမိရွေးချယ်ထားသော အကောင်းဆုံး Node များသာ ပါဝင်မည့် တရားဝင် Raw Sub link ဖြစ်ပါသည်။</p>
           </div>
 
           <!-- Token Input -->
-          <div class="space-y-1.5">
+          <div class="space-y-1">
             <label class="text-[11px] font-medium text-slate-300 flex items-center gap-1.5">
               <i class="fa-solid fa-key text-slate-400"></i> GitHub Token (PAT)
             </label>
@@ -113,18 +144,27 @@
             </div>
           </div>
 
-          <!-- Action Buttons -->
+          <!-- Buttons Group -->
           <div class="space-y-2 pt-1">
-            <button onclick="triggerGithubUpdate()" id="updateBtn"
-              class="w-full bg-sky-600 hover:bg-sky-500 text-white font-medium py-2.5 rounded-xl text-xs uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-sky-900/20 active:scale-95 transition">
-              <i id="btnIcon" class="fa-solid fa-arrows-rotate text-sm"></i>
-              <span>Scrape Fresh Nodes (Action)</span>
-            </button>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="triggerGithubUpdate()" id="updateBtn"
+                class="bg-sky-600 hover:bg-sky-500 text-white font-medium py-2 rounded-xl text-xs uppercase tracking-wide flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-sky-900/20 active:scale-95 transition">
+                <i id="btnIcon" class="fa-solid fa-arrows-rotate text-xs"></i>
+                <span>Action Scrape</span>
+              </button>
 
-            <button onclick="runBenchmarkAll()" id="benchmarkBtn"
-              class="w-full bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-slate-200 font-medium py-2.5 rounded-xl text-xs uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition">
-              <i id="testIcon" class="fa-solid fa-gauge-simple-high text-sm text-sky-400"></i>
-              <span>Test Latency & Auto-Select Best</span>
+              <button onclick="runBenchmarkAll()" id="benchmarkBtn"
+                class="bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-slate-200 font-medium py-2 rounded-xl text-xs uppercase tracking-wide flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition">
+                <i id="testIcon" class="fa-solid fa-gauge-simple-high text-xs text-sky-400"></i>
+                <span>Test Ping All</span>
+              </button>
+            </div>
+
+            <!-- SAVE TO FAST-SUB.TXT BUTTON -->
+            <button onclick="saveFastSubToGithub()" id="saveFastBtn"
+              class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-xs uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-emerald-900/30 active:scale-95 transition">
+              <i id="saveFastIcon" class="fa-solid fa-cloud-arrow-up text-sm"></i>
+              <span id="saveFastText">Save Selected to fast-sub.txt</span>
             </button>
           </div>
 
@@ -134,51 +174,20 @@
             <span id="statusMessage" class="text-[11px] leading-tight"></span>
           </div>
 
-          <!-- Add Custom Key Form -->
-          <div class="pt-2 border-t border-slate-800 space-y-2">
-            <label class="text-[11px] font-medium text-slate-300 flex items-center justify-between">
-              <span class="flex items-center gap-1.5"><i class="fa-solid fa-plus-circle text-sky-400"></i> Add External VLESS Key</span>
-              <span class="text-[10px] text-slate-500">Optional</span>
-            </label>
-            <div class="flex gap-1.5">
-              <input type="text" id="customNodeInput" placeholder="vless://uuid@domain:443?..."
-                class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500 font-mono">
-              <button onclick="addCustomNode()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sky-400 px-3 py-1.5 rounded-xl text-xs font-semibold active:scale-95 transition">
-                Add
-              </button>
-            </div>
-          </div>
-
-          <!-- Custom Tailored Subscription Link -->
-          <div class="pt-3 border-t border-slate-800 space-y-2.5">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-medium text-slate-300 flex items-center gap-1.5">
-                <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Your Tailored Sub URL
-              </span>
-              <span id="tailoredBadge" class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
-                0 nodes selected
-              </span>
-            </div>
-
-            <div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-800 rounded-xl p-1.5">
-              <input type="text" id="customSubUrl" readonly placeholder="Select nodes to generate link..."
-                class="w-full bg-transparent border-0 px-2 text-[11px] text-sky-300 font-mono truncate select-all focus:outline-none">
-              <button onclick="copySubLink()" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1">
-                <i class="fa-regular fa-copy"></i>
-                <span id="copyBtnText">Copy</span>
-              </button>
-            </div>
-            <p class="text-[10px] text-slate-400">ညာဘက်ခြမ်းတွင် အမှန်ခြစ်ထားသော Node များသာ ပါဝင်သည့် တိုက်ရိုက် Sub Link ဖြစ်ပါသည်။</p>
-          </div>
-
         </div>
 
-        <!-- Help Info -->
-        <div class="calm-panel rounded-2xl p-4 text-[11px] text-slate-400 space-y-1">
-          <p class="flex items-center gap-1.5 text-slate-300 font-medium">
-            <i class="fa-solid fa-circle-info text-sky-400"></i> စိတ်ကြိုက်ရွေးချယ်နည်း
-          </p>
-          <p class="leading-relaxed">ညာဘက်ရှိ Checkbox များဖြင့် မိမိကြိုက်နှစ်သက်ရာ Node များကို ပေါင်းထည့်/ဖြုတ်နိုင်ပါသည်။ အရေအတွက် ကန့်သတ်ချက်မရှိဘဲ ရွေးချယ်ထားသမျှ အားလုံးကို Subscription link အဖြစ် ချက်ချင်း ပြောင်းလဲပေးပါသည်။</p>
+        <!-- Add External Node Box -->
+        <div class="calm-panel rounded-2xl p-4 space-y-2">
+          <label class="text-[11px] font-medium text-slate-300 flex items-center justify-between">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-plus text-sky-400"></i> Add External VLESS Key</span>
+          </label>
+          <div class="flex gap-1.5">
+            <input type="text" id="customNodeInput" placeholder="vless://..."
+              class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500 font-mono">
+            <button onclick="addCustomNode()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sky-400 px-3 py-1.5 rounded-xl text-xs font-semibold active:scale-95 transition">
+              Add
+            </button>
+          </div>
         </div>
       </section>
 
@@ -189,11 +198,10 @@
         <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800">
           <div class="flex items-center gap-1.5">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
-              <i class="fa-solid fa-server text-sky-400"></i> Node Selection Pool
+              <i class="fa-solid fa-server text-sky-400"></i> Nodes Selection
             </h2>
           </div>
 
-          <!-- Quick Selector Presets -->
           <div class="flex items-center gap-1 text-[10px]">
             <span class="text-slate-500 mr-1">Select:</span>
             <button onclick="selectPreset('all')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded-md border border-slate-700 transition">All</button>
@@ -206,9 +214,9 @@
         </div>
 
         <!-- 2-Column Responsive Node Cards with Checkboxes -->
-        <div id="nodeListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[590px] overflow-y-auto pr-1 custom-scroll">
+        <div id="nodeListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[640px] overflow-y-auto pr-1 custom-scroll">
           <div class="col-span-full text-center py-12 text-xs text-slate-500">
-            <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading active nodes...
+            <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading active nodes from GitHub...
           </div>
         </div>
       </section>
@@ -257,7 +265,7 @@
       box.classList.remove("hidden");
     }
 
-    // ၁။ Fetch from sub.txt and initial populate
+    // ၁။ sub.txt ကို ဖတ်ယူခြင်း
     async function fetchAndParseNodes() {
       const listEl = document.getElementById("nodeListContainer");
       listEl.innerHTML = `<div class="col-span-full text-center py-12 text-xs text-slate-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Fetching latest sub.txt...</div>`;
@@ -284,13 +292,12 @@
 
         document.getElementById("nodeCount").innerText = parsedNodes.length;
         renderNodes();
-        updateTailoredSubLink();
       } catch (e) {
         listEl.innerHTML = `<div class="col-span-full text-center py-12 text-xs text-rose-400">Failed to load nodes from sub.txt.</div>`;
       }
     }
 
-    // ၂။ Render cards with dynamic checkboxes
+    // ၂။ Render cards
     function renderNodes() {
       const listEl = document.getElementById("nodeListContainer");
       if (parsedNodes.length === 0) {
@@ -301,9 +308,8 @@
       listEl.innerHTML = parsedNodes.map((n, i) => `
         <div class="bg-slate-900/70 border ${n.selected ? 'border-sky-500/50 bg-slate-900/90' : 'border-slate-800'} hover:border-slate-700 p-2.5 rounded-xl flex items-center justify-between gap-2 transition">
           <div class="flex items-center gap-2.5 min-w-0 flex-1">
-            <!-- Custom Toggle Checkbox -->
             <input type="checkbox" ${n.selected ? 'checked' : ''} onchange="toggleSelect(${i})"
-              class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-sky-500 focus:ring-0 focus:ring-offset-0 cursor-pointer accent-sky-500">
+              class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-sky-500 focus:ring-0 cursor-pointer accent-sky-500">
             
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5">
@@ -323,7 +329,7 @@
                 ${n.speed !== null ? n.speed + ' MB/s' : '-- MB/s'}
               </div>
             </div>
-            <button onclick="copySingleNode(${i})" title="Copy single URI" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 p-1.5 rounded-lg text-xs active:scale-95 transition">
+            <button onclick="copySingleNode(${i})" title="Copy key" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 p-1.5 rounded-lg text-xs active:scale-95 transition">
               <i class="fa-regular fa-copy"></i>
             </button>
           </div>
@@ -333,11 +339,9 @@
       updateSelectionCount();
     }
 
-    // ၃။ Checkbox Select / Deselect Logic
     function toggleSelect(index) {
       parsedNodes[index].selected = !parsedNodes[index].selected;
       renderNodes();
-      updateTailoredSubLink();
     }
 
     function selectPreset(type) {
@@ -351,42 +355,23 @@
         });
       }
       renderNodes();
-      updateTailoredSubLink();
     }
 
     function updateSelectionCount() {
       const selected = parsedNodes.filter(n => n.selected).length;
       document.getElementById("selectedCount").innerText = selected;
-      document.getElementById("tailoredBadge").innerText = `${selected} nodes selected`;
     }
 
-    // ၄။ Update Tailored Base64 Subscription Link
-    function updateTailoredSubLink() {
-      const selectedUris = parsedNodes.filter(n => n.selected).map(n => n.uri);
-      const input = document.getElementById("customSubUrl");
-
-      if (selectedUris.length === 0) {
-        input.value = "";
-        input.placeholder = "No nodes selected. Check boxes to generate link.";
-        return;
-      }
-
-      // Encode selected keys into Data URI Base64 sub link
-      const base64Data = btoa(selectedUris.join('\n'));
-      input.value = `data:text/plain;charset=utf-8;base64,${base64Data}`;
-    }
-
-    // ၅။ Add Custom Node dynamically
     function addCustomNode() {
       const input = document.getElementById("customNodeInput");
       const val = input.value.trim();
 
       if (!val || !val.startsWith("vless://")) {
-        showStatus("Please enter a valid vless:// URI!", "error");
+        showStatus("vless:// key မှန်ကန်စွာ ထည့်ပေးပါ!", "error");
         return;
       }
 
-      let name = `Custom-Node-${parsedNodes.length + 1}`;
+      let name = `Custom-${parsedNodes.length + 1}`;
       let host = "custom.edge";
       try {
         if (val.includes('#')) name = decodeURIComponent(val.split('#')[1]);
@@ -394,7 +379,6 @@
         if (matchHost) host = matchHost[1];
       } catch(e) {}
 
-      // Add to beginning of pool
       parsedNodes.unshift({
         id: Date.now(),
         uri: val,
@@ -408,11 +392,10 @@
       input.value = "";
       document.getElementById("nodeCount").innerText = parsedNodes.length;
       renderNodes();
-      updateTailoredSubLink();
-      showStatus(`Added custom node "${name}" to selection!`, "success");
+      showStatus(`"${name}" ကို ပေါင်းထည့်ပြီးပါပြီ!`, "success");
     }
 
-    // ၆။ Latency & Speed Benchmark with Auto Smart Select
+    // ၃။ Latency Benchmark & Auto Select
     async function testSingleNode(node) {
       const start = performance.now();
       try {
@@ -443,55 +426,122 @@
       const btn = document.getElementById("benchmarkBtn");
       const icon = document.getElementById("testIcon");
       btn.disabled = true;
-      icon.className = "fa-solid fa-spinner fa-spin text-sm text-sky-400";
-      showStatus("Testing all nodes & auto-filtering best candidates...", "loading");
+      icon.className = "fa-solid fa-spinner fa-spin text-xs text-sky-400";
+      showStatus("Testing latency...", "loading");
 
       let best = 9999;
 
       for (let i = 0; i < parsedNodes.length; i++) {
         await testSingleNode(parsedNodes[i]);
         if (parsedNodes[i].ping && parsedNodes[i].ping < best) best = parsedNodes[i].ping;
-        
-        // Auto select if ping is responsive (< 450ms)
         parsedNodes[i].selected = (parsedNodes[i].ping !== null && parsedNodes[i].ping < 450);
         renderNodes();
-        updateTailoredSubLink();
       }
 
-      // Sort nodes: Best ping first
       parsedNodes.sort((a, b) => (a.ping || 999) - (b.ping || 999));
       renderNodes();
-      updateTailoredSubLink();
 
       document.getElementById("bestPing").innerText = best !== 9999 ? `${best} ms` : "--";
 
       btn.disabled = false;
-      icon.className = "fa-solid fa-gauge-simple-high text-sm text-sky-400";
-      showStatus("Benchmark Complete! Responsive nodes automatically selected.", "success");
+      icon.className = "fa-solid fa-gauge-simple-high text-xs text-sky-400";
+      showStatus("Benchmark Complete! Fast nodes auto-selected. Click 'Save Selected' to push.", "success");
     }
 
-    // ၇။ Copy Helpers
+    // ၄။ GITHUB REPO သို့ FAST-SUB.TXT ဖိုင်အဖြစ် တိုက်ရိုက် ရေးတင်ခြင်း
+    async function saveFastSubToGithub() {
+      const token = document.getElementById("tokenInput").value.trim();
+      const selectedUris = parsedNodes.filter(n => n.selected).map(n => n.uri);
+
+      if (!token) {
+        showStatus("GitHub Token (PAT) အရင် ထည့်ပေးပါခင်ဗျာ!", "error");
+        return;
+      }
+
+      if (selectedUris.length === 0) {
+        showStatus("Node အနည်းဆုံး ၁ ခု ရွေးချယ်ပေးပါ!", "error");
+        return;
+      }
+
+      const saveBtn = document.getElementById("saveFastBtn");
+      const saveIcon = document.getElementById("saveFastIcon");
+      const saveText = document.getElementById("saveFastText");
+
+      saveBtn.disabled = true;
+      saveIcon.className = "fa-solid fa-spinner fa-spin text-sm";
+      saveText.innerText = "Saving to fast-sub.txt...";
+      showStatus("GitHub Repo ထဲသို့ fast-sub.txt အဖြစ် တင်ပေးနေပါသည်...", "loading");
+
+      try {
+        // Base64 encode the selected nodes
+        const base64Content = btoa(selectedUris.join('\n'));
+
+        // Check if fast-sub.txt already exists to get its SHA
+        let sha = null;
+        try {
+          const fileRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/fast-sub.txt`, {
+            headers: {
+              "Accept": "application/vnd.github+json",
+              "Authorization": `Bearer ${token}`
+            }
+          });
+          if (fileRes.ok) {
+            const fileData = await fileRes.json();
+            sha = fileData.sha;
+          }
+        } catch (e) {}
+
+        // Put (create or update) fast-sub.txt
+        const putPayload = {
+          message: `Update fast-sub.txt with ${selectedUris.length} fastest nodes`,
+          content: base64Content,
+          branch: "main"
+        };
+        if (sha) putPayload.sha = sha;
+
+        const updateRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/fast-sub.txt`, {
+          method: "PUT",
+          headers: {
+            "Accept": "application/vnd.github+json",
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(putPayload)
+        });
+
+        if (updateRes.ok) {
+          showStatus(`အောင်မြင်ပါသည်! ရွေးချယ်ထားသော Node ${selectedUris.length} ခုကို fast-sub.txt အဖြစ် သိမ်းဆည်းလိုက်ပါပြီ။`, "success");
+          document.getElementById("fastSubUrl").value = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/fast-sub.txt?t=${Date.now()}`;
+        } else {
+          const err = await updateRes.json();
+          showStatus(`Error: ${err.message}`, "error");
+        }
+      } catch (err) {
+        showStatus("Network connection error ဖြစ်ပေါ်နေပါသည်။", "error");
+      } finally {
+        saveBtn.disabled = false;
+        saveIcon.className = "fa-solid fa-cloud-arrow-up text-sm";
+        saveText.innerText = "Save Selected to fast-sub.txt";
+      }
+    }
+
+    // ၅။ Copy & GitHub Action helpers
+    function copyLink(inputId, btnId) {
+      const input = document.getElementById(inputId);
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      const btn = document.getElementById(btnId);
+      btn.innerText = "Copied!";
+      setTimeout(() => btn.innerText = "Copy", 2000);
+      showStatus("Link copied to clipboard!", "success");
+    }
+
     function copySingleNode(index) {
       const node = parsedNodes[index];
       navigator.clipboard.writeText(node.uri);
       showStatus(`"${node.name}" key copied!`, "success");
     }
 
-    function copySubLink() {
-      const input = document.getElementById("customSubUrl");
-      if (!input.value) {
-        showStatus("Please select at least 1 node first!", "error");
-        return;
-      }
-      input.select();
-      navigator.clipboard.writeText(input.value);
-      const copyBtn = document.getElementById("copyBtnText");
-      copyBtn.innerText = "Copied!";
-      setTimeout(() => copyBtn.innerText = "Copy", 2000);
-      showStatus("Tailored subscription link copied!", "success");
-    }
-
-    // ၈။ Trigger GitHub Action
     async function triggerGithubUpdate() {
       const token = document.getElementById("tokenInput").value.trim();
       const btn = document.getElementById("updateBtn");
@@ -504,7 +554,7 @@
 
       localStorage.setItem("gh_token", token);
       btn.disabled = true;
-      icon.className = "fa-solid fa-spinner fa-spin text-sm";
+      icon.className = "fa-solid fa-spinner fa-spin text-xs";
       showStatus("Triggering GitHub Action...", "loading");
 
       try {
@@ -519,16 +569,16 @@
         });
 
         if (response.status === 204) {
-          showStatus("Workflow dispatched! Refreshing nodes in 15s...", "success");
+          showStatus("Workflow dispatched! Refreshing in 15s...", "success");
           setTimeout(() => fetchAndParseNodes(), 15000);
         } else {
-          showStatus("Trigger failed. Check PAT permissions.", "error");
+          showStatus("Trigger failed.", "error");
         }
       } catch (err) {
         showStatus("Network Error.", "error");
       } finally {
         btn.disabled = false;
-        icon.className = "fa-solid fa-arrows-rotate text-sm";
+        icon.className = "fa-solid fa-arrows-rotate text-xs";
       }
     }
 
