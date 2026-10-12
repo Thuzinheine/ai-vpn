@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#080b14">
-<title>AI-VPN Core — 10ium Country Engine</title>
+<title>AI-VPN Core — 10ium Country Engine & Custom Manager</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 :root{
@@ -14,7 +14,7 @@
 }
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(ellipse at 15% -10%,rgba(95,83,220,.17),transparent 35%),radial-gradient(ellipse at 95% 15%,rgba(40,201,220,.09),transparent 28%),var(--bg);color:var(--text);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
-button,input,select{font:inherit}
+button,input,select,textarea{font:inherit}
 button{cursor:pointer}
 .app{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
 .sidebar{position:sticky;top:0;height:100vh;padding:25px 16px 18px;border-right:1px solid var(--line);background:rgba(8,11,20,.85);backdrop-filter:blur(22px);display:flex;flex-direction:column;z-index:5}
@@ -112,7 +112,20 @@ tbody tr{transition:background .15s}tbody tr:hover{background:#ffffff04}
 .small-btn:hover{color:white;background:#ffffff0b}
 input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height:15px}
 
-.toast{position:fixed;right:22px;bottom:22px;padding:12px 18px;background:#172235;border:1px solid #7b8bab35;color:#eaf2ff;border-radius:13px;box-shadow:var(--shadow);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s;z-index:20;font-size:12px}
+/* Modal CSS */
+.modal-overlay{position:fixed;inset:0;background:rgba(4,7,14,.78);backdrop-filter:blur(8px);display:none;place-items:center;z-index:50;padding:16px}
+.modal-overlay.open{display:grid}
+.modal-card{width:100%;max-width:540px;background:#0e1322;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;animation:popIn .2s ease-out}
+@keyframes popIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--line)}
+.modal-head h3{margin:0;font-size:16px;font-weight:750;letter-spacing:-.02em}
+.modal-body{padding:20px 24px;display:grid;gap:14px}
+.modal-foot{padding:16px 24px 22px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--line)}
+.field-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;display:block}
+.custom-textarea{width:100%;background:#090d16;border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:#fff;font-family:monospace;font-size:11px;outline:none;resize:vertical;min-height:95px}
+.custom-textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(107,231,244,.12)}
+
+.toast{position:fixed;right:22px;bottom:22px;padding:12px 18px;background:#172235;border:1px solid #7b8bab35;color:#eaf2ff;border-radius:13px;box-shadow:var(--shadow);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s;z-index:100;font-size:12px}
 .toast.show{opacity:1;transform:translateY(0)}
 .mobile-menu{display:none}
 
@@ -132,6 +145,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
       <button class="active"><i class="fa-solid fa-gauge-high"></i> Overview</button>
       <button onclick="scrollToNodes()"><i class="fa-solid fa-server"></i> Active Pool <span class="count" id="navCount">0</span></button>
       <button onclick="scrollToConfig()"><i class="fa-solid fa-link"></i> Subscriptions</button>
+      <button onclick="openCustomModal()"><i class="fa-solid fa-square-plus" style="color:var(--cyan)"></i> ＋ Add Custom Nodes</button>
       <button onclick="runBenchmarkAll()"><i class="fa-solid fa-bolt"></i> Run Benchmark</button>
     </nav>
     <div class="sidebar-bottom">
@@ -150,12 +164,13 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
         <div>
           <div class="eyebrow">10ium/telegram-configs-collector / Asia Mixed</div>
           <h1>Asia Country Subscriptions Center</h1>
-          <p class="subtitle">Clean IP & low-latency nodes for SG, HK, JP, MY, TH, VN, ID, IN, PK, PH</p>
+          <p class="subtitle">Clean IP & low-latency nodes with Custom Node Manager</p>
         </div>
       </div>
       <div class="top-actions">
         <div class="core-pill"><span class="dot"></span> 10IUM DEDICATED</div>
         <button class="icon-btn" onclick="fetchAndParseNodes()" title="Reload from GitHub"><i class="fa-solid fa-rotate"></i></button>
+        <button class="primary" onclick="openCustomModal()"><i class="fa-solid fa-plus mr-1"></i> Add Custom Node</button>
       </div>
     </header>
 
@@ -298,6 +313,45 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
   </main>
 </div>
 
+<!-- Modal: Add Custom Node & Push to GitHub -->
+<div class="modal-overlay" id="customModal">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-square-plus" style="color:var(--cyan);margin-right:8px"></i> Add Custom Nodes to GitHub</h3>
+      <button class="icon-btn" onclick="closeCustomModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <label class="field-label">Custom Node Name / Remark (Optional)</label>
+        <input type="text" id="modalCustomName" placeholder="e.g. [SG] VIP-Dedicated-01" class="custom-input" style="width:100%">
+        <small style="color:var(--muted);font-size:10px;margin-top:4px;display:block">ချန်ထားခဲ့ပါက Config မူလနာမည်အတိုင်း သိမ်းဆည်းပါမည်။</small>
+      </div>
+      <div>
+        <label class="field-label">Node URI Config(s)</label>
+        <textarea id="modalCustomUris" class="custom-textarea" placeholder="Paste single or multiple keys (vless://, vmess://, trojan://, ss://, hy2://)..."></textarea>
+      </div>
+      <div>
+        <label class="field-label">Target File to Save on GitHub</label>
+        <select id="modalTargetFile" class="select" style="width:100%">
+          <option value="sub.txt">Main Pool (sub.txt)</option>
+          <option value="fast-sub.txt">Curated Fast Sub (fast-sub.txt)</option>
+        </select>
+      </div>
+      <div id="modalLinkResult" style="display:none;background:#131b2e;padding:12px;border-radius:12px;border:1px solid rgba(107,231,244,.2)">
+        <span style="font-size:11px;color:var(--green);font-weight:700;display:block;margin-bottom:6px"><i class="fa-solid fa-circle-check mr-1"></i> Uploaded Successfully! Subscription Link:</span>
+        <div style="display:flex;gap:6px">
+          <input type="text" id="modalGeneratedLink" readonly class="custom-input" style="color:var(--cyan)">
+          <button class="primary" onclick="copyLink('modalGeneratedLink')" style="padding:6px 12px">Copy Link</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="ghost" onclick="closeCustomModal()">Cancel</button>
+      <button class="primary" id="modalPushBtn" onclick="submitCustomNodesToGithub()"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Save & Push to GitHub</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -328,6 +382,14 @@ function toast(msg){
 
 function scrollToNodes(){ document.getElementById('nodesPanel').scrollIntoView({ behavior: 'smooth' }); }
 function scrollToConfig(){ document.getElementById('configSection').scrollIntoView({ behavior: 'smooth' }); }
+
+function openCustomModal(){
+  document.getElementById("customModal").classList.add("open");
+  document.getElementById("modalLinkResult").style.display = "none";
+}
+function closeCustomModal(){
+  document.getElementById("customModal").classList.remove("open");
+}
 
 function parseProtocolAndHost(uri, idx) {
   let name = `Node-${idx + 1}`;
@@ -363,7 +425,6 @@ function parseProtocolAndHost(uri, idx) {
   }
 
   let flag = COUNTRY_FLAGS[countryCode] || '🌐';
-
   return { name, host, proto, countryCode, flag };
 }
 
@@ -418,7 +479,7 @@ async function fetchAndParseNodes() {
 function renderNodes() {
   const tbody = document.getElementById("nodeTableBody");
   if (parsedNodes.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">No 10ium nodes found in pool.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">No nodes found in pool.</td></tr>`;
     return;
   }
 
@@ -491,7 +552,6 @@ function filterNodes() {
 }
 
 // Latency စစ်ဆေးခြင်း: www.gstatic.com/generate_204
-// Speed test: speed.cloudflare.com
 async function testSingleNode(node) {
   const pingStart = performance.now();
   let pingOk = false;
@@ -653,6 +713,109 @@ async function saveFastSubToGithub() {
   } finally {
     btn.disabled = false;
     btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> Save Selected to fast-sub.txt`;
+  }
+}
+
+// Custom Node များကို စိတ်ကြိုက်နာမည်တပ်ကာ GitHub သို့ တိုက်ရိုက် Save လုပ်ပြီး Subscription Link ထုတ်ပေးခြင်း
+async function submitCustomNodesToGithub() {
+  const token = document.getElementById("tokenInput").value.trim();
+  if (!token) {
+    toast("Please enter your GitHub PAT token in the Dashboard first!");
+    return;
+  }
+  localStorage.setItem("gh_token", token);
+
+  const rawUris = document.getElementById("modalCustomUris").value.trim();
+  const customName = document.getElementById("modalCustomName").value.trim();
+  const targetFile = document.getElementById("modalTargetFile").value;
+  const pushBtn = document.getElementById("modalPushBtn");
+
+  if (!rawUris) {
+    toast("Please enter at least one node URI!");
+    return;
+  }
+
+  const lines = rawUris.split(/[\r\n]+/).map(l => l.trim()).filter(l => l.includes('://'));
+  if (lines.length === 0) {
+    toast("No valid node URIs found (e.g. vless://, vmess://, etc.)!");
+    return;
+  }
+
+  // စိတ်ကြိုက်နာမည် ထည့်သွင်းခြင်း
+  const formattedUris = lines.map((uri, idx) => {
+    if (!customName) return uri;
+    const finalLabel = lines.length > 1 ? `${customName}-${idx + 1}` : customName;
+    try {
+      if (uri.startsWith('vmess://')) {
+        const rawB64 = uri.replace(/^vmess:\/\//i, '').trim();
+        const json = JSON.parse(atob(rawB64));
+        json.ps = finalLabel;
+        return 'vmess://' + btoa(JSON.stringify(json));
+      }
+      return `${uri.split('#')[0]}#${encodeURIComponent(finalLabel)}`;
+    } catch(e) {
+      return uri;
+    }
+  });
+
+  pushBtn.disabled = true;
+  pushBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Saving to GitHub...`;
+
+  try {
+    // လက်ရှိ File ထဲတွင် ရှိပြီးသား Node များကို ဆွဲယူခြင်း
+    let existingNodes = [];
+    let sha = null;
+
+    try {
+      const getRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${targetFile}`, {
+        headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" }
+      });
+      if (getRes.ok) {
+        const data = await getRes.json();
+        sha = data.sha;
+        const decoded = atob(data.content.trim().replace(/\s+/g, ''));
+        existingNodes = decoded.split(/[\r\n]+/).filter(l => l.includes('://'));
+      }
+    } catch(e) {}
+
+    // Custom Node အသစ်များကို ထိပ်ဆုံးမှ ဦးစားပေး ထည့်သွင်းပေါင်းစပ်ခြင်း
+    const mergedList = Array.from(new Set([...formattedUris, ...existingNodes]));
+    const base64Content = btoa(mergedList.join('\n'));
+
+    const putPayload = {
+      message: `Add ${formattedUris.length} custom node(s) to ${targetFile}`,
+      content: base64Content,
+      branch: "main"
+    };
+    if (sha) putPayload.sha = sha;
+
+    const putRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${targetFile}`, {
+      method: "PUT",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(putPayload)
+    });
+
+    if (putRes.ok) {
+      const finalRawUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${targetFile}`;
+      document.getElementById("modalGeneratedLink").value = finalRawUrl;
+      document.getElementById("modalLinkResult").style.display = "block";
+      toast(`Successfully pushed ${formattedUris.length} custom node(s) to ${targetFile}!`);
+
+      // Dashboard Pool တွင် ချက်ချင်း update လုပ်ခြင်း
+      setTimeout(fetchAndParseNodes, 1200);
+    } else {
+      const err = await putRes.json();
+      toast(`GitHub Error: ${err.message}`);
+    }
+  } catch(err) {
+    toast(`Operation failed: ${err.message}`);
+  } finally {
+    pushBtn.disabled = false;
+    pushBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> Save & Push to GitHub`;
   }
 }
 
