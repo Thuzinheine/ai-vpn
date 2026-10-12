@@ -1,6 +1,6 @@
 /**
- * update.js - AI-VPN Core Live Verification Scraper
- * Protocols: Hysteria 2 & VLESS Reality (Verified Active Only)
+ * update.js - AI-VPN Core Aggregator (ES Module)
+ * Target: Hysteria 2 & VLESS Reality (Live Socket Verified)
  */
 import fs from 'node:fs';
 import https from 'node:https';
@@ -46,16 +46,12 @@ function decodeRecursive(content) {
   return content;
 }
 
-// Server IP/Port အမှန်တကယ် ပွင့်/မပွင့် TCP Handshake စစ်ဆေးခြင်း
-function verifyNodeConnection(host, port, timeout = 2500) {
+function verifyNodeConnection(host, port, timeout = 2000) {
   return new Promise((resolve) => {
     const socket = new net.Socket();
-    let status = false;
-
     socket.setTimeout(timeout);
 
     socket.connect(port, host, () => {
-      status = true;
       socket.destroy();
       resolve(true);
     });
@@ -72,7 +68,6 @@ function verifyNodeConnection(host, port, timeout = 2500) {
   });
 }
 
-// URI ထဲမှ Host နှင့် Port ကို ထုတ်ယူခြင်း
 function extractHostPort(uri) {
   try {
     const clean = uri.replace(/^(vless|hy2|hysteria2):\/\//, '');
@@ -88,8 +83,9 @@ function extractHostPort(uri) {
 }
 
 async function main() {
-  console.log('--- Step 1: Scraping Raw Feeds ---');
-  let rawList = [];
+  console.log('--- Step 1: Digging Reality & Hysteria 2 Edge Nodes ---');
+  let hy2List = [];
+  let realityList = [];
 
   for (const src of SOURCES) {
     try {
@@ -100,47 +96,44 @@ async function main() {
       for (const line of lines) {
         const trimmed = line.trim();
         if (!trimmed) continue;
-        const isHy2 = trimmed.startsWith('hy2://') || trimmed.startsWith('hysteria2://');
-        const isReality = trimmed.startsWith('vless://') && trimmed.includes('security=reality');
 
-        if (isHy2 || isReality) {
-          rawList.push(trimmed);
+        if (trimmed.startsWith('hy2://') || trimmed.startsWith('hysteria2://')) {
+          hy2List.push(trimmed);
+        } else if (trimmed.startsWith('vless://') && trimmed.includes('security=reality')) {
+          realityList.push(trimmed);
         }
       }
     } catch (err) {}
   }
 
-  const unique = Array.from(new Set(rawList));
-  console.log(`Discovered ${unique.length} candidate nodes. Starting live connectivity tests...`);
+  const uniqueHy2 = Array.from(new Set(hy2List));
+  const uniqueReality = Array.from(new Set(realityList));
+  console.log(`Discovered raw candidates: ${uniqueHy2.length} Hy2, ${uniqueReality.length} Reality`);
 
-  console.log('--- Step 2: Live Ping/Socket Verification ---');
+  console.log('--- Step 2: Live Socket Handshake Verification ---');
+  const candidatePool = [...uniqueHy2.slice(0, 70), ...uniqueReality.slice(0, 70)];
   let aliveNodes = [];
 
-  // အများဆုံး စစ်ဆေးမည့် node ပမာဏ (အချိန်မကြာစေရန် ပထမ ၁၅၀ ခု စစ်ဆေးမည်)
-  const candidates = unique.slice(0, 150);
-
-  for (const uri of candidates) {
+  for (const uri of candidatePool) {
     const target = extractHostPort(uri);
     if (!target || !target.host) continue;
 
-    const isAlive = await verifyNodeConnection(target.host, target.port, 2000);
+    const isAlive = await verifyNodeConnection(target.host, target.port, 1800);
     if (isAlive) {
-      console.log(`[PASS] ${target.host}:${target.port}`);
+      console.log(`[ALIVE] ${target.host}:${target.port}`);
       aliveNodes.push(uri);
-      if (aliveNodes.length >= 35) break; // အသက်ရှင်သော node ၃၅ ခုရလျှင် ရပ်မည်
+      if (aliveNodes.length >= 40) break;
     }
   }
 
-  console.log(`Verified ${aliveNodes.length} active live nodes.`);
-
   if (aliveNodes.length === 0) {
-    console.log('Warning: No live nodes passed socket test. sub.txt remains unchanged.');
+    console.log('No alive nodes passed handshake test. sub.txt remains unchanged.');
     return;
   }
 
   const base64Output = Buffer.from(aliveNodes.join('\n'), 'utf-8').toString('base64');
   fs.writeFileSync('sub.txt', base64Output, 'utf-8');
-  console.log(`Successfully updated sub.txt with ${aliveNodes.length} VERIFIED active nodes.`);
+  console.log(`Successfully verified and saved ${aliveNodes.length} low-latency nodes to sub.txt.`);
 }
 
 main();
