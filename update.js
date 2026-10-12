@@ -1,9 +1,11 @@
 /**
- * update.js - Asia-Optimized Reality & Hysteria 2 Aggregator
+ * update.js - AI-VPN Core Live Verification Scraper
+ * Protocols: Hysteria 2 & VLESS Reality (Verified Active Only)
  */
 import fs from 'node:fs';
 import https from 'node:https';
 import http from 'node:http';
+import net from 'node:net';
 
 const SOURCES = [
   'https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/protocols/hysteria2',
@@ -14,13 +16,10 @@ const SOURCES = [
   'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Sub1.txt'
 ];
 
-// မြန်မာနိုင်ငံအတွက် အဆင်ပြေဆုံး Asia Regions
-const ASIA_KEYWORDS = ['SG', 'Singapore', 'TH', 'Thailand', 'MY', 'Malaysia', 'JP', 'Japan', 'HK', 'Hong'];
-
 function fetchUrl(url) {
   return new Promise((resolve) => {
     const client = url.startsWith('https') ? https : http;
-    const req = client.get(url, { headers: { 'User-Agent': 'v2rayNG/1.8.5' }, timeout: 10000 }, (res) => {
+    const req = client.get(url, { headers: { 'User-Agent': 'v2rayNG/1.8.5' }, timeout: 8000 }, (res) => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         return resolve(fetchUrl(res.headers.location));
       }
@@ -47,8 +46,49 @@ function decodeRecursive(content) {
   return content;
 }
 
+// Server IP/Port အမှန်တကယ် ပွင့်/မပွင့် TCP Handshake စစ်ဆေးခြင်း
+function verifyNodeConnection(host, port, timeout = 2500) {
+  return new Promise((resolve) => {
+    const socket = new net.Socket();
+    let status = false;
+
+    socket.setTimeout(timeout);
+
+    socket.connect(port, host, () => {
+      status = true;
+      socket.destroy();
+      resolve(true);
+    });
+
+    socket.on('error', () => {
+      socket.destroy();
+      resolve(false);
+    });
+
+    socket.on('timeout', () => {
+      socket.destroy();
+      resolve(false);
+    });
+  });
+}
+
+// URI ထဲမှ Host နှင့် Port ကို ထုတ်ယူခြင်း
+function extractHostPort(uri) {
+  try {
+    const clean = uri.replace(/^(vless|hy2|hysteria2):\/\//, '');
+    const mainPart = clean.split('?')[0].split('#')[0];
+    const hostPort = mainPart.includes('@') ? mainPart.split('@')[1] : mainPart;
+    const parts = hostPort.split(':');
+    const host = parts[0];
+    const port = parseInt(parts[1], 10) || 443;
+    return { host, port };
+  } catch (e) {
+    return null;
+  }
+}
+
 async function main() {
-  console.log('--- Aggregating Best Quality Asia Nodes ---');
+  console.log('--- Step 1: Scraping Raw Feeds ---');
   let rawList = [];
 
   for (const src of SOURCES) {
@@ -71,28 +111,36 @@ async function main() {
   }
 
   const unique = Array.from(new Set(rawList));
+  console.log(`Discovered ${unique.length} candidate nodes. Starting live connectivity tests...`);
 
-  // Asia nodes များကို ဦးစားပေး စစ်ထုတ်ခြင်း
-  const asiaNodes = unique.filter(node => {
-    return ASIA_KEYWORDS.some(kw => node.toLowerCase().includes(kw.toLowerCase()));
-  });
+  console.log('--- Step 2: Live Ping/Socket Verification ---');
+  let aliveNodes = [];
 
-  const otherNodes = unique.filter(node => !asiaNodes.includes(node));
+  // အများဆုံး စစ်ဆေးမည့် node ပမာဏ (အချိန်မကြာစေရန် ပထမ ၁၅၀ ခု စစ်ဆေးမည်)
+  const candidates = unique.slice(0, 150);
 
-  // Asia Nodes အရင်ထည့်ပြီး ကျန်နေရာကို အခြား low-latency ဖြစ်နိုင်သော node များဖြင့် ဖြည့်ခြင်း
-  const selectedPool = [
-    ...asiaNodes.slice(0, 35),
-    ...otherNodes.slice(0, 15)
-  ];
+  for (const uri of candidates) {
+    const target = extractHostPort(uri);
+    if (!target || !target.host) continue;
 
-  if (selectedPool.length === 0) {
-    console.log('No nodes found.');
+    const isAlive = await verifyNodeConnection(target.host, target.port, 2000);
+    if (isAlive) {
+      console.log(`[PASS] ${target.host}:${target.port}`);
+      aliveNodes.push(uri);
+      if (aliveNodes.length >= 35) break; // အသက်ရှင်သော node ၃၅ ခုရလျှင် ရပ်မည်
+    }
+  }
+
+  console.log(`Verified ${aliveNodes.length} active live nodes.`);
+
+  if (aliveNodes.length === 0) {
+    console.log('Warning: No live nodes passed socket test. sub.txt remains unchanged.');
     return;
   }
 
-  const base64Output = Buffer.from(selectedPool.join('\n'), 'utf-8').toString('base64');
+  const base64Output = Buffer.from(aliveNodes.join('\n'), 'utf-8').toString('base64');
   fs.writeFileSync('sub.txt', base64Output, 'utf-8');
-  console.log(`Successfully generated sub.txt with ${selectedPool.length} nodes (Prioritized Asia).`);
+  console.log(`Successfully updated sub.txt with ${aliveNodes.length} VERIFIED active nodes.`);
 }
 
 main();
