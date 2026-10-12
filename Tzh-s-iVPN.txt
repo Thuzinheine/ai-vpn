@@ -1,0 +1,1 @@
+trojan://UX82473651@13.229.121.67:443?security=tls&sni=rested-seahorse.rooster465.autos&allowInsecure=1&type=tcp#[SG]%20Singapore%20-%20Node%2014
