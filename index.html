@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI VPN Core | Dual Sub Engine</title>
+  <title>AI VPN | Studio Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -18,6 +18,19 @@
           fontFamily: {
             sans: ['Plus Jakarta Sans', 'sans-serif'],
             mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            surface: {
+              DEFAULT: '#14161b',
+              panel: '#1a1d24',
+              elevated: '#21252e',
+              border: '#2a2f3a',
+            },
+            accent: {
+              DEFAULT: '#f59e0b',
+              muted: '#d97706',
+              light: '#fde68a',
+            }
           }
         }
       }
@@ -26,197 +39,187 @@
 
   <style>
     body {
-      background-color: #0b0f19;
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.04) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.04) 0px, transparent 50%);
-    }
-    .calm-panel {
-      background: rgba(18, 24, 38, 0.85);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      background-color: #0f1115;
     }
     .custom-scroll::-webkit-scrollbar {
-      width: 4px;
+      width: 5px;
     }
     .custom-scroll::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.6);
+      background: #14161b;
     }
     .custom-scroll::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.2);
-      border-radius: 8px;
+      background: #2a2f3a;
+      border-radius: 4px;
     }
   </style>
 </head>
-<body class="text-slate-200 min-h-screen p-3 sm:p-5 flex flex-col justify-between selection:bg-sky-500 selection:text-white">
+<body class="text-zinc-200 antialiased min-h-screen flex flex-col justify-between p-3 sm:p-5 selection:bg-amber-500/20 selection:text-amber-300">
 
-  <div class="max-w-7xl w-full mx-auto space-y-4">
+  <!-- Fixed Container -->
+  <div class="max-w-7xl w-full mx-auto space-y-3.5 flex-1 flex flex-col">
 
-    <!-- Top Navbar -->
-    <header class="calm-panel rounded-2xl px-5 py-3.5 flex flex-wrap items-center justify-between gap-3">
+    <!-- Header Navbar -->
+    <header class="bg-surface-panel border border-surface-border rounded-xl px-5 py-3 flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700/80 flex items-center justify-center text-sky-400 shadow-sm">
-          <i class="fa-solid fa-shield-halved text-lg"></i>
+        <div class="w-9 h-9 rounded-lg bg-surface-elevated border border-surface-border flex items-center justify-center text-amber-400">
+          <i class="fa-solid fa-server text-sm"></i>
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-base font-semibold text-slate-100 tracking-tight">AI-VPN Dual Sub Engine</h1>
-            <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-sky-500/10 text-sky-300 border border-sky-500/20">
-              Live Hub
-            </span>
+            <h1 class="text-sm font-semibold text-white tracking-wide">AI-VPN Core Studio</h1>
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-400 border border-zinc-700/60">50 Pool</span>
           </div>
-          <p class="text-[11px] text-slate-400">All Nodes Sub (50) + Custom Fastest Sub (fast-sub.txt)</p>
+          <p class="text-[11px] text-zinc-400">Dual Node Subscription Engine & Low-Latency Benchmarking</p>
         </div>
       </div>
 
       <!-- Quick Metrics Counters -->
-      <div class="flex items-center gap-2 text-xs">
-        <div class="bg-slate-900/80 border border-slate-800 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
-          <span class="text-slate-400 text-[10px] uppercase font-medium">Selected</span>
-          <span id="selectedCount" class="font-bold font-mono text-sky-400">0</span>
-          <span class="text-slate-600">/</span>
-          <span id="nodeCount" class="font-medium font-mono text-slate-300">0</span>
+      <div class="flex items-center gap-2 text-xs font-mono">
+        <div class="bg-surface border border-surface-border px-3 py-1.5 rounded-lg flex items-center gap-2">
+          <span class="text-zinc-500 text-[10px] uppercase font-sans">Selected</span>
+          <span id="selectedCount" class="font-bold text-amber-400">0</span>
+          <span class="text-zinc-700">/</span>
+          <span id="nodeCount" class="text-zinc-400">0</span>
         </div>
-        <div class="bg-slate-900/80 border border-slate-800 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
-          <span class="text-slate-400 text-[10px] uppercase font-medium">Best Ping</span>
-          <span id="bestPing" class="font-semibold font-mono text-emerald-400">-- ms</span>
+        <div class="bg-surface border border-surface-border px-3 py-1.5 rounded-lg flex items-center gap-2">
+          <span class="text-zinc-500 text-[10px] uppercase font-sans">Best Ping</span>
+          <span id="bestPing" class="font-bold text-amber-400">-- ms</span>
         </div>
       </div>
     </header>
 
-    <!-- Main Grid -->
-    <main class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+    <!-- Main Workspace (Desktop: Fixed Heights, No Layout Jumps) -->
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 flex-1 items-stretch">
       
-      <!-- Left Column: Links & Controls (Col Span 5) -->
-      <section class="lg:col-span-5 space-y-4">
+      <!-- Left Column: Controls (Col Span 5) -->
+      <section class="lg:col-span-5 flex flex-col gap-3.5">
         
-        <div class="calm-panel rounded-2xl p-5 space-y-4">
+        <!-- Controls Box -->
+        <div class="bg-surface-panel border border-surface-border rounded-xl p-4.5 space-y-3.5 flex-1">
           
-          <!-- 1. OFFICIAL GITHUB 50 NODES SUB LINK -->
-          <div class="space-y-1.5 pb-3 border-b border-slate-800">
-            <div class="flex justify-between items-center">
-              <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                <i class="fa-solid fa-list-check text-sky-400"></i> Main Sub Link (50 Nodes Pool)
+          <!-- sub.txt -->
+          <div class="space-y-1">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-medium text-zinc-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-layer-group text-zinc-400"></i> Main Pool (50 Nodes)
               </span>
-              <span class="text-[10px] text-sky-400 font-mono">sub.txt</span>
+              <span class="text-[10px] text-zinc-500 font-mono">sub.txt</span>
             </div>
-            <div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-800 rounded-xl p-1.5">
+            <div class="flex items-center gap-1.5 bg-surface border border-surface-border rounded-lg p-1">
               <input type="text" id="officialSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt"
-                class="w-full bg-transparent border-0 px-2 text-[11px] text-sky-300 font-mono truncate select-all focus:outline-none">
-              <button onclick="copyLink('officialSubUrl', 'copyOfficialBtn')" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1">
+                class="w-full bg-transparent border-0 px-2 text-[11px] text-zinc-300 font-mono truncate select-all focus:outline-none">
+              <button onclick="copyLink('officialSubUrl', 'copyOfficialBtn')" class="bg-surface-elevated hover:bg-zinc-700 active:scale-95 text-zinc-300 border border-surface-border px-2.5 py-1 rounded text-xs font-medium transition flex items-center gap-1">
                 <i class="fa-regular fa-copy"></i>
                 <span id="copyOfficialBtn">Copy</span>
               </button>
             </div>
           </div>
 
-          <!-- 2. FAST-SUB.TXT (BENCHMARK စစ်ပြီးရွေးထားသော SUB LINK) -->
-          <div class="space-y-1.5 pb-3 border-b border-slate-800">
-            <div class="flex justify-between items-center">
-              <span class="text-[11px] font-semibold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
-                <i class="fa-solid fa-bolt text-emerald-400"></i> Fast Sub Link (Custom Best Only)
+          <!-- fast-sub.txt -->
+          <div class="space-y-1">
+            <div class="flex justify-between items-center text-xs">
+              <span class="font-medium text-amber-300/90 flex items-center gap-1.5">
+                <i class="fa-solid fa-bolt text-amber-400"></i> Fast Pool (Custom Selected)
               </span>
-              <span class="text-[10px] text-emerald-400 font-mono">fast-sub.txt</span>
+              <span class="text-[10px] text-amber-400/70 font-mono">fast-sub.txt</span>
             </div>
-            <div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-800 rounded-xl p-1.5">
+            <div class="flex items-center gap-1.5 bg-surface border border-surface-border rounded-lg p-1">
               <input type="text" id="fastSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/fast-sub.txt"
-                class="w-full bg-transparent border-0 px-2 text-[11px] text-emerald-400 font-mono truncate select-all focus:outline-none">
-              <button onclick="copyLink('fastSubUrl', 'copyFastBtn')" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1">
+                class="w-full bg-transparent border-0 px-2 text-[11px] text-amber-300 font-mono truncate select-all focus:outline-none">
+              <button onclick="copyLink('fastSubUrl', 'copyFastBtn')" class="bg-surface-elevated hover:bg-zinc-700 active:scale-95 text-zinc-300 border border-surface-border px-2.5 py-1 rounded text-xs font-medium transition flex items-center gap-1">
                 <i class="fa-regular fa-copy"></i>
                 <span id="copyFastBtn">Copy</span>
               </button>
             </div>
-            <p class="text-[10px] text-slate-400">Benchmark စစ်ပြီး မိမိရွေးချယ်ထားသော အကောင်းဆုံး Node များသာ ပါဝင်မည့် တရားဝင် Raw Sub link ဖြစ်ပါသည်။</p>
           </div>
 
-          <!-- Token Input -->
+          <!-- PAT -->
           <div class="space-y-1">
-            <label class="text-[11px] font-medium text-slate-300 flex items-center gap-1.5">
-              <i class="fa-solid fa-key text-slate-400"></i> GitHub Token (PAT)
+            <label class="text-[11px] font-medium text-zinc-400 flex items-center gap-1.5">
+              <i class="fa-solid fa-key text-zinc-500"></i> GitHub Token (PAT)
             </label>
             <div class="relative">
               <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" 
-                class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-3 pr-9 py-2 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500 font-mono">
-              <button type="button" onclick="toggleTokenVisibility()" class="absolute right-3 top-2.5 text-slate-500 hover:text-slate-300">
+                class="w-full bg-surface border border-surface-border rounded-lg pl-3 pr-8 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-amber-500 font-mono">
+              <button type="button" onclick="toggleTokenVisibility()" class="absolute right-2.5 top-2 text-zinc-500 hover:text-zinc-300">
                 <i id="eyeIcon" class="fa-regular fa-eye text-xs"></i>
               </button>
             </div>
           </div>
 
-          <!-- Buttons Group -->
+          <!-- Actions Grid -->
           <div class="space-y-2 pt-1">
             <div class="grid grid-cols-2 gap-2">
               <button onclick="triggerGithubUpdate()" id="updateBtn"
-                class="bg-sky-600 hover:bg-sky-500 text-white font-medium py-2 rounded-xl text-xs uppercase tracking-wide flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-sky-900/20 active:scale-95 transition">
+                class="bg-surface-elevated hover:bg-zinc-700 border border-surface-border text-zinc-200 font-medium py-2 rounded-lg text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition">
                 <i id="btnIcon" class="fa-solid fa-arrows-rotate text-xs"></i>
                 <span>Action Scrape</span>
               </button>
 
               <button onclick="runBenchmarkAll()" id="benchmarkBtn"
-                class="bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-slate-200 font-medium py-2 rounded-xl text-xs uppercase tracking-wide flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition">
-                <i id="testIcon" class="fa-solid fa-gauge-simple-high text-xs text-sky-400"></i>
-                <span>Test Ping All</span>
+                class="bg-amber-600 hover:bg-amber-500 text-zinc-950 font-semibold py-2 rounded-lg text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition">
+                <i id="testIcon" class="fa-solid fa-gauge-high text-xs text-zinc-950"></i>
+                <span>Benchmark</span>
               </button>
             </div>
 
-            <!-- SAVE TO FAST-SUB.TXT BUTTON -->
             <button onclick="saveFastSubToGithub()" id="saveFastBtn"
-              class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl text-xs uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-emerald-900/30 active:scale-95 transition">
-              <i id="saveFastIcon" class="fa-solid fa-cloud-arrow-up text-sm"></i>
-              <span id="saveFastText">Save Selected to fast-sub.txt</span>
+              class="w-full bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-200 font-medium py-2 rounded-lg text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition">
+              <i id="saveFastIcon" class="fa-solid fa-cloud-arrow-up text-xs text-amber-400"></i>
+              <span id="saveFastText">Save to fast-sub.txt</span>
             </button>
           </div>
 
           <!-- Toast Message -->
-          <div id="statusBox" class="hidden p-3 rounded-xl text-xs flex items-center gap-2.5 border transition-all">
-            <i id="statusIcon" class="fa-solid fa-circle-notch fa-spin text-sm"></i>
+          <div id="statusBox" class="hidden p-2.5 rounded-lg text-xs flex items-center gap-2 border transition-all">
+            <i id="statusIcon" class="fa-solid fa-circle-notch fa-spin text-xs"></i>
             <span id="statusMessage" class="text-[11px] leading-tight"></span>
           </div>
 
         </div>
 
-        <!-- Add External Node Box -->
-        <div class="calm-panel rounded-2xl p-4 space-y-2">
-          <label class="text-[11px] font-medium text-slate-300 flex items-center justify-between">
-            <span class="flex items-center gap-1.5"><i class="fa-solid fa-plus text-sky-400"></i> Add External VLESS Key</span>
+        <!-- Add Custom Key Card -->
+        <div class="bg-surface-panel border border-surface-border rounded-xl p-3.5 space-y-2">
+          <label class="text-[11px] font-medium text-zinc-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-plus text-amber-400"></i> Add External VLESS Key
           </label>
           <div class="flex gap-1.5">
             <input type="text" id="customNodeInput" placeholder="vless://..."
-              class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500 font-mono">
-            <button onclick="addCustomNode()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sky-400 px-3 py-1.5 rounded-xl text-xs font-semibold active:scale-95 transition">
+              class="w-full bg-surface border border-surface-border rounded-lg px-2.5 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-amber-500 font-mono">
+            <button onclick="addCustomNode()" class="bg-surface-elevated hover:bg-zinc-700 border border-surface-border text-zinc-300 px-3 py-1.5 rounded-lg text-xs font-medium active:scale-95 transition">
               Add
             </button>
           </div>
         </div>
+
       </section>
 
-      <!-- Right Column: Nodes Grid with Multi-select (Col Span 7) -->
-      <section class="lg:col-span-7 calm-panel rounded-2xl p-5 space-y-3">
+      <!-- Right Column: Node Selection Panel (Col Span 7) -->
+      <section class="lg:col-span-7 bg-surface-panel border border-surface-border rounded-xl p-4 flex flex-col h-[680px]">
         
-        <!-- Filter Toolbar -->
-        <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800">
-          <div class="flex items-center gap-1.5">
-            <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
-              <i class="fa-solid fa-server text-sky-400"></i> Nodes Selection
+        <!-- Toolbar -->
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-surface-border flex-shrink-0">
+          <div class="flex items-center gap-2">
+            <h2 class="text-xs font-semibold uppercase tracking-wider text-zinc-200 flex items-center gap-1.5">
+              <i class="fa-solid fa-network-wired text-amber-400"></i> Node Selection Pool
             </h2>
           </div>
 
           <div class="flex items-center gap-1 text-[10px]">
-            <span class="text-slate-500 mr-1">Select:</span>
-            <button onclick="selectPreset('all')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded-md border border-slate-700 transition">All</button>
-            <button onclick="selectPreset('good')" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 px-2 py-1 rounded-md border border-slate-700 transition">Ping &lt; 350ms</button>
-            <button onclick="selectPreset('none')" class="bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-1 rounded-md border border-slate-700 transition">Clear</button>
-            <button onclick="fetchAndParseNodes()" title="Reload from GitHub" class="text-slate-400 hover:text-slate-200 ml-1.5 p-1 transition">
+            <span class="text-zinc-500 mr-1">Select:</span>
+            <button onclick="selectPreset('all')" class="bg-surface-elevated hover:bg-zinc-700 text-zinc-300 px-2 py-1 rounded border border-surface-border transition">All</button>
+            <button onclick="selectPreset('good')" class="bg-surface-elevated hover:bg-zinc-700 text-amber-400 px-2 py-1 rounded border border-surface-border transition">Ping &lt; 350ms</button>
+            <button onclick="selectPreset('none')" class="bg-surface-elevated hover:bg-zinc-700 text-zinc-400 px-2 py-1 rounded border border-surface-border transition">Clear</button>
+            <button onclick="fetchAndParseNodes()" title="Reload from GitHub" class="text-zinc-400 hover:text-zinc-200 ml-1.5 p-1 transition">
               <i class="fa-solid fa-rotate-right"></i>
             </button>
           </div>
         </div>
 
-        <!-- 2-Column Responsive Node Cards with Checkboxes -->
-        <div id="nodeListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[640px] overflow-y-auto pr-1 custom-scroll">
-          <div class="col-span-full text-center py-12 text-xs text-slate-500">
-            <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading active nodes from GitHub...
+        <!-- Fixed Scrollable Node Cards Container -->
+        <div id="nodeListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 overflow-y-auto pr-1 flex-1 custom-scroll content-start">
+          <div class="col-span-full text-center py-16 text-xs text-zinc-500">
+            <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading active nodes...
           </div>
         </div>
       </section>
@@ -250,25 +253,24 @@
       const msg = document.getElementById("statusMessage");
       const icon = document.getElementById("statusIcon");
 
-      box.className = "p-3 rounded-xl text-xs flex items-center gap-2.5 border transition-all ";
+      box.className = "p-2.5 rounded-lg text-xs flex items-center gap-2 border transition-all ";
       if (type === "success") {
-        box.classList.add("bg-emerald-500/10", "border-emerald-500/20", "text-emerald-300");
-        icon.className = "fa-solid fa-circle-check text-sm text-emerald-400";
+        box.classList.add("bg-emerald-950/30", "border-emerald-800/40", "text-emerald-400");
+        icon.className = "fa-solid fa-circle-check text-xs text-emerald-400";
       } else if (type === "error") {
-        box.classList.add("bg-rose-500/10", "border-rose-500/20", "text-rose-300");
-        icon.className = "fa-solid fa-circle-exclamation text-sm text-rose-400";
+        box.classList.add("bg-rose-950/30", "border-rose-800/40", "text-rose-400");
+        icon.className = "fa-solid fa-circle-exclamation text-xs text-rose-400";
       } else {
-        box.classList.add("bg-sky-500/10", "border-sky-500/20", "text-sky-300");
-        icon.className = "fa-solid fa-circle-notch fa-spin text-sm text-sky-400";
+        box.classList.add("bg-zinc-900", "border-zinc-700", "text-zinc-300");
+        icon.className = "fa-solid fa-circle-notch fa-spin text-xs text-amber-400";
       }
       msg.innerText = message;
       box.classList.remove("hidden");
     }
 
-    // ၁။ sub.txt ကို ဖတ်ယူခြင်း
     async function fetchAndParseNodes() {
       const listEl = document.getElementById("nodeListContainer");
-      listEl.innerHTML = `<div class="col-span-full text-center py-12 text-xs text-slate-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Fetching latest sub.txt...</div>`;
+      listEl.innerHTML = `<div class="col-span-full text-center py-16 text-xs text-zinc-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Fetching latest sub.txt...</div>`;
       
       try {
         const url = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/sub.txt?t=${Date.now()}`;
@@ -293,43 +295,42 @@
         document.getElementById("nodeCount").innerText = parsedNodes.length;
         renderNodes();
       } catch (e) {
-        listEl.innerHTML = `<div class="col-span-full text-center py-12 text-xs text-rose-400">Failed to load nodes from sub.txt.</div>`;
+        listEl.innerHTML = `<div class="col-span-full text-center py-16 text-xs text-rose-400">Failed to load nodes from sub.txt.</div>`;
       }
     }
 
-    // ၂။ Render cards
     function renderNodes() {
       const listEl = document.getElementById("nodeListContainer");
       if (parsedNodes.length === 0) {
-        listEl.innerHTML = `<div class="col-span-full text-center py-12 text-xs text-slate-500">No nodes found.</div>`;
+        listEl.innerHTML = `<div class="col-span-full text-center py-16 text-xs text-zinc-500">No nodes found.</div>`;
         return;
       }
 
       listEl.innerHTML = parsedNodes.map((n, i) => `
-        <div class="bg-slate-900/70 border ${n.selected ? 'border-sky-500/50 bg-slate-900/90' : 'border-slate-800'} hover:border-slate-700 p-2.5 rounded-xl flex items-center justify-between gap-2 transition">
-          <div class="flex items-center gap-2.5 min-w-0 flex-1">
+        <div class="bg-surface border ${n.selected ? 'border-amber-500/40' : 'border-surface-border'} hover:border-zinc-600 p-2.5 rounded-lg flex items-center justify-between gap-2 transition h-[58px]">
+          <div class="flex items-center gap-2 min-w-0 flex-1">
             <input type="checkbox" ${n.selected ? 'checked' : ''} onchange="toggleSelect(${i})"
-              class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-sky-500 focus:ring-0 cursor-pointer accent-sky-500">
+              class="w-3.5 h-3.5 rounded bg-surface-elevated border-surface-border text-amber-500 focus:ring-0 cursor-pointer accent-amber-500">
             
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${n.ping ? (n.ping < 250 ? 'bg-emerald-400' : 'bg-amber-400') : 'bg-slate-600'}"></span>
-                <h3 class="text-xs font-medium ${n.selected ? 'text-white' : 'text-slate-400'} truncate">${n.name}</h3>
+                <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${n.ping ? (n.ping < 250 ? 'bg-emerald-400' : 'bg-amber-400') : 'bg-zinc-600'}"></span>
+                <h3 class="text-xs font-medium ${n.selected ? 'text-zinc-100' : 'text-zinc-500'} truncate">${n.name}</h3>
               </div>
-              <p class="text-[10px] text-slate-500 font-mono mt-0.5 truncate pl-3">${n.host}</p>
+              <p class="text-[10px] text-zinc-500 font-mono mt-0.5 truncate pl-3">${n.host}</p>
             </div>
           </div>
 
           <div class="flex items-center gap-2 flex-shrink-0">
-            <div class="text-right">
-              <div class="text-[11px] font-mono font-medium ${n.ping ? (n.ping < 250 ? 'text-emerald-400' : 'text-amber-300') : 'text-slate-500'}">
+            <div class="text-right font-mono">
+              <div class="text-[11px] font-medium ${n.ping ? (n.ping < 250 ? 'text-emerald-400' : 'text-amber-400') : 'text-zinc-600'}">
                 ${n.ping !== null ? n.ping + ' ms' : '-- ms'}
               </div>
-              <div class="text-[9px] text-slate-500 font-mono">
+              <div class="text-[9px] text-zinc-500">
                 ${n.speed !== null ? n.speed + ' MB/s' : '-- MB/s'}
               </div>
             </div>
-            <button onclick="copySingleNode(${i})" title="Copy key" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 p-1.5 rounded-lg text-xs active:scale-95 transition">
+            <button onclick="copySingleNode(${i})" title="Copy key" class="bg-surface-elevated hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 border border-surface-border p-1.5 rounded text-xs active:scale-95 transition">
               <i class="fa-regular fa-copy"></i>
             </button>
           </div>
@@ -395,7 +396,6 @@
       showStatus(`"${name}" ကို ပေါင်းထည့်ပြီးပါပြီ!`, "success");
     }
 
-    // ၃။ Latency Benchmark & Auto Select
     async function testSingleNode(node) {
       const start = performance.now();
       try {
@@ -426,7 +426,7 @@
       const btn = document.getElementById("benchmarkBtn");
       const icon = document.getElementById("testIcon");
       btn.disabled = true;
-      icon.className = "fa-solid fa-spinner fa-spin text-xs text-sky-400";
+      icon.className = "fa-solid fa-spinner fa-spin text-xs";
       showStatus("Testing latency...", "loading");
 
       let best = 9999;
@@ -444,17 +444,16 @@
       document.getElementById("bestPing").innerText = best !== 9999 ? `${best} ms` : "--";
 
       btn.disabled = false;
-      icon.className = "fa-solid fa-gauge-simple-high text-xs text-sky-400";
-      showStatus("Benchmark Complete! Fast nodes auto-selected. Click 'Save Selected' to push.", "success");
+      icon.className = "fa-solid fa-gauge-high text-xs text-zinc-950";
+      showStatus("Benchmark Complete!", "success");
     }
 
-    // ၄။ GITHUB REPO သို့ FAST-SUB.TXT ဖိုင်အဖြစ် တိုက်ရိုက် ရေးတင်ခြင်း
     async function saveFastSubToGithub() {
       const token = document.getElementById("tokenInput").value.trim();
       const selectedUris = parsedNodes.filter(n => n.selected).map(n => n.uri);
 
       if (!token) {
-        showStatus("GitHub Token (PAT) အရင် ထည့်ပေးပါခင်ဗျာ!", "error");
+        showStatus("GitHub Token (PAT) အရင် ထည့်ပေးပါ!", "error");
         return;
       }
 
@@ -468,15 +467,12 @@
       const saveText = document.getElementById("saveFastText");
 
       saveBtn.disabled = true;
-      saveIcon.className = "fa-solid fa-spinner fa-spin text-sm";
-      saveText.innerText = "Saving to fast-sub.txt...";
-      showStatus("GitHub Repo ထဲသို့ fast-sub.txt အဖြစ် တင်ပေးနေပါသည်...", "loading");
+      saveIcon.className = "fa-solid fa-spinner fa-spin text-xs";
+      saveText.innerText = "Saving...";
+      showStatus("Saving to fast-sub.txt...", "loading");
 
       try {
-        // Base64 encode the selected nodes
         const base64Content = btoa(selectedUris.join('\n'));
-
-        // Check if fast-sub.txt already exists to get its SHA
         let sha = null;
         try {
           const fileRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/fast-sub.txt`, {
@@ -491,9 +487,8 @@
           }
         } catch (e) {}
 
-        // Put (create or update) fast-sub.txt
         const putPayload = {
-          message: `Update fast-sub.txt with ${selectedUris.length} fastest nodes`,
+          message: `Update fast-sub.txt (${selectedUris.length} nodes)`,
           content: base64Content,
           branch: "main"
         };
@@ -510,22 +505,21 @@
         });
 
         if (updateRes.ok) {
-          showStatus(`အောင်မြင်ပါသည်! ရွေးချယ်ထားသော Node ${selectedUris.length} ခုကို fast-sub.txt အဖြစ် သိမ်းဆည်းလိုက်ပါပြီ။`, "success");
+          showStatus(`fast-sub.txt သို့ Node ${selectedUris.length} ခု သိမ်းဆည်းပြီးပါပြီ!`, "success");
           document.getElementById("fastSubUrl").value = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/fast-sub.txt?t=${Date.now()}`;
         } else {
           const err = await updateRes.json();
           showStatus(`Error: ${err.message}`, "error");
         }
       } catch (err) {
-        showStatus("Network connection error ဖြစ်ပေါ်နေပါသည်။", "error");
+        showStatus("Network connection error.", "error");
       } finally {
         saveBtn.disabled = false;
-        saveIcon.className = "fa-solid fa-cloud-arrow-up text-sm";
-        saveText.innerText = "Save Selected to fast-sub.txt";
+        saveIcon.className = "fa-solid fa-cloud-arrow-up text-xs text-amber-400";
+        saveText.innerText = "Save to fast-sub.txt";
       }
     }
 
-    // ၅။ Copy & GitHub Action helpers
     function copyLink(inputId, btnId) {
       const input = document.getElementById(inputId);
       input.select();
@@ -533,7 +527,7 @@
       const btn = document.getElementById(btnId);
       btn.innerText = "Copied!";
       setTimeout(() => btn.innerText = "Copy", 2000);
-      showStatus("Link copied to clipboard!", "success");
+      showStatus("Link copied!", "success");
     }
 
     function copySingleNode(index) {
@@ -555,7 +549,7 @@
       localStorage.setItem("gh_token", token);
       btn.disabled = true;
       icon.className = "fa-solid fa-spinner fa-spin text-xs";
-      showStatus("Triggering GitHub Action...", "loading");
+      showStatus("Triggering workflow...", "loading");
 
       try {
         const response = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW_ID}/dispatches`, {
@@ -569,7 +563,7 @@
         });
 
         if (response.status === 204) {
-          showStatus("Workflow dispatched! Refreshing in 15s...", "success");
+          showStatus("Action dispatched! Reload in 15s...", "success");
           setTimeout(() => fetchAndParseNodes(), 15000);
         } else {
           showStatus("Trigger failed.", "error");
