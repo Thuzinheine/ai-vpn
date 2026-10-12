@@ -313,7 +313,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
   </main>
 </div>
 
-<!-- Modal: Add Custom Node & Push to GitHub -->
+<!-- Modal: Add Custom Node & Push to GitHub (With Dynamic File Creation) -->
 <div class="modal-overlay" id="customModal">
   <div class="modal-card">
     <div class="modal-head">
@@ -332,11 +332,23 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
       </div>
       <div>
         <label class="field-label">Target File to Save on GitHub</label>
-        <select id="modalTargetFile" class="select" style="width:100%">
+        <select id="modalTargetFile" class="select" style="width:100%" onchange="handleTargetFileChange()">
           <option value="sub.txt">Main Pool (sub.txt)</option>
           <option value="fast-sub.txt">Curated Fast Sub (fast-sub.txt)</option>
+          <option value="__new__">＋ Create New Sub File (ဖိုင်အသစ် သီးသန့်ဆောက်မည်)...</option>
         </select>
       </div>
+      
+      <!-- ဖိုင်အသစ်နာမည် ရိုက်ထည့်ရန် ကွက်လပ် -->
+      <div id="newFileNameContainer" style="display:none;background:#101726;padding:12px;border-radius:12px;border:1px solid rgba(167,139,250,.3)">
+        <label class="field-label" style="color:var(--violet)">New Sub File Name (.txt)</label>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input type="text" id="customNewFileName" placeholder="vip-sub" class="custom-input" style="width:100%;color:#fff">
+          <span style="color:var(--muted);font-family:monospace;font-size:12px">.txt</span>
+        </div>
+        <small style="color:var(--muted);font-size:10px;margin-top:4px;display:block">ဥပမာ- vip-sub, my-nodes (နောက်က .txt ထည့်ရန်မလိုပါ)</small>
+      </div>
+
       <div id="modalLinkResult" style="display:none;background:#131b2e;padding:12px;border-radius:12px;border:1px solid rgba(107,231,244,.2)">
         <span style="font-size:11px;color:var(--green);font-weight:700;display:block;margin-bottom:6px"><i class="fa-solid fa-circle-check mr-1"></i> Uploaded Successfully! Subscription Link:</span>
         <div style="display:flex;gap:6px">
@@ -383,10 +395,25 @@ function toast(msg){
 function scrollToNodes(){ document.getElementById('nodesPanel').scrollIntoView({ behavior: 'smooth' }); }
 function scrollToConfig(){ document.getElementById('configSection').scrollIntoView({ behavior: 'smooth' }); }
 
+function handleTargetFileChange() {
+  const val = document.getElementById("modalTargetFile").value;
+  const newNameBox = document.getElementById("newFileNameContainer");
+  if (val === "__new__") {
+    newNameBox.style.display = "block";
+    document.getElementById("customNewFileName").focus();
+  } else {
+    newNameBox.style.display = "none";
+  }
+}
+
 function openCustomModal(){
   document.getElementById("customModal").classList.add("open");
   document.getElementById("modalLinkResult").style.display = "none";
+  document.getElementById("modalTargetFile").value = "sub.txt";
+  document.getElementById("newFileNameContainer").style.display = "none";
+  document.getElementById("customNewFileName").value = "";
 }
+
 function closeCustomModal(){
   document.getElementById("customModal").classList.remove("open");
 }
@@ -479,7 +506,7 @@ async function fetchAndParseNodes() {
 function renderNodes() {
   const tbody = document.getElementById("nodeTableBody");
   if (parsedNodes.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">No nodes found in pool.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">No 10ium nodes found in pool.</td></tr>`;
     return;
   }
 
@@ -552,6 +579,7 @@ function filterNodes() {
 }
 
 // Latency စစ်ဆေးခြင်း: www.gstatic.com/generate_204
+// Speed test: speed.cloudflare.com
 async function testSingleNode(node) {
   const pingStart = performance.now();
   let pingOk = false;
@@ -716,7 +744,7 @@ async function saveFastSubToGithub() {
   }
 }
 
-// Custom Node များကို စိတ်ကြိုက်နာမည်တပ်ကာ GitHub သို့ တိုက်ရိုက် Save လုပ်ပြီး Subscription Link ထုတ်ပေးခြင်း
+// Custom Node များကို စိတ်ကြိုက်ဖိုင်အသစ်ဖြင့်ဖြစ်စေ၊ ရှိပြီးသားဖိုင်ဖြင့်ဖြစ်စေ Push လုပ်ပြီး Link ထုတ်ပေးခြင်း
 async function submitCustomNodesToGithub() {
   const token = document.getElementById("tokenInput").value.trim();
   if (!token) {
@@ -727,8 +755,21 @@ async function submitCustomNodesToGithub() {
 
   const rawUris = document.getElementById("modalCustomUris").value.trim();
   const customName = document.getElementById("modalCustomName").value.trim();
-  const targetFile = document.getElementById("modalTargetFile").value;
+  const selectedTarget = document.getElementById("modalTargetFile").value;
   const pushBtn = document.getElementById("modalPushBtn");
+
+  let targetFile = selectedTarget;
+  if (selectedTarget === "__new__") {
+    let inputName = document.getElementById("customNewFileName").value.trim();
+    if (!inputName) {
+      toast("Please enter a name for the new sub file!");
+      return;
+    }
+    if (!inputName.endsWith(".txt")) {
+      inputName += ".txt";
+    }
+    targetFile = inputName.replace(/[^a-zA-Z0-9_\-\.]/g, "-");
+  }
 
   if (!rawUris) {
     toast("Please enter at least one node URI!");
@@ -741,7 +782,6 @@ async function submitCustomNodesToGithub() {
     return;
   }
 
-  // စိတ်ကြိုက်နာမည် ထည့်သွင်းခြင်း
   const formattedUris = lines.map((uri, idx) => {
     if (!customName) return uri;
     const finalLabel = lines.length > 1 ? `${customName}-${idx + 1}` : customName;
@@ -762,7 +802,6 @@ async function submitCustomNodesToGithub() {
   pushBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> Saving to GitHub...`;
 
   try {
-    // လက်ရှိ File ထဲတွင် ရှိပြီးသား Node များကို ဆွဲယူခြင်း
     let existingNodes = [];
     let sha = null;
 
@@ -778,7 +817,6 @@ async function submitCustomNodesToGithub() {
       }
     } catch(e) {}
 
-    // Custom Node အသစ်များကို ထိပ်ဆုံးမှ ဦးစားပေး ထည့်သွင်းပေါင်းစပ်ခြင်း
     const mergedList = Array.from(new Set([...formattedUris, ...existingNodes]));
     const base64Content = btoa(mergedList.join('\n'));
 
@@ -803,10 +841,11 @@ async function submitCustomNodesToGithub() {
       const finalRawUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${targetFile}`;
       document.getElementById("modalGeneratedLink").value = finalRawUrl;
       document.getElementById("modalLinkResult").style.display = "block";
-      toast(`Successfully pushed ${formattedUris.length} custom node(s) to ${targetFile}!`);
+      toast(`Successfully saved to "${targetFile}"!`);
 
-      // Dashboard Pool တွင် ချက်ချင်း update လုပ်ခြင်း
-      setTimeout(fetchAndParseNodes, 1200);
+      if (targetFile === "sub.txt") {
+        setTimeout(fetchAndParseNodes, 1200);
+      }
     } else {
       const err = await putRes.json();
       toast(`GitHub Error: ${err.message}`);
