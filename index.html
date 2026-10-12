@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI VPN Core | Calm Slate Dashboard</title>
+  <title>AI VPN Core | Custom Sub Builder</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,18 +18,6 @@
           fontFamily: {
             sans: ['Plus Jakarta Sans', 'sans-serif'],
             mono: ['JetBrains Mono', 'monospace'],
-          },
-          colors: {
-            slate: {
-              850: '#151e2e',
-              900: '#0f172a',
-              950: '#090d16',
-            },
-            calm: {
-              accent: '#38bdf8', /* Soft Sky Blue */
-              soft: '#7dd3fc',
-              subtle: '#0284c7',
-            }
           }
         }
       }
@@ -63,7 +51,6 @@
 </head>
 <body class="text-slate-200 min-h-screen p-3 sm:p-5 flex flex-col justify-between selection:bg-sky-500 selection:text-white">
 
-  <!-- Full Width Main Dashboard Container -->
   <div class="max-w-7xl w-full mx-auto space-y-4">
 
     <!-- Top Navbar -->
@@ -74,44 +61,42 @@
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h1 class="text-base font-semibold text-slate-100 tracking-tight">AI-VPN Sub Hub</h1>
+            <h1 class="text-base font-semibold text-slate-100 tracking-tight">AI-VPN Custom Studio</h1>
             <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-sky-500/10 text-sky-300 border border-sky-500/20">
-              Edge Pool
+              Interactive Sub Builder
             </span>
           </div>
-          <p class="text-[11px] text-slate-400">VLESS Subscription Engine & Latency Monitor</p>
+          <p class="text-[11px] text-slate-400">Auto Benchmark, Custom Selection & Tailored Sub Export</p>
         </div>
       </div>
 
       <!-- Quick Metrics Counters -->
       <div class="flex items-center gap-2 text-xs">
         <div class="bg-slate-900/80 border border-slate-800 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
-          <span class="text-slate-400 text-[10px] uppercase font-medium">Nodes</span>
-          <span id="nodeCount" class="font-semibold font-mono text-slate-200">0</span>
+          <span class="text-slate-400 text-[10px] uppercase font-medium">Selected</span>
+          <span id="selectedCount" class="font-bold font-mono text-sky-400">0</span>
+          <span class="text-slate-600">/</span>
+          <span id="nodeCount" class="font-medium font-mono text-slate-300">0</span>
         </div>
         <div class="bg-slate-900/80 border border-slate-800 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
           <span class="text-slate-400 text-[10px] uppercase font-medium">Best Ping</span>
-          <span id="bestPing" class="font-semibold font-mono text-sky-400">-- ms</span>
-        </div>
-        <div class="bg-slate-900/80 border border-slate-800 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
-          <span class="text-slate-400 text-[10px] uppercase font-medium">Est. Speed</span>
-          <span id="avgSpeed" class="font-semibold font-mono text-indigo-300">-- MB/s</span>
+          <span id="bestPing" class="font-semibold font-mono text-emerald-400">-- ms</span>
         </div>
       </div>
     </header>
 
-    <!-- Main 2-Column Grid -->
+    <!-- Main Grid -->
     <main class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
       
-      <!-- Left Column: Controls (Col Span 4) -->
-      <section class="lg:col-span-4 space-y-4">
+      <!-- Left Column: Controls & Dynamic Subscription Link (Col Span 5) -->
+      <section class="lg:col-span-5 space-y-4">
         
         <div class="calm-panel rounded-2xl p-5 space-y-4">
           <div class="flex justify-between items-center pb-2 border-b border-slate-800">
             <span class="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-              <i class="fa-solid fa-sliders text-sky-400"></i> Settings & Control
+              <i class="fa-solid fa-sliders text-sky-400"></i> Automation & Triggers
             </span>
-            <span class="text-[10px] text-slate-500">API Trigger</span>
+            <span class="text-[10px] text-slate-500">Actions Engine</span>
           </div>
 
           <!-- Token Input -->
@@ -128,18 +113,18 @@
             </div>
           </div>
 
-          <!-- Buttons -->
+          <!-- Action Buttons -->
           <div class="space-y-2 pt-1">
             <button onclick="triggerGithubUpdate()" id="updateBtn"
               class="w-full bg-sky-600 hover:bg-sky-500 text-white font-medium py-2.5 rounded-xl text-xs uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-sky-900/20 active:scale-95 transition">
               <i id="btnIcon" class="fa-solid fa-arrows-rotate text-sm"></i>
-              <span>Refresh GitHub Nodes</span>
+              <span>Scrape Fresh Nodes (Action)</span>
             </button>
 
             <button onclick="runBenchmarkAll()" id="benchmarkBtn"
               class="w-full bg-slate-800 hover:bg-slate-700/80 border border-slate-700 text-slate-200 font-medium py-2.5 rounded-xl text-xs uppercase tracking-wide flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition">
               <i id="testIcon" class="fa-solid fa-gauge-simple-high text-sm text-sky-400"></i>
-              <span>Test Latency & Speed</span>
+              <span>Test Latency & Auto-Select Best</span>
             </button>
           </div>
 
@@ -149,47 +134,79 @@
             <span id="statusMessage" class="text-[11px] leading-tight"></span>
           </div>
 
-          <!-- Sub Link URL -->
-          <div class="space-y-1.5 pt-2 border-t border-slate-800">
-            <label class="text-[11px] font-medium text-slate-300 flex items-center gap-1.5">
-              <i class="fa-solid fa-link text-sky-400"></i> Raw Subscription Link
+          <!-- Add Custom Key Form -->
+          <div class="pt-2 border-t border-slate-800 space-y-2">
+            <label class="text-[11px] font-medium text-slate-300 flex items-center justify-between">
+              <span class="flex items-center gap-1.5"><i class="fa-solid fa-plus-circle text-sky-400"></i> Add External VLESS Key</span>
+              <span class="text-[10px] text-slate-500">Optional</span>
             </label>
-            <div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-800 rounded-xl p-1.5">
-              <input type="text" id="subUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt"
-                class="w-full bg-transparent border-0 px-2 text-[11px] text-sky-300 font-mono truncate select-all focus:outline-none">
-              <button onclick="copySubLink()" id="copyBtn" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1">
-                <i class="fa-regular fa-copy"></i>
-                <span id="copyText">Copy</span>
+            <div class="flex gap-1.5">
+              <input type="text" id="customNodeInput" placeholder="vless://uuid@domain:443?..."
+                class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-sky-500 font-mono">
+              <button onclick="addCustomNode()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sky-400 px-3 py-1.5 rounded-xl text-xs font-semibold active:scale-95 transition">
+                Add
               </button>
             </div>
           </div>
+
+          <!-- Custom Tailored Subscription Link -->
+          <div class="pt-3 border-t border-slate-800 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-medium text-slate-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-wand-magic-sparkles text-sky-400"></i> Your Tailored Sub URL
+              </span>
+              <span id="tailoredBadge" class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                0 nodes selected
+              </span>
+            </div>
+
+            <div class="flex items-center gap-1.5 bg-slate-900/90 border border-slate-800 rounded-xl p-1.5">
+              <input type="text" id="customSubUrl" readonly placeholder="Select nodes to generate link..."
+                class="w-full bg-transparent border-0 px-2 text-[11px] text-sky-300 font-mono truncate select-all focus:outline-none">
+              <button onclick="copySubLink()" class="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-1">
+                <i class="fa-regular fa-copy"></i>
+                <span id="copyBtnText">Copy</span>
+              </button>
+            </div>
+            <p class="text-[10px] text-slate-400">ညာဘက်ခြမ်းတွင် အမှန်ခြစ်ထားသော Node များသာ ပါဝင်သည့် တိုက်ရိုက် Sub Link ဖြစ်ပါသည်။</p>
+          </div>
+
         </div>
 
+        <!-- Help Info -->
         <div class="calm-panel rounded-2xl p-4 text-[11px] text-slate-400 space-y-1">
           <p class="flex items-center gap-1.5 text-slate-300 font-medium">
-            <i class="fa-solid fa-circle-info text-sky-400"></i> အသုံးပြုနည်း
+            <i class="fa-solid fa-circle-info text-sky-400"></i> စိတ်ကြိုက်ရွေးချယ်နည်း
           </p>
-          <p class="leading-relaxed">Subscription Link တစ်ခုလုံးကို NekoBox / v2rayNG ထဲ ထည့်သုံးနိုင်သလို၊ ညာဘက်ခြမ်းမှ မိမိကြိုက်နှစ်သက်ရာ Node တစ်ခုချင်းစီ၏ Copy ခလုတ်ကို နှိပ်၍လည်း တိုက်ရိုက် ထည့်သွင်းနိုင်ပါသည်။</p>
+          <p class="leading-relaxed">ညာဘက်ရှိ Checkbox များဖြင့် မိမိကြိုက်နှစ်သက်ရာ Node များကို ပေါင်းထည့်/ဖြုတ်နိုင်ပါသည်။ အရေအတွက် ကန့်သတ်ချက်မရှိဘဲ ရွေးချယ်ထားသမျှ အားလုံးကို Subscription link အဖြစ် ချက်ချင်း ပြောင်းလဲပေးပါသည်။</p>
         </div>
       </section>
 
-      <!-- Right Column: Nodes Grid (Col Span 8) -->
-      <section class="lg:col-span-8 calm-panel rounded-2xl p-5 space-y-3">
-        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-          <div class="flex items-center gap-2">
+      <!-- Right Column: Nodes Grid with Multi-select (Col Span 7) -->
+      <section class="lg:col-span-7 calm-panel rounded-2xl p-5 space-y-3">
+        
+        <!-- Filter Toolbar -->
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800">
+          <div class="flex items-center gap-1.5">
             <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-200 flex items-center gap-1.5">
-              <i class="fa-solid fa-server text-sky-400"></i> Available Node Pool
+              <i class="fa-solid fa-server text-sky-400"></i> Node Selection Pool
             </h2>
-            <span class="text-[10px] text-slate-500 font-mono">(Sorted by ping)</span>
           </div>
-          <button onclick="fetchAndParseNodes()" class="text-[11px] text-slate-400 hover:text-slate-200 flex items-center gap-1.5 transition">
-            <i class="fa-solid fa-rotate-right"></i>
-            <span>Reload</span>
-          </button>
+
+          <!-- Quick Selector Presets -->
+          <div class="flex items-center gap-1 text-[10px]">
+            <span class="text-slate-500 mr-1">Select:</span>
+            <button onclick="selectPreset('all')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1 rounded-md border border-slate-700 transition">All</button>
+            <button onclick="selectPreset('good')" class="bg-slate-800 hover:bg-slate-700 text-emerald-400 px-2 py-1 rounded-md border border-slate-700 transition">Ping &lt; 350ms</button>
+            <button onclick="selectPreset('none')" class="bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-1 rounded-md border border-slate-700 transition">Clear</button>
+            <button onclick="fetchAndParseNodes()" title="Reload from GitHub" class="text-slate-400 hover:text-slate-200 ml-1.5 p-1 transition">
+              <i class="fa-solid fa-rotate-right"></i>
+            </button>
+          </div>
         </div>
 
-        <!-- 2-Column Responsive Node Cards -->
-        <div id="nodeListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[580px] overflow-y-auto pr-1 custom-scroll">
+        <!-- 2-Column Responsive Node Cards with Checkboxes -->
+        <div id="nodeListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[590px] overflow-y-auto pr-1 custom-scroll">
           <div class="col-span-full text-center py-12 text-xs text-slate-500">
             <i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading active nodes...
           </div>
@@ -240,6 +257,7 @@
       box.classList.remove("hidden");
     }
 
+    // ၁။ Fetch from sub.txt and initial populate
     async function fetchAndParseNodes() {
       const listEl = document.getElementById("nodeListContainer");
       listEl.innerHTML = `<div class="col-span-full text-center py-12 text-xs text-slate-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Fetching latest sub.txt...</div>`;
@@ -261,32 +279,41 @@
             const matchHost = uri.match(/sni=([^&]+)/) || uri.match(/host=([^&]+)/) || uri.match(/@([^:]+)/);
             if (matchHost) host = matchHost[1];
           } catch(e) {}
-          return { uri, name, host, ping: null, speed: null };
+          return { id: idx, uri, name, host, ping: null, speed: null, selected: true };
         });
 
         document.getElementById("nodeCount").innerText = parsedNodes.length;
         renderNodes();
+        updateTailoredSubLink();
       } catch (e) {
         listEl.innerHTML = `<div class="col-span-full text-center py-12 text-xs text-rose-400">Failed to load nodes from sub.txt.</div>`;
       }
     }
 
+    // ၂။ Render cards with dynamic checkboxes
     function renderNodes() {
       const listEl = document.getElementById("nodeListContainer");
       if (parsedNodes.length === 0) {
-        listEl.innerHTML = `<div class="col-span-full text-center py-12 text-xs text-slate-500">No nodes found in sub.txt</div>`;
+        listEl.innerHTML = `<div class="col-span-full text-center py-12 text-xs text-slate-500">No nodes found.</div>`;
         return;
       }
 
       listEl.innerHTML = parsedNodes.map((n, i) => `
-        <div class="bg-slate-900/70 border border-slate-800 hover:border-slate-700 p-2.5 rounded-xl flex items-center justify-between gap-2 transition group">
-          <div class="min-w-0 flex-1">
-            <div class="flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${n.ping ? (n.ping < 250 ? 'bg-emerald-400' : 'bg-amber-400') : 'bg-slate-600'}"></span>
-              <h3 class="text-xs font-medium text-slate-200 truncate group-hover:text-sky-300 transition">${n.name}</h3>
+        <div class="bg-slate-900/70 border ${n.selected ? 'border-sky-500/50 bg-slate-900/90' : 'border-slate-800'} hover:border-slate-700 p-2.5 rounded-xl flex items-center justify-between gap-2 transition">
+          <div class="flex items-center gap-2.5 min-w-0 flex-1">
+            <!-- Custom Toggle Checkbox -->
+            <input type="checkbox" ${n.selected ? 'checked' : ''} onchange="toggleSelect(${i})"
+              class="w-4 h-4 rounded bg-slate-800 border-slate-700 text-sky-500 focus:ring-0 focus:ring-offset-0 cursor-pointer accent-sky-500">
+            
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${n.ping ? (n.ping < 250 ? 'bg-emerald-400' : 'bg-amber-400') : 'bg-slate-600'}"></span>
+                <h3 class="text-xs font-medium ${n.selected ? 'text-white' : 'text-slate-400'} truncate">${n.name}</h3>
+              </div>
+              <p class="text-[10px] text-slate-500 font-mono mt-0.5 truncate pl-3">${n.host}</p>
             </div>
-            <p class="text-[10px] text-slate-500 font-mono mt-0.5 truncate pl-3">${n.host}</p>
           </div>
+
           <div class="flex items-center gap-2 flex-shrink-0">
             <div class="text-right">
               <div class="text-[11px] font-mono font-medium ${n.ping ? (n.ping < 250 ? 'text-emerald-400' : 'text-amber-300') : 'text-slate-500'}">
@@ -296,14 +323,96 @@
                 ${n.speed !== null ? n.speed + ' MB/s' : '-- MB/s'}
               </div>
             </div>
-            <button onclick="copySingleNode('${i}')" title="Copy Single Key" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 p-1.5 rounded-lg text-xs active:scale-95 transition">
+            <button onclick="copySingleNode(${i})" title="Copy single URI" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 p-1.5 rounded-lg text-xs active:scale-95 transition">
               <i class="fa-regular fa-copy"></i>
             </button>
           </div>
         </div>
       `).join('');
+
+      updateSelectionCount();
     }
 
+    // ၃။ Checkbox Select / Deselect Logic
+    function toggleSelect(index) {
+      parsedNodes[index].selected = !parsedNodes[index].selected;
+      renderNodes();
+      updateTailoredSubLink();
+    }
+
+    function selectPreset(type) {
+      if (type === 'all') {
+        parsedNodes.forEach(n => n.selected = true);
+      } else if (type === 'none') {
+        parsedNodes.forEach(n => n.selected = false);
+      } else if (type === 'good') {
+        parsedNodes.forEach(n => {
+          n.selected = (n.ping !== null && n.ping < 350);
+        });
+      }
+      renderNodes();
+      updateTailoredSubLink();
+    }
+
+    function updateSelectionCount() {
+      const selected = parsedNodes.filter(n => n.selected).length;
+      document.getElementById("selectedCount").innerText = selected;
+      document.getElementById("tailoredBadge").innerText = `${selected} nodes selected`;
+    }
+
+    // ၄။ Update Tailored Base64 Subscription Link
+    function updateTailoredSubLink() {
+      const selectedUris = parsedNodes.filter(n => n.selected).map(n => n.uri);
+      const input = document.getElementById("customSubUrl");
+
+      if (selectedUris.length === 0) {
+        input.value = "";
+        input.placeholder = "No nodes selected. Check boxes to generate link.";
+        return;
+      }
+
+      // Encode selected keys into Data URI Base64 sub link
+      const base64Data = btoa(selectedUris.join('\n'));
+      input.value = `data:text/plain;charset=utf-8;base64,${base64Data}`;
+    }
+
+    // ၅။ Add Custom Node dynamically
+    function addCustomNode() {
+      const input = document.getElementById("customNodeInput");
+      const val = input.value.trim();
+
+      if (!val || !val.startsWith("vless://")) {
+        showStatus("Please enter a valid vless:// URI!", "error");
+        return;
+      }
+
+      let name = `Custom-Node-${parsedNodes.length + 1}`;
+      let host = "custom.edge";
+      try {
+        if (val.includes('#')) name = decodeURIComponent(val.split('#')[1]);
+        const matchHost = val.match(/sni=([^&]+)/) || val.match(/host=([^&]+)/) || val.match(/@([^:]+)/);
+        if (matchHost) host = matchHost[1];
+      } catch(e) {}
+
+      // Add to beginning of pool
+      parsedNodes.unshift({
+        id: Date.now(),
+        uri: val,
+        name: name,
+        host: host,
+        ping: null,
+        speed: null,
+        selected: true
+      });
+
+      input.value = "";
+      document.getElementById("nodeCount").innerText = parsedNodes.length;
+      renderNodes();
+      updateTailoredSubLink();
+      showStatus(`Added custom node "${name}" to selection!`, "success");
+    }
+
+    // ၆။ Latency & Speed Benchmark with Auto Smart Select
     async function testSingleNode(node) {
       const start = performance.now();
       try {
@@ -335,33 +444,33 @@
       const icon = document.getElementById("testIcon");
       btn.disabled = true;
       icon.className = "fa-solid fa-spinner fa-spin text-sm text-sky-400";
-      showStatus("Testing latency & speed for all nodes...", "loading");
+      showStatus("Testing all nodes & auto-filtering best candidates...", "loading");
 
       let best = 9999;
-      let totalSpeed = 0;
-      let count = 0;
 
       for (let i = 0; i < parsedNodes.length; i++) {
         await testSingleNode(parsedNodes[i]);
         if (parsedNodes[i].ping && parsedNodes[i].ping < best) best = parsedNodes[i].ping;
-        if (parsedNodes[i].speed) {
-          totalSpeed += parseFloat(parsedNodes[i].speed);
-          count++;
-        }
+        
+        // Auto select if ping is responsive (< 450ms)
+        parsedNodes[i].selected = (parsedNodes[i].ping !== null && parsedNodes[i].ping < 450);
         renderNodes();
+        updateTailoredSubLink();
       }
 
+      // Sort nodes: Best ping first
       parsedNodes.sort((a, b) => (a.ping || 999) - (b.ping || 999));
       renderNodes();
+      updateTailoredSubLink();
 
       document.getElementById("bestPing").innerText = best !== 9999 ? `${best} ms` : "--";
-      document.getElementById("avgSpeed").innerText = count > 0 ? `${(totalSpeed / count).toFixed(1)} MB/s` : "--";
 
       btn.disabled = false;
       icon.className = "fa-solid fa-gauge-simple-high text-sm text-sky-400";
-      showStatus("Benchmark Complete!", "success");
+      showStatus("Benchmark Complete! Responsive nodes automatically selected.", "success");
     }
 
+    // ၇။ Copy Helpers
     function copySingleNode(index) {
       const node = parsedNodes[index];
       navigator.clipboard.writeText(node.uri);
@@ -369,14 +478,20 @@
     }
 
     function copySubLink() {
-      const input = document.getElementById("subUrl");
+      const input = document.getElementById("customSubUrl");
+      if (!input.value) {
+        showStatus("Please select at least 1 node first!", "error");
+        return;
+      }
       input.select();
       navigator.clipboard.writeText(input.value);
-      const copyText = document.getElementById("copyText");
-      copyText.innerText = "Copied!";
-      setTimeout(() => copyText.innerText = "Copy", 2000);
+      const copyBtn = document.getElementById("copyBtnText");
+      copyBtn.innerText = "Copied!";
+      setTimeout(() => copyBtn.innerText = "Copy", 2000);
+      showStatus("Tailored subscription link copied!", "success");
     }
 
+    // ၈။ Trigger GitHub Action
     async function triggerGithubUpdate() {
       const token = document.getElementById("tokenInput").value.trim();
       const btn = document.getElementById("updateBtn");
@@ -404,7 +519,7 @@
         });
 
         if (response.status === 204) {
-          showStatus("Workflow dispatched! New nodes fetching in 15s...", "success");
+          showStatus("Workflow dispatched! Refreshing nodes in 15s...", "success");
           setTimeout(() => fetchAndParseNodes(), 15000);
         } else {
           showStatus("Trigger failed. Check PAT permissions.", "error");
