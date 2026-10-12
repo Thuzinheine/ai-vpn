@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#080b14">
-<title>AI-VPN Core — Universal Multi-Protocol Hub</title>
+<title>AI-VPN Core — 10ium Country Engine</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 :root{
@@ -73,8 +73,8 @@ h1{font-size:clamp(22px,2.5vw,30px);line-height:1.15;letter-spacing:-.04em;margi
 
 .nodes{overflow:hidden}
 .node-head{padding-bottom:14px}
-.node-tools{display:flex;gap:8px;align-items:center}
-.search{width:180px;padding:8px 12px;border:1px solid var(--line);background:#0c111d;border-radius:10px;color:var(--text);outline:none;font-size:11px}
+.node-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.search{width:160px;padding:8px 12px;border:1px solid var(--line);background:#0c111d;border-radius:10px;color:var(--text);outline:none;font-size:11px}
 .select{background:#141b2a;border:1px solid var(--line);color:#b9c5dc;padding:7px 10px;border-radius:9px;font-size:11px;outline:none}
 
 .table-scroll{
@@ -97,7 +97,7 @@ th{padding:10px 18px;text-align:left;color:#6f7c97;text-transform:uppercase;lett
 td{padding:12px 18px;border-bottom:1px solid #ffffff08;color:#bfc9dd;font-size:12px;white-space:nowrap}
 tbody tr{transition:background .15s}tbody tr:hover{background:#ffffff04}
 .node-name{display:flex;align-items:center;gap:10px;color:#edf2ff;font-weight:600}
-.flag{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#ffffff07;border:1px solid var(--line);font-size:14px}
+.flag{width:32px;height:32px;display:grid;place-items:center;border-radius:9px;background:#ffffff07;border:1px solid var(--line);font-size:16px}
 .node-name small{display:block;color:var(--muted);font-size:10px;font-weight:400;margin-top:2px}
 
 .proto-tag{display:inline-block;padding:2px 7px;border-radius:5px;font-size:9px;font-weight:750;letter-spacing:.04em;text-transform:uppercase}
@@ -124,8 +124,8 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
 <div class="app">
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <div class="logo"><i class="fa-solid fa-globe"></i></div>
-      <div><strong>AI-VPN CORE</strong><small>UNIVERSAL HUB</small></div>
+      <div class="logo"><i class="fa-solid fa-map-location-dot"></i></div>
+      <div><strong>10IUM ASIA HUB</strong><small>COUNTRY EDITION</small></div>
     </div>
     <div class="section-label">Workspace</div>
     <nav class="nav">
@@ -136,7 +136,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
     </nav>
     <div class="sidebar-bottom">
       <div class="core-mini">
-        <div class="core-mini-top"><span class="dot"></span> Multi-Protocol Core</div>
+        <div class="core-mini-top"><span class="dot"></span> 10ium Feeds Engine</div>
         <p id="coreMiniText">Ready for Testing</p>
         <div class="mini-meter"><span id="sidebarProgress"></span></div>
       </div>
@@ -148,15 +148,14 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
       <div style="display:flex;align-items:center;gap:12px">
         <button class="icon-btn mobile-menu" id="menuBtn"><i class="fa-solid fa-bars"></i></button>
         <div>
-          <div class="eyebrow">Production Engine / Multi-Protocol</div>
-          <h1>Universal Node Control Center</h1>
-          <p class="subtitle">Real GeoIP Verification & gstatic/Cloudflare benchmark engine</p>
+          <div class="eyebrow">10ium/telegram-configs-collector / Asia Mixed</div>
+          <h1>Asia Country Subscriptions Center</h1>
+          <p class="subtitle">Clean IP & low-latency nodes for HK, IN, ID, JP, MY, PK, PH, TH, VN</p>
         </div>
       </div>
       <div class="top-actions">
-        <div class="core-pill"><span class="dot"></span> GEOIP VERIFIED</div>
+        <div class="core-pill"><span class="dot"></span> 10IUM DEDICATED</div>
         <button class="icon-btn" onclick="fetchAndParseNodes()" title="Reload from GitHub"><i class="fa-solid fa-rotate"></i></button>
-        <button class="primary" onclick="addCustomNode()">＋ Add Node</button>
       </div>
     </header>
 
@@ -178,9 +177,9 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
 
     <section class="metrics">
       <article class="card metric" style="--accent:var(--cyan);--glow:var(--cyan)">
-        <div class="metric-head"><span>Total Pool</span><span class="metric-icon"><i class="fa-solid fa-server"></i></span></div>
+        <div class="metric-head"><span>Active 10ium Pool</span><span class="metric-icon"><i class="fa-solid fa-server"></i></span></div>
         <div class="metric-value" id="activeCount">0</div>
-        <div class="metric-foot"><span class="trend">● Pool</span><span>·</span><span>Verified Feeds</span></div>
+        <div class="metric-foot"><span class="trend">● Pool</span><span>·</span><span>Verified Nodes</span></div>
       </article>
       <article class="card metric" style="--accent:var(--green);--glow:var(--green)">
         <div class="metric-head"><span>Lowest Latency</span><span class="metric-icon"><i class="fa-solid fa-stopwatch"></i></span></div>
@@ -207,7 +206,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
         <div style="padding:16px 20px 0;display:grid;gap:12px">
           <div>
             <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px">
-              <span>Main Sub (All Protocols)</span><span style="font-family:monospace">sub.txt</span>
+              <span>Main Sub (All 10ium Asia)</span><span style="font-family:monospace">sub.txt</span>
             </div>
             <div style="display:flex;gap:8px">
               <input type="text" id="officialSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt" class="custom-input">
@@ -233,7 +232,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
         <div style="padding:16px 20px 0;display:grid;gap:10px">
           <input type="password" id="tokenInput" placeholder="Enter GitHub Token (ghp_...)" class="custom-input">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <button onclick="triggerGithubUpdate()" id="updateBtn" class="ghost"><i class="fa-solid fa-arrows-rotate mr-1"></i> Scrape GitHub</button>
+            <button onclick="triggerGithubUpdate()" id="updateBtn" class="ghost"><i class="fa-solid fa-arrows-rotate mr-1"></i> Scrape 10ium</button>
             <button onclick="runBenchmarkAll()" id="benchBtn" class="ghost" style="color:var(--cyan)"><i class="fa-solid fa-bolt mr-1"></i> Benchmark</button>
           </div>
           <button onclick="saveFastSubToGithub()" id="saveFastBtn" class="primary" style="width:100%"><i class="fa-solid fa-cloud-arrow-up mr-1"></i> Save Selected to fast-sub.txt</button>
@@ -243,9 +242,21 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
 
     <section class="card nodes" id="nodesPanel">
       <div class="panel-head node-head">
-        <div><h2>Nodes Pool</h2><p>Real GeoIP Verified Server Endpoints</p></div>
+        <div><h2>10ium Country Pool</h2><p>Verified Asia Region endpoints</p></div>
         <div class="node-tools">
-          <input class="search" id="nodeSearch" placeholder="Search Country, SNI, Host..." oninput="filterNodes()">
+          <input class="search" id="nodeSearch" placeholder="Search Host, Tag..." oninput="filterNodes()">
+          <select class="select" id="countryFilter" onchange="filterNodes()">
+            <option value="all">All Countries</option>
+            <option value="HK">Hong Kong (HK)</option>
+            <option value="IN">India (IN)</option>
+            <option value="ID">Indonesia (ID)</option>
+            <option value="JP">Japan (JP)</option>
+            <option value="MY">Malaysia (MY)</option>
+            <option value="PK">Pakistan (PK)</option>
+            <option value="PH">Philippines (PH)</option>
+            <option value="TH">Thailand (TH)</option>
+            <option value="VN">Vietnam (VN)</option>
+          </select>
           <select class="select" id="protocolFilter" onchange="filterNodes()">
             <option value="all">All Protocols</option>
             <option value="vless">VLESS</option>
@@ -269,7 +280,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
           <thead>
             <tr>
               <th style="width:40px">Include</th>
-              <th>Real GeoIP / Location</th>
+              <th>Country / Node</th>
               <th>Protocol</th>
               <th>SNI / Host</th>
               <th>Latency (gstatic)</th>
@@ -278,7 +289,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
             </tr>
           </thead>
           <tbody id="nodeTableBody">
-            <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">Loading active nodes...</td></tr>
+            <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">Loading 10ium country nodes...</td></tr>
           </tbody>
         </table>
       </div>
@@ -294,6 +305,11 @@ const REPO = "ai-vpn";
 const WORKFLOW_ID = "main.yml";
 const PING_THRESHOLD = 100;
 let parsedNodes = [];
+
+const COUNTRY_FLAGS = {
+  'HK': '🇭🇰', 'IN': '🇮🇳', 'ID': '🇮🇩', 'JP': '🇯🇵',
+  'MY': '🇲🇾', 'PK': '🇵🇰', 'PH': '🇵🇭', 'TH': '🇹🇭', 'VN': '🇻🇳'
+};
 
 document.getElementById("tokenInput").value = localStorage.getItem("gh_token") || "";
 const menuBtn = document.getElementById('menuBtn');
@@ -312,18 +328,11 @@ function toast(msg){
 function scrollToNodes(){ document.getElementById('nodesPanel').scrollIntoView({ behavior: 'smooth' }); }
 function scrollToConfig(){ document.getElementById('configSection').scrollIntoView({ behavior: 'smooth' }); }
 
-// Country Code မှ Flag Emoji သို့ တိုက်ရိုက်ပြောင်းလဲခြင်း
-function getFlagEmoji(code) {
-  if (!code || code === 'UN' || code.length !== 2) return '🌐';
-  const codePoints = code.toUpperCase().split('').map(c => 127397 + c.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
-}
-
-// True GeoIP Tag Parser
 function parseProtocolAndHost(uri, idx) {
   let name = `Node-${idx + 1}`;
   let host = "speed.cloudflare.com";
   let proto = "vless";
+  let countryCode = "UN";
 
   const lower = uri.toLowerCase();
   if (lower.startsWith('vmess://')) proto = "vmess";
@@ -347,20 +356,14 @@ function parseProtocolAndHost(uri, idx) {
     } catch(e) {}
   }
 
-  // Real GeoIP Tag [SG], [JP], [HK], [MY], etc. ခွဲထုတ်ခြင်း
-  let flag = '🌐';
-  const matchCode = name.match(/\[([A-Z]{2})\]/);
-  if (matchCode) {
-    flag = getFlagEmoji(matchCode[1]);
-  } else {
-    if (name.includes("Singapore")) flag = "🇸🇬";
-    else if (name.includes("Japan")) flag = "🇯🇵";
-    else if (name.includes("Hong Kong")) flag = "🇭🇰";
-    else if (name.includes("Malaysia")) flag = "🇲🇾";
-    else if (name.includes("Thailand")) flag = "🇹🇭";
+  const matchTag = name.match(/\[([A-Z]{2})\]/);
+  if (matchTag && matchTag[1]) {
+    countryCode = matchTag[1];
   }
 
-  return { name, host, proto, flag };
+  let flag = COUNTRY_FLAGS[countryCode] || '🌐';
+
+  return { name, host, proto, countryCode, flag };
 }
 
 function updateDynamicProtocolsMetric() {
@@ -385,7 +388,7 @@ function updateDynamicProtocolsMetric() {
 
 async function fetchAndParseNodes() {
   const tbody = document.getElementById("nodeTableBody");
-  tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Fetching latest sub.txt...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Fetching 10ium sub.txt...</td></tr>`;
 
   try {
     const res = await fetch(`https://raw.githubusercontent.com/${OWNER}/${REPO}/main/sub.txt?t=${Date.now()}`);
@@ -405,7 +408,7 @@ async function fetchAndParseNodes() {
 
     updateDynamicProtocolsMetric();
     renderNodes();
-    toast(`Loaded ${parsedNodes.length} GeoIP-verified nodes.`);
+    toast(`Loaded ${parsedNodes.length} nodes from 10ium sources.`);
   } catch(e) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--red)">Failed to load sub.txt. Make sure file exists in repo.</td></tr>`;
   }
@@ -414,7 +417,7 @@ async function fetchAndParseNodes() {
 function renderNodes() {
   const tbody = document.getElementById("nodeTableBody");
   if (parsedNodes.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">No nodes found in pool.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">No 10ium nodes found in pool.</td></tr>`;
     return;
   }
 
@@ -468,24 +471,24 @@ function updateSelectedMetric() {
 
 function filterNodes() {
   const q = document.getElementById("nodeSearch").value.toLowerCase();
+  const country = document.getElementById("countryFilter").value;
   const protoFilter = document.getElementById("protocolFilter").value;
   const statusFilter = document.getElementById("statusFilter").value;
   const rows = document.querySelectorAll("#nodeTableBody tr");
 
   parsedNodes.forEach((n, i) => {
     let matchQuery = n.name.toLowerCase().includes(q) || n.host.toLowerCase().includes(q);
+    let matchCountry = (country === 'all') || (n.countryCode === country);
     let matchProto = (protoFilter === 'all') || (n.proto === protoFilter);
     let matchStatus = true;
 
     if (statusFilter === 'good') matchStatus = (n.ping !== null && n.ping < PING_THRESHOLD);
     if (statusFilter === 'selected') matchStatus = n.selected;
 
-    if (rows[i]) rows[i].style.display = (matchQuery && matchProto && matchStatus) ? '' : 'none';
+    if (rows[i]) rows[i].style.display = (matchQuery && matchCountry && matchProto && matchStatus) ? '' : 'none';
   });
 }
 
-// Latency စစ်ဆေးခြင်း: www.gstatic.com/generate_204
-// Speed test: speed.cloudflare.com
 async function testSingleNode(node) {
   const pingStart = performance.now();
   let pingOk = false;
@@ -554,11 +557,10 @@ async function runBenchmarkAll() {
   let best = 9999;
 
   for (let i = 0; i < total; i++) {
-    progressStatus.innerText = `Testing: ${parsedNodes[i].name} (${parsedNodes[i].proto.toUpperCase()})`;
+    progressStatus.innerText = `Testing: [${parsedNodes[i].countryCode}] ${parsedNodes[i].name} (${parsedNodes[i].proto.toUpperCase()})`;
     await testSingleNode(parsedNodes[i]);
     
     if (parsedNodes[i].ping && parsedNodes[i].ping < best) best = parsedNodes[i].ping;
-    
     parsedNodes[i].selected = (parsedNodes[i].ping !== null && parsedNodes[i].ping < PING_THRESHOLD);
 
     const completed = i + 1;
@@ -649,17 +651,6 @@ async function saveFastSubToGithub() {
     btn.disabled = false;
     btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> Save Selected to fast-sub.txt`;
   }
-}
-
-function addCustomNode() {
-  const key = prompt("Enter proxy URI (vless, vmess, trojan, ss, hy2):");
-  if (!key || !key.includes('://')) return;
-  const parsed = parseProtocolAndHost(key, parsedNodes.length);
-
-  parsedNodes.unshift({ id: Date.now(), uri: key, ...parsed, ping: null, speed: null, selected: true });
-  updateDynamicProtocolsMetric();
-  renderNodes();
-  toast(`Added "${parsed.name}" to pool.`);
 }
 
 function copySingleUri(i) {
