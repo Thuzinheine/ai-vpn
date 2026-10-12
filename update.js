@@ -1,61 +1,94 @@
-import fs from 'fs';
-import axios from 'axios';
+/**
+ * update.js - AI-VPN Core Scraper
+ * Reality & Hysteria 2 Specialized Aggregator
+ */
+const fs = require('fs');
+const https = require('https');
+const http = require('http');
 
+// Reality & Hysteria 2 ပါဝင်သော Public Aggregator Sources များ
 const SOURCES = [
-  'https://raw.githubusercontent.com/Epodonios/v2ray-configs/main/All_Configs_Sub.txt',
+  'https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/xray/normal/mix',
   'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Sub1.txt',
-  'https://raw.githubusercontent.com/peass/v2ray-node/main/vless'
+  'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Sub2.txt',
+  'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge.txt',
+  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/reality',
+  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria'
 ];
 
-function extractVless(rawText) {
-  let list = [];
-  if (!rawText || typeof rawText !== 'string') return list;
+function fetchUrl(url) {
+  return new Promise((resolve) => {
+    const client = url.startsWith('https') ? https : http;
+    const req = client.get(url, { headers: { 'User-Agent': 'v2rayNG/1.8.5' }, timeout: 10000 }, (res) => {
+      let data = '';
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        return resolve(fetchUrl(res.headers.location));
+      }
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => resolve(data));
+    });
+    req.on('error', () => resolve(''));
+    req.on('timeout', () => { req.destroy(); resolve(''); });
+  });
+}
 
-  const directMatches = rawText.match(/vless:\/\/[^\s<"'\n\r]+/g);
-  if (directMatches) list.push(...directMatches);
-
+function decodeContent(content) {
+  if (!content) return '';
+  content = content.trim();
+  // Base64 decode attempt
   try {
-    const cleanStr = rawText.trim().replace(/\s+/g, '');
-    const decoded = Buffer.from(cleanStr, 'base64').toString('utf-8');
-    const decodedMatches = decoded.match(/vless:\/\/[^\s<"'\n\r]+/g);
-    if (decodedMatches) list.push(...decodedMatches);
+    const buff = Buffer.from(content.replace(/\s+/g, ''), 'base64');
+    const decoded = buff.toString('utf-8');
+    if (decoded.includes('://')) return decoded;
   } catch (e) {}
-
-  return list;
+  return content;
 }
 
 async function main() {
-  let existingNodes = [];
-  if (fs.existsSync('sub.txt')) {
+  console.log('Fetching configurations from sources...');
+  let collected = [];
+
+  for (const src of SOURCES) {
     try {
-      const oldRaw = fs.readFileSync('sub.txt', 'utf-8');
-      const oldDecoded = Buffer.from(oldRaw, 'base64').toString('utf-8');
-      existingNodes = extractVless(oldDecoded);
-    } catch (e) {}
+      const raw = await fetchUrl(src);
+      const text = decodeContent(raw);
+      const lines = text.split(/[\r\n]+/);
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+
+        // 1. Hysteria 2 Check
+        const isHy2 = trimmed.startsWith('hy2://') || trimmed.startsWith('hysteria2://');
+        
+        // 2. VLESS Reality Check (security=reality ပါရမည်)
+        const isReality = trimmed.startsWith('vless://') && trimmed.includes('security=reality');
+
+        if (isHy2 || isReality) {
+          collected.push(trimmed);
+        }
+      }
+    } catch (err) {
+      console.log(`Failed to fetch from ${src}: ${err.message}`);
+    }
   }
 
-  let newCollected = [];
-  for (const url of SOURCES) {
-    try {
-      const res = await axios.get(url, { timeout: 8000, headers: { 'User-Agent': 'v2rayNG/1.8.12' } });
-      const found = extractVless(res.data);
-      if (found.length > 0) newCollected.push(...found);
-    } catch (e) {}
+  // Duplicate များကို ဖယ်ထုတ်ခြင်း
+  const uniqueNodes = Array.from(new Set(collected));
+  console.log(`Discovered ${uniqueNodes.length} unique Reality & Hysteria 2 nodes.`);
+
+  // Node အရေအတွက် အများဆုံး 50 ခုသာ ကန့်သတ်ယူခြင်း
+  const finalNodes = uniqueNodes.slice(0, 50);
+
+  if (finalNodes.length === 0) {
+    console.log('No valid Reality / Hysteria 2 nodes found. Leaving sub.txt untouched.');
+    return;
   }
 
-  const combined = [...new Set([...existingNodes, ...newCollected])];
-  const targetCount = Math.min(combined.length, 60);
-  const finalNodes = [];
-
-  for (let i = 0; i < targetCount; i++) {
-    const baseUri = combined[i].split('#')[0];
-    const country = (i % 2 === 0) ? 'SG' : 'JP';
-    finalNodes.push(`${baseUri}#${country}-AI-VLESS-${String(i + 1).padStart(2, '0')}`);
-  }
-
-  const base64Data = Buffer.from(finalNodes.join('\n')).toString('base64');
-  fs.writeFileSync('sub.txt', base64Data, 'utf-8');
-  console.log(`Merged & Exported ${finalNodes.length} nodes.`);
+  // Base64 encode ပြုလုပ်ပြီး sub.txt ထဲသို့ ရေးသားခြင်း
+  const base64Output = Buffer.from(finalNodes.join('\n'), 'utf-8').toString('base64');
+  fs.writeFileSync('sub.txt', base64Output, 'utf-8');
+  console.log(`Successfully written ${finalNodes.length} nodes to sub.txt`);
 }
 
 main();
