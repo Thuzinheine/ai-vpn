@@ -2,3 +2,4 @@ trojan://UX82473651@13.229.121.67:443?security=tls&sni=rested-seahorse.rooster46
 trojan://UX82473651@52.221.219.241:443?security=tls&sni=fond-mammoth.rooster465.autos&allowInsecure=1&type=tcp#Singapore%20Node%2002
 vless://ff31a3de-bf0b-4e7e-885c-d77e5f0cd107@thuzin.adminx.bot.cd:443?security=tls&sni=thuzin.adminx.bot.cd&fp=chrome&type=ws&path=/mall/articles/avatar?ed%3D2560&host=thuzin.adminx.bot.cd&encryption=none#Singapore%20Node%2003
 vless://ff31a3de-bf0b-4e7e-885c-d77e5f0cd107@www.digitalocean.com:443?security=tls&sni=thuzin.adminx.bot.cd&fp=chrome&type=ws&path=/forums?ed%3D2560&host=thuzin.adminx.bot.cd&encryption=none#Singapore%20Node%2004
+vless://814bd064-544d-4255-a070-5705c03f6da9@3.0.111.82:12972?security=reality&sni=www.apple.com&fp=chrome&pbk=k2hPp0tTW0Da-HK94wYpSCLbuK44LfGqC2MSJIM1Ti0&sid=48050fab&type=tcp&flow=xtls-rprx-vision&encryption=none#%F0%9F%94%92%20VL-TCP-RLT%20%F0%9F%87%B8%F0%9F%87%AC%20SG-3.0.111.82:12972
