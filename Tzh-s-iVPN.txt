@@ -2,7 +2,3 @@ trojan://UX82473651@13.229.121.67:443?security=tls&sni=rested-seahorse.rooster46
 trojan://UX82473651@52.221.219.241:443?security=tls&sni=fond-mammoth.rooster465.autos&allowInsecure=1&type=tcp#Singapore%20Node%2002
 vless://ff31a3de-bf0b-4e7e-885c-d77e5f0cd107@thuzin.adminx.bot.cd:443?security=tls&sni=thuzin.adminx.bot.cd&fp=chrome&type=ws&path=/mall/articles/avatar?ed%3D2560&host=thuzin.adminx.bot.cd&encryption=none#Singapore%20Node%2003
 vless://ff31a3de-bf0b-4e7e-885c-d77e5f0cd107@www.digitalocean.com:443?security=tls&sni=thuzin.adminx.bot.cd&fp=chrome&type=ws&path=/forums?ed%3D2560&host=thuzin.adminx.bot.cd&encryption=none#Singapore%20Node%2004
-trojan://UX82473651@13.229.121.67:443?security=tls&sni=rested-seahorse.rooster465.autos&allowInsecure=1&type=tcp#[SG]%20Singapore%20-%20Node%2014
-trojan://UX82473651@52.221.219.241:443?security=tls&sni=fond-mammoth.rooster465.autos&allowInsecure=1&type=tcp#[SG]%20Singapore%20-%20Node%205
-vless://ff31a3de-bf0b-4e7e-885c-d77e5f0cd107@thuzin.adminx.bot.cd:443?security=tls&sni=thuzin.adminx.bot.cd&fp=chrome&type=ws&path=/mall/articles/avatar?ed%3D2560&host=thuzin.adminx.bot.cd&encryption=none#Thu%20Zin%2001
-vless://ff31a3de-bf0b-4e7e-885c-d77e5f0cd107@www.digitalocean.com:443?security=tls&sni=thuzin.adminx.bot.cd&fp=chrome&type=ws&path=/forums?ed%3D2560&host=thuzin.adminx.bot.cd&encryption=none#Thu%20Zin%20Atom%20DO%2002
