@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#080b14">
-<title>AI-VPN Core — 10ium Country Engine & Custom Manager</title>
+<title>AI-VPN Core — 10ium Country Engine & Advanced Queue Manager</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 :root{
@@ -68,7 +68,7 @@ h1{font-size:clamp(22px,2.5vw,30px);line-height:1.15;letter-spacing:-.04em;margi
 .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 0}
 .panel-head h2{font-size:14px;margin:0;font-weight:750;letter-spacing:-.01em}
 .panel-head p{color:var(--muted);font-size:11px;margin:3px 0 0}
-.custom-input{flex:1;background:#0c111d;border:1px solid var(--line);padding:9px 12px;border-radius:10px;color:#fff;font-size:11px;font-family:monospace;outline:none}
+.custom-input{background:#0c111d;border:1px solid var(--line);padding:9px 12px;border-radius:10px;color:#fff;font-size:11px;font-family:monospace;outline:none}
 .custom-input:focus{border-color:#8c83ff80;box-shadow:0 0 0 3px #8c83ff10}
 
 .nodes{overflow:hidden}
@@ -112,24 +112,36 @@ tbody tr{transition:background .15s}tbody tr:hover{background:#ffffff04}
 .small-btn:hover{color:white;background:#ffffff0b}
 input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height:15px}
 
-/* Modal Styling */
-.modal-overlay{position:fixed;inset:0;background:rgba(4,7,14,.82);backdrop-filter:blur(10px);display:none;place-items:center;z-index:100;padding:16px}
+/* Advanced Modal (Large & Two-Column Split Layout) */
+.modal-overlay{position:fixed;inset:0;background:rgba(4,7,14,.85);backdrop-filter:blur(10px);display:none;place-items:center;z-index:100;padding:20px}
 .modal-overlay.open{display:grid}
-.modal-card{width:100%;max-width:620px;background:#0d1220;border:1px solid rgba(155,174,216,.2);border-radius:22px;box-shadow:var(--shadow);overflow:hidden;animation:popIn .2s ease-out}
-@keyframes popIn{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
-.modal-head{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;border-bottom:1px solid var(--line);background:#101726}
-.modal-head h3{margin:0;font-size:15px;font-weight:750}
-.modal-body{padding:20px 22px;display:grid;gap:14px;max-height:75vh;overflow-y:auto}
-.field-box{background:#090d16;padding:14px;border-radius:14px;border:1px solid var(--line)}
+.modal-card-lg{width:100%;max-width:960px;height:85vh;background:#0d1220;border:1px solid rgba(155,174,216,.2);border-radius:24px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden;animation:popIn .2s ease-out}
+@keyframes popIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:scale(1)}}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid var(--line);background:#101726}
+.modal-grid{display:grid;grid-template-columns:1fr 1.2fr;flex:1;min-height:0}
+.modal-pane-left{padding:20px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.modal-pane-right{padding:20px;display:flex;flex-direction:column;gap:12px;background:#0a0e1a;min-height:0}
 .field-label{font-size:11px;font-weight:750;color:#9cb0d8;margin-bottom:6px;display:block}
-.queue-box{background:#0a0f1c;border-radius:12px;border:1px solid var(--line);overflow:hidden;margin-top:4px}
-.queue-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #ffffff06;font-size:12px}
-.queue-item:last-child{border-bottom:0}
+.custom-textarea{width:100%;background:#090d16;border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:#fff;font-family:monospace;font-size:11px;outline:none;resize:none}
+
+.staged-list-container{flex:1;overflow-y:auto;border:1px solid var(--line);border-radius:14px;background:#060912;padding:8px;display:flex;flex-direction:column;gap:8px}
+.staged-card{background:#0e1424;border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:10px 12px;display:grid;gap:6px}
+.staged-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.staged-name-input{background:#141b2c;border:1px solid var(--line);color:#7cebf4;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:700;outline:none;flex:1}
+.staged-name-input:focus{border-color:var(--cyan)}
+.staged-uri{font-family:monospace;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.warning-banner{padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;display:none;align-items:center;gap:6px}
+.warning-banner.show{display:flex}
+.warning-banner.alert{background:rgba(255,204,122,.12);color:var(--amber);border:1px solid rgba(255,204,122,.3)}
+.warning-banner.ok{background:rgba(94,230,168,.12);color:var(--green);border:1px solid rgba(94,230,168,.3)}
+
 .toast{position:fixed;right:22px;bottom:22px;padding:12px 18px;background:#172235;border:1px solid #7b8bab35;color:#eaf2ff;border-radius:13px;box-shadow:var(--shadow);transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s;z-index:200;font-size:12px}
 .toast.show{opacity:1;transform:translateY(0)}
 .mobile-menu{display:none}
 
 @media(max-width:1100px){.app{grid-template-columns:210px minmax(0,1fr)}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.config-grid{grid-template-columns:1fr}}
+@media(max-width:850px){.modal-grid{grid-template-columns:1fr;overflow-y:auto}.modal-pane-left{border-right:0;border-bottom:1px solid var(--line)}.modal-card-lg{height:95vh}}
 @media(max-width:760px){.app{display:block}.sidebar{position:fixed;left:0;top:0;width:260px;transform:translateX(-105%);transition:transform .25s;box-shadow:var(--shadow);background:#0b101b}.sidebar.open{transform:translateX(0)}.mobile-menu{display:grid}main{padding:18px 14px 30px}.metrics{gap:10px}.node-head{flex-direction:column;align-items:flex-start}.node-tools{width:100%}.search{flex:1}}
 </style>
 </head>
@@ -145,7 +157,6 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
       <button class="active"><i class="fa-solid fa-gauge-high"></i> Overview</button>
       <button onclick="scrollToNodes()"><i class="fa-solid fa-server"></i> Active Pool <span class="count" id="navCount">0</span></button>
       <button onclick="scrollToConfig()"><i class="fa-solid fa-link"></i> Subscriptions</button>
-      <!-- Menu Item အသစ် -->
       <button onclick="openCustomModal()"><i class="fa-solid fa-folder-plus" style="color:var(--cyan)"></i> Add Custom Nodes</button>
       <button onclick="runBenchmarkAll()"><i class="fa-solid fa-bolt"></i> Run Benchmark</button>
     </nav>
@@ -225,7 +236,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
               <span>Main Sub (All 10ium Asia)</span><span style="font-family:monospace">sub.txt</span>
             </div>
             <div style="display:flex;gap:8px">
-              <input type="text" id="officialSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt" class="custom-input">
+              <input type="text" id="officialSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt" class="custom-input" style="flex:1">
               <button onclick="copyLink('officialSubUrl')" class="ghost">Copy</button>
             </div>
           </div>
@@ -234,7 +245,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
               <span>Fast Sub (Auto &lt; 100ms)</span><span style="font-family:monospace">fast-sub.txt</span>
             </div>
             <div style="display:flex;gap:8px">
-              <input type="text" id="fastSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/fast-sub.txt" class="custom-input" style="color:var(--cyan)">
+              <input type="text" id="fastSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/fast-sub.txt" class="custom-input" style="flex:1;color:var(--cyan)">
               <button onclick="copyLink('fastSubUrl')" class="ghost" style="color:var(--cyan);border-color:rgba(107,231,244,.2)">Copy</button>
             </div>
           </div>
@@ -314,81 +325,89 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
   </main>
 </div>
 
-<!-- Modal: Step-by-Step Staged Custom Node Manager -->
+<!-- Advanced Modal: Spacious Two-Column Layout -->
 <div class="modal-overlay" id="customModal">
-  <div class="modal-card">
+  <div class="modal-card-lg">
     <div class="modal-head">
-      <h3><i class="fa-solid fa-layer-group" style="color:var(--cyan);margin-right:8px"></i> Custom Node Manager (Queue System)</h3>
+      <div style="display:flex;align-items:center;gap:10px">
+        <i class="fa-solid fa-diagram-project" style="color:var(--cyan);font-size:18px"></i>
+        <h3 style="margin:0;font-size:16px">Custom Nodes Staging Hub</h3>
+      </div>
       <button class="icon-btn" onclick="closeCustomModal()"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    
-    <div class="modal-body">
-      <!-- အဆင့် (၁): Node တစ်ခုချင်းစီ စိတ်ကြိုက်နာမည်ဖြင့် ထည့်သွင်းခြင်း -->
-      <div class="field-box">
-        <span style="font-weight:700;color:var(--cyan);font-size:12px;display:block;margin-bottom:10px">
-          အဆင့် (၁) - Node တစ်ခုချင်းစီ စိတ်ကြိုက်နာမည်ဖြင့် ထည့်ပါ (Add to Local Queue)
-        </span>
-        <div style="margin-bottom:10px">
-          <label class="field-label">၁။ စိတ်ကြိုက်ပေးလိုသော နာမည် (Custom Name)</label>
-          <input type="text" id="stageNodeName" placeholder="ဥပမာ- [SG] VIP-Dedicated-01" class="custom-input" style="width:100%">
+
+    <div class="modal-grid">
+      <!-- ဘယ်ဘက်ခြမ်း: အများအပြား Paste လုပ်ပြီး စာရင်းသွင်းသည့် Input ဇုန် -->
+      <div class="modal-pane-left">
+        <div>
+          <label class="field-label">Prefix / Group Name (Optional)</label>
+          <input type="text" id="stageNodePrefix" placeholder="e.g. My-VIP-Node" class="custom-input" style="width:100%">
+          <small style="color:var(--muted);font-size:10px;margin-top:3px;display:block">ချန်ထားပါက Config နာမည်အတိုင်း ယူပါမည်။ ရိုက်ထည့်ပါက Prefix-1, Prefix-2 စီပေးပါမည်။</small>
         </div>
-        <div style="margin-bottom:10px">
-          <label class="field-label">၂။ Node Key / Config (URI)</label>
-          <input type="text" id="stageNodeUri" placeholder="vless://, vmess://, trojan://, ss://, hy2://..." class="custom-input" style="width:100%">
+
+        <div style="flex:1;display:flex;flex-direction:column">
+          <label class="field-label">Paste 1 or Multiple Node URIs (တစ်ပြိုင်နက် ၄/၅/၆ ခု ထည့်နိုင်သည်)</label>
+          <textarea id="stageRawInput" class="custom-textarea" style="flex:1;min-height:160px" placeholder="vless://...&#10;vmess://...&#10;trojan://...&#10;ss://...&#10;hy2://..."></textarea>
+          <small style="color:var(--muted);font-size:10px;margin-top:4px">လိုင်းခွဲပြီး တစ်ခါတည်း အများအပြား paste ချနိုင်ပါသည်။</small>
         </div>
-        <button class="primary" onclick="addNodeToQueue()" style="width:100%;padding:10px">
-          <i class="fa-solid fa-plus mr-1"></i> စာရင်းထဲသို့ ထည့်မည် (Add to Queue)
+
+        <button class="primary" onclick="parseAndAddBatch()" style="padding:12px">
+          <i class="fa-solid fa-layer-group mr-1"></i> Auto-Split & Add to Staging Queue
         </button>
       </div>
 
-      <!-- အဆင့် (၂): စုဆောင်းထားသော Node များစာရင်း -->
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <label class="field-label" style="margin:0">
-            လက်ရှိ စုဆောင်းထားသော Node များ (<span id="stagedCount" style="color:var(--cyan)">0</span> ခု)
-          </label>
-          <button class="ghost" onclick="clearQueue()" style="padding:3px 8px;font-size:10px;color:var(--red)">Clear All</button>
+      <!-- ညာဘက်ခြမ်း: စာရင်းများအား Live ကြည့်ရှုခြင်း၊ နာမည်ပြန်ပြင်ခြင်းနှင့် GitHub သို့ Batch တင်ခြင်း -->
+      <div class="modal-pane-right">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-weight:750;font-size:12px;color:var(--cyan)">
+            Staged Nodes Review (<span id="stagedCount">0</span> Nodes)
+          </span>
+          <button class="ghost" onclick="clearQueue()" style="padding:4px 8px;font-size:10px;color:var(--red)">
+            <i class="fa-solid fa-trash-can mr-1"></i> Clear All
+          </button>
         </div>
-        <div class="queue-box" id="queueList">
-          <div style="padding:18px;text-align:center;color:var(--muted);font-size:11px">
-            Node မရှိသေးပါ။ အပေါ်ကနေ တစ်ခုချင်းစီ ရိုက်ထည့်ပြီး "စာရင်းထဲသို့ ထည့်မည်" ကို နှိပ်ပါ။
-          </div>
-        </div>
-      </div>
 
-      <!-- အဆင့် (၃): စုပြီးမှ GitHub ပေါ်သို့ တစ်ခါတည်း တင်မည့် Target File ရွေးချယ်မှု -->
-      <div class="field-box" style="border-color:rgba(167,139,250,.25)">
-        <span style="font-weight:700;color:var(--violet);font-size:12px;display:block;margin-bottom:10px">
-          အဆင့် (၂) - GitHub ပေါ်သို့ တစ်ပြိုင်နက် သိမ်းဆည်းမည့် File သတ်မှတ်ပါ
-        </span>
-        <label class="field-label">Target File</label>
-        <select id="modalTargetFile" class="select" style="width:100%;margin-bottom:10px" onchange="handleTargetFileChange()">
-          <option value="sub.txt">Main Pool (sub.txt)</option>
-          <option value="fast-sub.txt">Curated Fast Sub (fast-sub.txt)</option>
-          <option value="__new__">＋ Create New Sub File (ဖိုင်အသစ် သီးသန့်ဆောက်မည်)...</option>
-        </select>
-
-        <div id="newFileNameContainer" style="display:none;margin-bottom:10px">
-          <label class="field-label" style="color:var(--violet)">ဖိုင်အသစ် အမည်ရိုက်ထည့်ပါ (.txt)</label>
-          <div style="display:flex;align-items:center;gap:6px">
-            <input type="text" id="customNewFileName" placeholder="vip-sub" class="custom-input" style="width:100%">
-            <span style="color:var(--muted);font-family:monospace;font-size:12px">.txt</span>
+        <!-- Scroll လုပ်စရာမလိုဘဲ နာမည်တိုက်ရိုက် ပြင်နိုင်သော Queue Container -->
+        <div class="staged-list-container" id="stagedListContainer">
+          <div style="margin:auto;text-align:center;color:var(--muted);font-size:11px;padding:20px">
+            <i class="fa-solid fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:.4"></i>
+            ဘယ်ဘက်ခြမ်းမှ Node များကို Paste လုပ်ပြီး ထည့်သွင်းပါ။ ဤနေရာတွင် နာမည်များ ပြန်ပြင်နိုင်ပါမည်။
           </div>
         </div>
 
-        <button class="primary" id="modalPushBtn" onclick="submitBatchToGithub()" style="width:100%;background:linear-gradient(105deg,#a78bfa,#6be7f4);color:#08131a;padding:12px">
-          <i class="fa-solid fa-cloud-arrow-up mr-1"></i> အားလုံးကို GitHub ပေါ်သို့ တင်မည် (Save All to GitHub)
-        </button>
-      </div>
+        <!-- Target File & Existence Check -->
+        <div style="display:grid;gap:8px;background:#060a14;padding:12px;border-radius:12px;border:1px solid var(--line)">
+          <div style="display:flex;gap:8px">
+            <div style="flex:1">
+              <label class="field-label">Save To File</label>
+              <select id="modalTargetFile" class="select" style="width:100%" onchange="handleTargetFileChange()">
+                <option value="sub.txt">Main Pool (sub.txt)</option>
+                <option value="fast-sub.txt">Fast Pool (fast-sub.txt)</option>
+                <option value="__new__">＋ Create New Sub Group...</option>
+              </select>
+            </div>
+            <div id="newFileNameContainer" style="flex:1;display:none">
+              <label class="field-label">New Group Name</label>
+              <input type="text" id="customNewFileName" placeholder="vip-sub" class="custom-input" style="width:100%" oninput="checkFileDuplicateDebounced()">
+            </div>
+          </div>
 
-      <!-- Subscription Link ရလဒ် ထုတ်ပေးသည့် Box -->
-      <div id="modalLinkResult" style="display:none;background:#101a2c;padding:14px;border-radius:14px;border:1px solid rgba(107,231,244,.3)">
-        <span style="font-size:12px;color:var(--green);font-weight:700;display:block;margin-bottom:6px">
-          <i class="fa-solid fa-circle-check mr-1"></i> GitHub ပေါ် အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ! Subscription Link:
-        </span>
-        <div style="display:flex;gap:6px">
-          <input type="text" id="modalGeneratedLink" readonly class="custom-input" style="color:var(--cyan)">
-          <button class="primary" onclick="copyLink('modalGeneratedLink')" style="padding:6px 12px">Copy Link</button>
+          <div id="fileWarningBanner" class="warning-banner"></div>
+
+          <button class="primary" id="modalPushBtn" onclick="submitBatchToGithub()" style="padding:11px;background:linear-gradient(105deg,#a78bfa,#6be7f4);color:#08131a">
+            <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Save Staged Nodes to GitHub
+          </button>
+        </div>
+
+        <!-- Result Subscription Link Box -->
+        <div id="modalLinkResult" style="display:none;background:#0d1828;padding:10px 12px;border-radius:10px;border:1px solid rgba(107,231,244,.3)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <span style="font-size:11px;color:var(--green);font-weight:700"><i class="fa-solid fa-circle-check mr-1"></i> Saved to GitHub!</span>
+          </div>
+          <div style="display:flex;gap:6px">
+            <input type="text" id="modalGeneratedLink" readonly class="custom-input" style="flex:1;color:var(--cyan);font-size:10px">
+            <button class="primary" onclick="copyLink('modalGeneratedLink')" style="padding:4px 10px;font-size:11px">Copy Link</button>
+          </div>
         </div>
       </div>
     </div>
@@ -403,7 +422,8 @@ const REPO = "ai-vpn";
 const WORKFLOW_ID = "main.yml";
 const PING_THRESHOLD = 100;
 let parsedNodes = [];
-let stagedQueue = []; // စုစည်းထားသော Local Node Queue စာရင်း
+let stagedQueue = [];
+let debounceTimer = null;
 
 const COUNTRY_FLAGS = {
   'SG': '🇸🇬', 'HK': '🇭🇰', 'IN': '🇮🇳', 'ID': '🇮🇩', 'JP': '🇯🇵',
@@ -430,7 +450,7 @@ function scrollToConfig(){ document.getElementById('configSection').scrollIntoVi
 function openCustomModal(){
   document.getElementById("customModal").classList.add("open");
   document.getElementById("modalLinkResult").style.display = "none";
-  renderQueueUI();
+  renderStagedQueueUI();
 }
 
 function closeCustomModal(){
@@ -439,102 +459,139 @@ function closeCustomModal(){
 
 function handleTargetFileChange() {
   const val = document.getElementById("modalTargetFile").value;
-  document.getElementById("newFileNameContainer").style.display = (val === "__new__") ? "block" : "none";
+  const newBox = document.getElementById("newFileNameContainer");
+  const warn = document.getElementById("fileWarningBanner");
+  warn.className = "warning-banner";
+  warn.style.display = "none";
+
+  if (val === "__new__") {
+    newBox.style.display = "block";
+    document.getElementById("customNewFileName").focus();
+  } else {
+    newBox.style.display = "none";
+  }
 }
 
-// ၁။ Node တစ်ခုချင်းစီ စိတ်ကြိုက်နာမည်ဖြင့် Local Queue ထဲ ထည့်သွင်းခြင်း
-function addNodeToQueue() {
-  const nameInput = document.getElementById("stageNodeName");
-  const uriInput = document.getElementById("stageNodeUri");
+// GitHub တွင် Sub File ရှိနှင့်ပြီးသားလား Real-time စစ်ဆေးခြင်း
+function checkFileDuplicateDebounced() {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(checkFileDuplicate, 500);
+}
 
-  const customName = nameInput.value.trim();
-  const rawUri = uriInput.value.trim();
+async function checkFileDuplicate() {
+  const token = document.getElementById("tokenInput").value.trim();
+  let name = document.getElementById("customNewFileName").value.trim();
+  const warn = document.getElementById("fileWarningBanner");
 
-  if (!rawUri || !rawUri.includes('://')) {
-    toast("မှန်ကန်သော Node Config (vless, vmess, trojan, etc.) ကို ထည့်ပေးပါ!");
+  if (!name) { warn.style.display = "none"; return; }
+  if (!name.endsWith(".txt")) name += ".txt";
+  const cleanFile = name.replace(/[^a-zA-Z0-9_\-\.]/g, "-");
+
+  if (!token) return;
+
+  try {
+    const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${cleanFile}`, {
+      headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" }
+    });
+    if (res.ok) {
+      warn.className = "warning-banner alert show";
+      warn.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> သတိပေးချက်: "<b>${cleanFile}</b>" သည် GitHub တွင် ရှိပြီးသားဖြစ်နေပါသည်။ Node အသစ်များ ပေါင်းထည့် (Append) သွားပါမည်။`;
+    } else {
+      warn.className = "warning-banner ok show";
+      warn.innerHTML = `<i class="fa-solid fa-circle-check"></i> "<b>${cleanFile}</b>" သည် ဖိုင်အသစ်စက်စက် ဖြစ်ပါသည်။`;
+    }
+  } catch(e) {}
+}
+
+// တစ်ခါတည်း ၄/၅/၆ ခု Paste ချပြီး သီးသန့် auto ခွဲထုတ် စီပေးခြင်း
+function parseAndAddBatch() {
+  const rawText = document.getElementById("stageRawInput").value.trim();
+  const prefix = document.getElementById("stageNodePrefix").value.trim();
+
+  if (!rawText) { toast("ကျေးဇူးပြု၍ Node URI များကို Paste လုပ်ပေးပါ!"); return; }
+
+  // vless, vmess, trojan, ss, hy2 စသည်ဖြင့် မျဉ်းခွဲပြီး အလိုအလျောက် သီးသန့် ခွဲထုတ်ခြင်း
+  const lines = rawText.split(/[\r\n]+/).map(l => l.trim()).filter(l => l.includes('://'));
+
+  if (lines.length === 0) {
+    toast("မှန်ကန်သော Proxy URI link ရှာမတွေ့ပါ!");
     return;
   }
 
-  // စိတ်ကြိုက်နာမည် တပ်ဆင်ခြင်း
-  let finalUri = rawUri;
-  if (customName) {
-    try {
-      if (rawUri.startsWith('vmess://')) {
-        const rawB64 = rawUri.replace(/^vmess:\/\//i, '').trim();
-        const json = JSON.parse(atob(rawB64));
-        json.ps = customName;
-        finalUri = 'vmess://' + btoa(JSON.stringify(json));
-      } else {
-        finalUri = `${rawUri.split('#')[0]}#${encodeURIComponent(customName)}`;
+  lines.forEach((uri, idx) => {
+    let defaultName = `Node-${stagedQueue.length + 1}`;
+    if (prefix) {
+      defaultName = lines.length > 1 ? `${prefix}-${stagedQueue.length + 1}` : prefix;
+    } else {
+      // Config မူလ နာမည် ထုတ်ယူခြင်း
+      if (uri.includes('#')) {
+        try { defaultName = decodeURIComponent(uri.split('#')[1]); } catch(e){}
+      } else if (uri.startsWith('vmess://')) {
+        try {
+          const json = JSON.parse(atob(uri.replace(/^vmess:\/\//i, '').trim()));
+          if (json.ps) defaultName = json.ps;
+        } catch(e){}
       }
-    } catch(e) {
-      finalUri = rawUri;
     }
-  }
 
-  stagedQueue.push({
-    name: customName || `Custom-Node-${stagedQueue.length + 1}`,
-    uri: finalUri
+    stagedQueue.push({ id: Date.now() + Math.random(), name: defaultName, uri });
   });
 
-  // Input Box များကို Clear လုပ်ပြီး Focus ပြန်ပေးခြင်း
-  nameInput.value = "";
-  uriInput.value = "";
-  nameInput.focus();
-
-  renderQueueUI();
-  toast(`Node ထည့်ပြီးပါပြီ! (စုစုပေါင်း ${stagedQueue.length} ခု)`);
+  document.getElementById("stageRawInput").value = "";
+  renderStagedQueueUI();
+  toast(`Node ${lines.length} ခုကို အလိုအလျောက် ခွဲထုတ်စီတန်းပေးပြီးပါပြီ!`);
 }
 
-function removeQueueItem(index) {
-  stagedQueue.splice(index, 1);
-  renderQueueUI();
+function updateStagedNodeName(idx, newName) {
+  if (stagedQueue[idx]) stagedQueue[idx].name = newName;
+}
+
+function removeStagedItem(idx) {
+  stagedQueue.splice(idx, 1);
+  renderStagedQueueUI();
 }
 
 function clearQueue() {
   stagedQueue = [];
-  renderQueueUI();
+  renderStagedQueueUI();
 }
 
-// Queue စာရင်း UI ဆွဲခြင်း
-function renderQueueUI() {
-  const container = document.getElementById("queueList");
-  const countEl = document.getElementById("stagedCount");
-  countEl.innerText = stagedQueue.length;
+function renderStagedQueueUI() {
+  const container = document.getElementById("stagedListContainer");
+  document.getElementById("stagedCount").innerText = stagedQueue.length;
 
   if (stagedQueue.length === 0) {
     container.innerHTML = `
-      <div style="padding:18px;text-align:center;color:var(--muted);font-size:11px">
-        Node မရှိသေးပါ။ အပေါ်ကနေ တစ်ခုချင်းစီ ရိုက်ထည့်ပြီး "စာရင်းထဲသို့ ထည့်မည်" ကို နှိပ်ပါ။
+      <div style="margin:auto;text-align:center;color:var(--muted);font-size:11px;padding:20px">
+        <i class="fa-solid fa-inbox" style="font-size:24px;margin-bottom:8px;display:block;opacity:.4"></i>
+        ဘယ်ဘက်ခြမ်းမှ Node များကို Paste လုပ်ပြီး ထည့်သွင်းပါ။ ဤနေရာတွင် နာမည်များ ပြန်ပြင်နိုင်ပါမည်။
       </div>
     `;
     return;
   }
 
   container.innerHTML = stagedQueue.map((item, idx) => `
-    <div class="queue-item">
-      <div>
-        <strong style="color:#edf2ff;display:block">${item.name}</strong>
-        <span style="font-family:monospace;font-size:10px;color:var(--muted)">${item.uri.substring(0, 38)}...</span>
+    <div class="staged-card">
+      <div class="staged-head">
+        <span style="font-size:10px;color:var(--muted);font-weight:700">#${idx + 1}</span>
+        <input type="text" class="staged-name-input" value="${item.name}" oninput="updateStagedNodeName(${idx}, this.value)" placeholder="Edit Node Name...">
+        <button class="small-btn" onclick="removeStagedItem(${idx})" style="color:var(--red);flex-shrink:0" title="Delete">
+          <i class="fa-solid fa-trash"></i>
+        </button>
       </div>
-      <button class="small-btn" onclick="removeQueueItem(${idx})" style="color:var(--red)" title="ဖျက်မည်">
-        <i class="fa-solid fa-trash-can"></i>
-      </button>
+      <div class="staged-uri" title="${item.uri}">${item.uri}</div>
     </div>
   `).join('');
 }
 
-// ၂။ စုဆောင်းထားသော Node အားလုံးကို GitHub သို့ တစ်ပြိုင်နက် Push တင်ခြင်း
+// GitHub သို့ အားလုံး တစ်ပြိုင်နက် သိမ်းဆည်းခြင်း
 async function submitBatchToGithub() {
   const token = document.getElementById("tokenInput").value.trim();
-  if (!token) {
-    toast("Dashboard ရှိ GitHub PAT Token ကို အရင်ဖြည့်ပေးပါ!");
-    return;
-  }
+  if (!token) { toast("Dashboard ပေါ်ရှိ GitHub Token ကို အရင်ဖြည့်ပေးပါ!"); return; }
   localStorage.setItem("gh_token", token);
 
   if (stagedQueue.length === 0) {
-    toast("စာရင်းထဲတွင် ထည့်ထားသော Node တစ်ခုမှ မရှိသေးပါ!");
+    toast("တင်ရန် Node တစ်ခုမှ မရှိသေးပါ။ အရင်ထည့်ပေးပါ!");
     return;
   }
 
@@ -543,17 +600,14 @@ async function submitBatchToGithub() {
 
   if (selectedTarget === "__new__") {
     let inputName = document.getElementById("customNewFileName").value.trim();
-    if (!inputName) {
-      toast("ဖိုင်အသစ်နာမည်ကို ရိုက်ထည့်ပေးပါ!");
-      return;
-    }
+    if (!inputName) { toast("ဖိုင်အသစ် အမည်ကို ရိုက်ထည့်ပေးပါ!"); return; }
     if (!inputName.endsWith(".txt")) inputName += ".txt";
     targetFile = inputName.replace(/[^a-zA-Z0-9_\-\.]/g, "-");
   }
 
   const pushBtn = document.getElementById("modalPushBtn");
   pushBtn.disabled = true;
-  pushBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> GitHub ပေါ်သို့ တင်နေပါသည်...`;
+  pushBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1"></i> GitHub သို့ တင်နေပါသည်...`;
 
   try {
     let existingNodes = [];
@@ -571,8 +625,24 @@ async function submitBatchToGithub() {
       }
     } catch(e) {}
 
-    const newUris = stagedQueue.map(item => item.uri);
-    const mergedList = Array.from(new Set([...newUris, ...existingNodes]));
+    // စိတ်ကြိုက် ပြင်ဆင်ထားသော နာမည်များကို URI ထဲသို့ ထည့်သွင်းခြင်း
+    const finalFormattedUris = stagedQueue.map(item => {
+      const label = item.name.trim();
+      let uri = item.uri;
+      try {
+        if (uri.startsWith('vmess://')) {
+          const rawB64 = uri.replace(/^vmess:\/\//i, '').trim();
+          const json = JSON.parse(atob(rawB64));
+          json.ps = label;
+          return 'vmess://' + btoa(JSON.stringify(json));
+        }
+        return `${uri.split('#')[0]}#${encodeURIComponent(label)}`;
+      } catch(e) {
+        return uri;
+      }
+    });
+
+    const mergedList = Array.from(new Set([...finalFormattedUris, ...existingNodes]));
     const base64Content = btoa(mergedList.join('\n'));
 
     const putRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${targetFile}`, {
@@ -583,7 +653,7 @@ async function submitBatchToGithub() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        message: `Add ${newUris.length} custom node(s) to ${targetFile}`,
+        message: `Add ${finalFormattedUris.length} custom node(s) to ${targetFile}`,
         content: base64Content,
         branch: "main",
         ...(sha ? { sha } : {})
@@ -594,11 +664,10 @@ async function submitBatchToGithub() {
       const finalRawUrl = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${targetFile}`;
       document.getElementById("modalGeneratedLink").value = finalRawUrl;
       document.getElementById("modalLinkResult").style.display = "block";
-      toast(`Node ${newUris.length} ခုလုံးကို "${targetFile}" သို့ တင်ပြီးပါပြီ!`);
+      toast(`Node ${finalFormattedUris.length} ခုလုံးကို "${targetFile}" သို့ တင်ပြီးပါပြီ!`);
 
-      // Queue ရှင်းလင်းခြင်း
       stagedQueue = [];
-      renderQueueUI();
+      renderStagedQueueUI();
 
       if (targetFile === "sub.txt") {
         setTimeout(fetchAndParseNodes, 1200);
@@ -611,7 +680,7 @@ async function submitBatchToGithub() {
     toast(`Operation failed: ${err.message}`);
   } finally {
     pushBtn.disabled = false;
-    pushBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> အားလုံးကို GitHub ပေါ်သို့ တင်မည် (Save All to GitHub)`;
+    pushBtn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up mr-1"></i> Save Staged Nodes to GitHub`;
   }
 }
 
@@ -694,7 +763,7 @@ async function fetchAndParseNodes() {
 
     updateDynamicProtocolsMetric();
     renderNodes();
-    toast(`Loaded ${parsedNodes.length} nodes from 10ium sources.`);
+    toast(`Loaded ${parsedNodes.length} nodes.`);
   } catch(e) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--red)">Failed to load sub.txt. Make sure file exists in repo.</td></tr>`;
   }
@@ -703,7 +772,7 @@ async function fetchAndParseNodes() {
 function renderNodes() {
   const tbody = document.getElementById("nodeTableBody");
   if (parsedNodes.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">No 10ium nodes found in pool.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">No nodes found in pool.</td></tr>`;
     return;
   }
 
@@ -775,7 +844,7 @@ function filterNodes() {
   });
 }
 
-// Latency စစ်ဆေးခြင်း: www.gstatic.com/generate_204
+// Latency & Speed Test
 async function testSingleNode(node) {
   const pingStart = performance.now();
   let pingOk = false;
