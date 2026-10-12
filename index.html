@@ -32,7 +32,7 @@ button{cursor:pointer}
 .core-mini-top{display:flex;align-items:center;gap:8px;font-weight:650;font-size:12px}
 .dot{width:7px;height:7px;background:var(--green);border-radius:50%;box-shadow:0 0 13px #5ee6a8a8}
 .core-mini p{color:var(--muted);font-size:11px;margin:8px 0 10px}
-.mini-meter{height:4px;background:#252e40;border-radius:8px;overflow:hidden}.mini-meter span{display:block;height:100%;width:65%;background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:8px}
+.mini-meter{height:4px;background:#252e40;border-radius:8px;overflow:hidden}.mini-meter span{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:8px;transition:width .2s}
 
 main{padding:26px clamp(16px,2.5vw,36px) 36px;min-width:0;max-width:1600px;width:100%;margin:0 auto}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
@@ -48,6 +48,13 @@ h1{font-size:clamp(22px,2.5vw,30px);line-height:1.15;letter-spacing:-.04em;margi
 .ghost{border:1px solid var(--line);color:#dce5f9;background:#ffffff04;padding:8px 12px;border-radius:10px;font-size:12px;transition:.2s}
 .ghost:hover{background:#ffffff0b;color:#fff}
 
+/* Progress Bar Panel */
+.progress-card{display:none;margin-bottom:18px;padding:16px 20px;border-radius:16px;background:linear-gradient(145deg,rgba(20,27,43,.94),rgba(13,18,30,.92));border:1px solid rgba(107,231,244,.25);box-shadow:var(--shadow)}
+.progress-card.active{display:block}
+.progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px}
+.progress-bar-bg{height:7px;background:#1a2336;border-radius:8px;overflow:hidden;position:relative}
+.progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:8px;transition:width .15s ease}
+
 .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
 .card{border:1px solid var(--line);background:linear-gradient(145deg,rgba(20,27,43,.94),rgba(13,18,30,.92));border-radius:var(--radius);box-shadow:var(--shadow);min-width:0}
 .metric{padding:18px 18px 16px;position:relative;overflow:hidden}
@@ -58,12 +65,10 @@ h1{font-size:clamp(22px,2.5vw,30px);line-height:1.15;letter-spacing:-.04em;margi
 .metric-foot{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px}
 .trend{color:var(--green);font-weight:700}
 
-/* Sub Link Hub & Settings Grid */
 .config-grid{display:grid;grid-template-columns:1.2fr 0.8fr;gap:15px;margin-bottom:18px}
 .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px 0}
 .panel-head h2{font-size:14px;margin:0;font-weight:750;letter-spacing:-.01em}
 .panel-head p{color:var(--muted);font-size:11px;margin:3px 0 0}
-.input-row{display:flex;gap:8px;padding:12px 20px 0}
 .custom-input{flex:1;background:#0c111d;border:1px solid var(--line);padding:9px 12px;border-radius:10px;color:#fff;font-size:11px;font-family:monospace;outline:none}
 .custom-input:focus{border-color:#8c83ff80;box-shadow:0 0 0 3px #8c83ff10}
 
@@ -83,8 +88,6 @@ tbody tr{transition:background .15s}tbody tr:hover{background:#ffffff04}
 .flag{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#ffffff07;border:1px solid var(--line);font-size:14px}
 .node-name small{display:block;color:var(--muted);font-size:10px;font-weight:400;margin-top:2px}
 .ping{display:flex;align-items:center;gap:7px;font-weight:700;font-family:monospace}.ping i{width:6px;height:6px;border-radius:50%;background:var(--green)}.ping.medium i{background:var(--amber)}.ping.bad i{background:var(--red)}
-.state{display:inline-flex;align-items:center;gap:6px;color:#8de9bf;background:#5ee6a80d;border:1px solid #5ee6a81c;border-radius:7px;padding:4px 8px;font-size:10px;font-weight:700}
-.state i{width:5px;height:5px;border-radius:50%;background:currentColor}
 .small-btn{width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--line);background:#ffffff03;border-radius:8px;color:#9aa7c1}
 .small-btn:hover{color:white;background:#ffffff0b}
 input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height:15px}
@@ -99,7 +102,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
 </head>
 <body>
 <div class="app">
-  <!-- Modern Left Sidebar -->
+  <!-- Left Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
       <div class="logo"><i class="fa-solid fa-shield-halved"></i></div>
@@ -114,9 +117,9 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
     </nav>
     <div class="sidebar-bottom">
       <div class="core-mini">
-        <div class="core-mini-top"><span class="dot"></span> Core Online</div>
-        <p>Live GitHub API Connection Ready</p>
-        <div class="mini-meter"><span></span></div>
+        <div class="core-mini-top"><span class="dot"></span> Core Status</div>
+        <p id="coreMiniText">Ready for Benchmark</p>
+        <div class="mini-meter"><span id="sidebarProgress"></span></div>
       </div>
     </div>
   </aside>
@@ -139,17 +142,34 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
       </div>
     </header>
 
-    <!-- Top 4 Modern Metric Cards -->
+    <!-- LIVE BENCHMARK PROGRESS BAR CARD (Auto Shown During Test) -->
+    <section class="progress-card" id="progressCard">
+      <div class="progress-header">
+        <span style="font-weight:600;color:var(--cyan);display:flex;align-items:center;gap:8px">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          <span id="progressCurrentStatus">Benchmarking nodes...</span>
+        </span>
+        <span style="font-family:monospace;font-weight:700">
+          <span id="progressRatio" style="color:var(--muted)">0/0</span>
+          <span id="progressPercent" style="color:var(--cyan);margin-left:8px">0%</span>
+        </span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+      </div>
+    </section>
+
+    <!-- Metric Cards -->
     <section class="metrics">
       <article class="card metric" style="--accent:var(--cyan);--glow:var(--cyan)">
         <div class="metric-head"><span>Active Nodes</span><span class="metric-icon"><i class="fa-solid fa-server"></i></span></div>
         <div class="metric-value" id="activeCount">0</div>
-        <div class="metric-foot"><span class="trend">● Pool</span><span>·</span><span>Raw 50 Feed</span></div>
+        <div class="metric-foot"><span class="trend">● Pool</span><span>·</span><span>Raw Feed</span></div>
       </article>
       <article class="card metric" style="--accent:var(--violet);--glow:var(--violet)">
         <div class="metric-head"><span>Fast Selected</span><span class="metric-icon"><i class="fa-solid fa-circle-check"></i></span></div>
         <div class="metric-value" id="selectedCount">0</div>
-        <div class="metric-foot"><span class="trend">⚡ Curated</span><span>·</span><span>Ready to sync</span></div>
+        <div class="metric-foot"><span class="trend">⚡ Selected</span><span>·</span><span>Sync Target</span></div>
       </article>
       <article class="card metric" style="--accent:var(--green);--glow:var(--green)">
         <div class="metric-head"><span>Lowest Latency</span><span class="metric-icon"><i class="fa-solid fa-stopwatch"></i></span></div>
@@ -157,25 +177,24 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
         <div class="metric-foot"><span class="trend">↓ Real-time</span><span>·</span><span>Edge ping</span></div>
       </article>
       <article class="card metric" style="--accent:var(--amber);--glow:var(--amber)">
-        <div class="metric-head"><span>Status</span><span class="metric-icon"><i class="fa-solid fa-shield-halved"></i></span></div>
-        <div class="metric-value">Operational</div>
-        <div class="metric-foot"><span class="trend">● Verified</span><span>·</span><span>GitHub connected</span></div>
+        <div class="metric-head"><span>Benchmark State</span><span class="metric-icon"><i class="fa-solid fa-chart-line"></i></span></div>
+        <div class="metric-value" id="benchStateText" style="font-size:22px">Idle</div>
+        <div class="metric-foot"><span class="trend" id="benchStateFoot">Ready</span><span>·</span><span>Client test</span></div>
       </article>
     </section>
 
-    <!-- Subscription & Controls Grid -->
+    <!-- Subscriptions & Engine Operations -->
     <section class="config-grid" id="configSection">
-      <!-- Subscriptions Card -->
+      <!-- Subscriptions -->
       <article class="card" style="padding-bottom:18px">
         <div class="panel-head">
           <div><h2>Subscription Endpoints</h2><p>Official Raw Link & Benchmark Subset</p></div>
         </div>
 
         <div style="padding:16px 20px 0;display:grid;gap:12px">
-          <!-- sub.txt -->
           <div>
             <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px">
-              <span>Main Sub (50 Nodes Auto)</span><span style="font-family:monospace">sub.txt</span>
+              <span>Main Sub (All Nodes Pool)</span><span style="font-family:monospace">sub.txt</span>
             </div>
             <div style="display:flex;gap:8px">
               <input type="text" id="officialSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt" class="custom-input">
@@ -183,7 +202,6 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
             </div>
           </div>
 
-          <!-- fast-sub.txt -->
           <div>
             <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--cyan);margin-bottom:4px">
               <span>Fast Sub (Custom Benchmarked)</span><span style="font-family:monospace">fast-sub.txt</span>
@@ -196,10 +214,10 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
         </div>
       </article>
 
-      <!-- GitHub API & Engine Control -->
+      <!-- Engine Operations -->
       <article class="card" style="padding-bottom:18px">
         <div class="panel-head">
-          <div><h2>Engine Operations</h2><p>GitHub PAT & Sync Actions</p></div>
+          <div><h2>Engine Operations</h2><p>GitHub PAT & Actions Trigger</p></div>
         </div>
 
         <div style="padding:16px 20px 0;display:grid;gap:10px">
@@ -213,10 +231,10 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
       </article>
     </section>
 
-    <!-- Interactive Nodes Table -->
+    <!-- Node Matrix Table -->
     <section class="card nodes" id="nodesPanel">
       <div class="panel-head node-head">
-        <div><h2>VPN Nodes Pool</h2><p>Real-time tested nodes from sub.txt. Check boxes to include in fast-sub.txt</p></div>
+        <div><h2>VPN Nodes Pool</h2><p>Check boxes to include in fast-sub.txt</p></div>
         <div class="node-tools">
           <input class="search" id="nodeSearch" placeholder="Search nodes or SNI..." oninput="filterNodes()">
           <select class="select" id="statusFilter" onchange="filterNodes()">
@@ -396,24 +414,67 @@ async function testSingleNode(node) {
   }
 }
 
+// REAL-TIME PROGRESS BENCHMARK RUNNER
 async function runBenchmarkAll(){
   if(parsedNodes.length === 0) return;
   const btn = document.getElementById("benchBtn");
-  btn.disabled = true;
-  toast("Running real latency benchmark across all nodes...");
+  const progressCard = document.getElementById("progressCard");
+  const progressFill = document.getElementById("progressBarFill");
+  const progressRatio = document.getElementById("progressRatio");
+  const progressPercent = document.getElementById("progressPercent");
+  const progressStatus = document.getElementById("progressCurrentStatus");
+  const benchStateText = document.getElementById("benchStateText");
+  const sidebarProgress = document.getElementById("sidebarProgress");
+  const coreMiniText = document.getElementById("coreMiniText");
 
+  btn.disabled = true;
+  progressCard.classList.add("active");
+  benchStateText.innerText = "Testing…";
+  benchStateText.style.color = "var(--cyan)";
+
+  const total = parsedNodes.length;
   let best = 9999;
-  for(let i=0; i<parsedNodes.length; i++){
+
+  for(let i=0; i<total; i++){
+    progressStatus.innerText = `Testing: ${parsedNodes[i].name}`;
     await testSingleNode(parsedNodes[i]);
+    
     if(parsedNodes[i].ping && parsedNodes[i].ping < best) best = parsedNodes[i].ping;
     parsedNodes[i].selected = (parsedNodes[i].ping !== null && parsedNodes[i].ping < 450);
+
+    const completed = i + 1;
+    const pct = Math.round((completed / total) * 100);
+
+    // Update Percentage, Progress Bar and Counters
+    progressRatio.innerText = `${completed} / ${total}`;
+    progressPercent.innerText = `${pct}%`;
+    progressFill.style.width = `${pct}%`;
+    sidebarProgress.style.width = `${pct}%`;
+    coreMiniText.innerText = `Testing (${pct}%)`;
+
     renderNodes();
   }
 
+  // Sort by ping after completion
   parsedNodes.sort((a,b) => (a.ping || 999) - (b.ping || 999));
   renderNodes();
 
   document.getElementById("bestPing").innerHTML = `${best !== 9999 ? best : '--'} <span style="font-size:16px;color:#a7b3cb;font-weight:600">ms</span>`;
+  
+  progressStatus.innerHTML = `<span style="color:var(--green)"><i class="fa-solid fa-circle-check"></i> Benchmark Completed!</span>`;
+  benchStateText.innerText = "Done";
+  benchStateText.style.color = "var(--green)";
+  coreMiniText.innerText = "Completed (100%)";
+
+  setTimeout(() => {
+    progressCard.classList.remove("active");
+    progressFill.style.width = `0%`;
+    sidebarProgress.style.width = `0%`;
+    coreMiniText.innerText = "Ready for Benchmark";
+    benchStateText.innerText = "Idle";
+    benchStateText.style.color = "var(--text)";
+  }, 4000);
+
   btn.disabled = false;
   toast("Benchmark complete! Best nodes auto-selected.");
 }
