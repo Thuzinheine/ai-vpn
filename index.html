@@ -150,7 +150,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
         <div>
           <div class="eyebrow">10ium/telegram-configs-collector / Asia Mixed</div>
           <h1>Asia Country Subscriptions Center</h1>
-          <p class="subtitle">Clean IP & low-latency nodes for HK, IN, ID, JP, MY, PK, PH, TH, VN</p>
+          <p class="subtitle">Clean IP & low-latency nodes for SG, HK, JP, MY, TH, VN, ID, IN, PK, PH</p>
         </div>
       </div>
       <div class="top-actions">
@@ -247,15 +247,16 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
           <input class="search" id="nodeSearch" placeholder="Search Host, Tag..." oninput="filterNodes()">
           <select class="select" id="countryFilter" onchange="filterNodes()">
             <option value="all">All Countries</option>
-            <option value="HK">Hong Kong (HK)</option>
-            <option value="IN">India (IN)</option>
-            <option value="ID">Indonesia (ID)</option>
-            <option value="JP">Japan (JP)</option>
-            <option value="MY">Malaysia (MY)</option>
-            <option value="PK">Pakistan (PK)</option>
-            <option value="PH">Philippines (PH)</option>
-            <option value="TH">Thailand (TH)</option>
-            <option value="VN">Vietnam (VN)</option>
+            <option value="SG" selected>Singapore (SG) 🇸🇬</option>
+            <option value="HK">Hong Kong (HK) 🇭🇰</option>
+            <option value="JP">Japan (JP) 🇯🇵</option>
+            <option value="MY">Malaysia (MY) 🇲🇾</option>
+            <option value="TH">Thailand (TH) 🇹🇭</option>
+            <option value="VN">Vietnam (VN) 🇻🇳</option>
+            <option value="ID">Indonesia (ID) 🇮🇩</option>
+            <option value="IN">India (IN) 🇮🇳</option>
+            <option value="PH">Philippines (PH) 🇵🇭</option>
+            <option value="PK">Pakistan (PK) 🇵🇰</option>
           </select>
           <select class="select" id="protocolFilter" onchange="filterNodes()">
             <option value="all">All Protocols</option>
@@ -307,7 +308,7 @@ const PING_THRESHOLD = 100;
 let parsedNodes = [];
 
 const COUNTRY_FLAGS = {
-  'HK': '🇭🇰', 'IN': '🇮🇳', 'ID': '🇮🇩', 'JP': '🇯🇵',
+  'SG': '🇸🇬', 'HK': '🇭🇰', 'IN': '🇮🇳', 'ID': '🇮🇩', 'JP': '🇯🇵',
   'MY': '🇲🇾', 'PK': '🇵🇰', 'PH': '🇵🇭', 'TH': '🇹🇭', 'VN': '🇻🇳'
 };
 
@@ -489,6 +490,8 @@ function filterNodes() {
   });
 }
 
+// Latency စစ်ဆေးခြင်း: www.gstatic.com/generate_204
+// Speed test: speed.cloudflare.com
 async function testSingleNode(node) {
   const pingStart = performance.now();
   let pingOk = false;
