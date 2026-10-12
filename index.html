@@ -48,6 +48,7 @@ h1{font-size:clamp(22px,2.5vw,30px);line-height:1.15;letter-spacing:-.04em;margi
 .ghost{border:1px solid var(--line);color:#dce5f9;background:#ffffff04;padding:8px 12px;border-radius:10px;font-size:12px;transition:.2s}
 .ghost:hover{background:#ffffff0b;color:#fff}
 
+/* Live Benchmark Progress Bar */
 .progress-card{display:none;margin-bottom:18px;padding:16px 20px;border-radius:16px;background:linear-gradient(145deg,rgba(20,27,43,.94),rgba(13,18,30,.92));border:1px solid rgba(107,231,244,.25);box-shadow:var(--shadow)}
 .progress-card.active{display:block}
 .progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px}
@@ -77,6 +78,7 @@ h1{font-size:clamp(22px,2.5vw,30px);line-height:1.15;letter-spacing:-.04em;margi
 .search{width:180px;padding:8px 12px;border:1px solid var(--line);background:#0c111d;border-radius:10px;color:var(--text);outline:none;font-size:11px}
 .select{background:#141b2a;border:1px solid var(--line);color:#b9c5dc;padding:7px 10px;border-radius:9px;font-size:11px;outline:none}
 
+/* Smooth Cyan Scrollbar */
 .table-scroll{
   overflow-x:auto;
   max-height:480px;
@@ -99,9 +101,11 @@ tbody tr{transition:background .15s}tbody tr:hover{background:#ffffff04}
 .node-name{display:flex;align-items:center;gap:10px;color:#edf2ff;font-weight:600}
 .flag{width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:#ffffff07;border:1px solid var(--line);font-size:14px}
 .node-name small{display:block;color:var(--muted);font-size:10px;font-weight:400;margin-top:2px}
+
 .proto-tag{display:inline-block;padding:2px 6px;border-radius:5px;font-size:9px;font-weight:700;letter-spacing:.03em;margin-top:3px}
 .proto-hy2{background:rgba(255,204,122,.12);color:var(--amber);border:1px solid rgba(255,204,122,.25)}
 .proto-reality{background:rgba(107,231,244,.12);color:var(--cyan);border:1px solid rgba(107,231,244,.25)}
+
 .ping{display:flex;align-items:center;gap:7px;font-weight:700;font-family:monospace}.ping i{width:6px;height:6px;border-radius:50%;background:var(--green)}.ping.medium i{background:var(--amber)}.ping.bad i{background:var(--red)}
 .small-btn{width:28px;height:28px;display:grid;place-items:center;border:1px solid var(--line);background:#ffffff03;border-radius:8px;color:#9aa7c1}
 .small-btn:hover{color:white;background:#ffffff0b}
@@ -155,6 +159,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
       </div>
     </header>
 
+    <!-- Benchmark Progress Indicator -->
     <section class="progress-card" id="progressCard">
       <div class="progress-header">
         <span style="font-weight:600;color:var(--cyan);display:flex;align-items:center;gap:8px">
@@ -171,6 +176,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
       </div>
     </section>
 
+    <!-- Metrics -->
     <section class="metrics">
       <article class="card metric" style="--accent:var(--cyan);--glow:var(--cyan)">
         <div class="metric-head"><span>Active Pool</span><span class="metric-icon"><i class="fa-solid fa-server"></i></span></div>
@@ -188,12 +194,13 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
         <div class="metric-foot"><span class="trend">↓ Real-time</span><span>·</span><span>Tested RTT</span></div>
       </article>
       <article class="card metric" style="--accent:var(--violet);--glow:var(--violet)">
-        <div class="metric-head"><span>Selected for Fast-Sub</span><span class="metric-icon"><i class="fa-solid fa-circle-check"></i></span></div>
+        <div class="metric-head"><span>Selected (&lt;100ms)</span><span class="metric-icon"><i class="fa-solid fa-circle-check"></i></span></div>
         <div class="metric-value" id="selectedCount">0</div>
-        <div class="metric-foot"><span class="trend">⚡ Ready</span><span>·</span><span>Sync payload</span></div>
+        <div class="metric-foot"><span class="trend">⚡ Auto Selected</span><span>·</span><span>Sync Target</span></div>
       </article>
     </section>
 
+    <!-- Subscriptions & Engine Operations -->
     <section class="config-grid" id="configSection">
       <article class="card" style="padding-bottom:18px">
         <div class="panel-head">
@@ -236,6 +243,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
       </article>
     </section>
 
+    <!-- Nodes Table -->
     <section class="card nodes" id="nodesPanel">
       <div class="panel-head node-head">
         <div><h2>High-Speed Nodes Pool</h2><p>VLESS Reality & Hysteria 2 Protocol Endpoints</p></div>
@@ -248,7 +256,7 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
           </select>
           <select class="select" id="statusFilter" onchange="filterNodes()">
             <option value="all">All Ping</option>
-            <option value="good">Ping &lt; 350ms</option>
+            <option value="good">Ping &lt; 100ms</option>
             <option value="selected">Selected</option>
           </select>
           <button onclick="selectPreset('all')" class="ghost">Select All</button>
@@ -284,20 +292,25 @@ input[type="checkbox"]{accent-color:var(--cyan);cursor:pointer;width:15px;height
 const OWNER = "Thuzinheine";
 const REPO = "ai-vpn";
 const WORKFLOW_ID = "main.yml";
+const PING_THRESHOLD = 100; // Ping < 100 ms အောက်ကိုသာ သီးသန့် auto-select လုပ်မည်
 let parsedNodes = [];
 
 document.getElementById("tokenInput").value = localStorage.getItem("gh_token") || "";
-document.getElementById('menuBtn').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
+const menuBtn = document.getElementById('menuBtn');
+if (menuBtn) {
+  menuBtn.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+}
 
 function toast(msg){
   const el = document.getElementById("toast");
+  if (!el) return;
   el.textContent = msg;
   el.classList.add("show");
-  setTimeout(()=>el.classList.remove("show"), 2800);
+  setTimeout(() => el.classList.remove("show"), 2800);
 }
 
-function scrollToNodes(){ document.getElementById('nodesPanel').scrollIntoView({behavior:'smooth'}); }
-function scrollToConfig(){ document.getElementById('configSection').scrollIntoView({behavior:'smooth'}); }
+function scrollToNodes(){ document.getElementById('nodesPanel').scrollIntoView({ behavior: 'smooth' }); }
+function scrollToConfig(){ document.getElementById('configSection').scrollIntoView({ behavior: 'smooth' }); }
 
 async function fetchAndParseNodes() {
   const tbody = document.getElementById("nodeTableBody");
@@ -308,20 +321,24 @@ async function fetchAndParseNodes() {
     if (!res.ok) throw new Error();
     const b64 = await res.text();
     const decoded = atob(b64.trim().replace(/\s+/g, ''));
-    const lines = decoded.split('\n').filter(l => l.startsWith('vless://') || l.startsWith('hy2://') || l.startsWith('hysteria2://'));
+    
+    // Reality နှင့် Hysteria 2 သာ ရွေးထုတ်ခြင်း
+    const lines = decoded.split('\n').filter(l => {
+      const isHy2 = l.startsWith('hy2://') || l.startsWith('hysteria2://');
+      const isReality = l.startsWith('vless://') && l.includes('security=reality');
+      return isHy2 || isReality;
+    });
 
     let hy2Total = 0;
     parsedNodes = lines.map((uri, idx) => {
       let name = `Node-${idx + 1}`;
       let host = "speed.cloudflare.com";
       let flag = "🌐";
-      let proto = "vless";
+      let proto = "reality";
 
       if (uri.startsWith('hy2://') || uri.startsWith('hysteria2://')) {
         proto = "hy2";
         hy2Total++;
-      } else if (uri.includes('security=reality')) {
-        proto = "reality";
       }
 
       try {
@@ -342,7 +359,7 @@ async function fetchAndParseNodes() {
     document.getElementById("hy2Count").innerText = hy2Total;
 
     renderNodes();
-    toast(`Loaded ${parsedNodes.length} nodes successfully.`);
+    toast(`Loaded ${parsedNodes.length} high-speed nodes.`);
   } catch(e) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--red)">Failed to load sub.txt. Make sure file exists in repo.</td></tr>`;
   }
@@ -350,17 +367,15 @@ async function fetchAndParseNodes() {
 
 function renderNodes() {
   const tbody = document.getElementById("nodeTableBody");
-  if(parsedNodes.length === 0){
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">No nodes found in pool.</td></tr>`;
+  if (parsedNodes.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">No Hysteria 2 or Reality nodes found.</td></tr>`;
     return;
   }
 
   tbody.innerHTML = parsedNodes.map((n, i) => {
-    let protoBadge = `<span class="proto-tag" style="background:#ffffff10;color:#cbd5e1">VLESS Standard</span>`;
-    if(n.proto === 'hy2') {
+    let protoBadge = `<span class="proto-tag proto-reality"><i class="fa-solid fa-shield-halved mr-1"></i>VLESS Reality</span>`;
+    if (n.proto === 'hy2') {
       protoBadge = `<span class="proto-tag proto-hy2"><i class="fa-solid fa-bolt mr-1"></i>Hysteria 2</span>`;
-    } else if(n.proto === 'reality') {
-      protoBadge = `<span class="proto-tag proto-reality"><i class="fa-solid fa-shield-halved mr-1"></i>VLESS Reality</span>`;
     }
 
     return `
@@ -377,7 +392,7 @@ function renderNodes() {
         <td>${protoBadge}</td>
         <td style="font-family:monospace;font-size:11px;color:var(--muted)">${n.host}</td>
         <td>
-          <span class="ping ${n.ping ? (n.ping < 250 ? '' : (n.ping < 450 ? 'medium' : 'bad')) : ''}">
+          <span class="ping ${n.ping ? (n.ping < PING_THRESHOLD ? '' : (n.ping < 200 ? 'medium' : 'bad')) : ''}">
             <i></i>${n.ping !== null ? n.ping + ' ms' : '-- ms'}
           </span>
         </td>
@@ -394,23 +409,23 @@ function renderNodes() {
   updateSelectedMetric();
 }
 
-function toggleSelect(i){
+function toggleSelect(i) {
   parsedNodes[i].selected = !parsedNodes[i].selected;
   updateSelectedMetric();
 }
 
-function selectPreset(type){
-  if(type === 'all') parsedNodes.forEach(n => n.selected = true);
-  if(type === 'none') parsedNodes.forEach(n => n.selected = false);
+function selectPreset(type) {
+  if (type === 'all') parsedNodes.forEach(n => n.selected = true);
+  if (type === 'none') parsedNodes.forEach(n => n.selected = false);
   renderNodes();
 }
 
-function updateSelectedMetric(){
+function updateSelectedMetric() {
   const count = parsedNodes.filter(n => n.selected).length;
   document.getElementById("selectedCount").innerText = count;
 }
 
-function filterNodes(){
+function filterNodes() {
   const q = document.getElementById("nodeSearch").value.toLowerCase();
   const protoFilter = document.getElementById("protocolFilter").value;
   const statusFilter = document.getElementById("statusFilter").value;
@@ -421,10 +436,10 @@ function filterNodes(){
     let matchProto = (protoFilter === 'all') || (n.proto === protoFilter);
     let matchStatus = true;
 
-    if(statusFilter === 'good') matchStatus = (n.ping !== null && n.ping < 350);
-    if(statusFilter === 'selected') matchStatus = n.selected;
+    if (statusFilter === 'good') matchStatus = (n.ping !== null && n.ping < PING_THRESHOLD);
+    if (statusFilter === 'selected') matchStatus = n.selected;
 
-    if(rows[i]) rows[i].style.display = (matchQuery && matchProto && matchStatus) ? '' : 'none';
+    if (rows[i]) rows[i].style.display = (matchQuery && matchProto && matchStatus) ? '' : 'none';
   });
 }
 
@@ -432,17 +447,21 @@ async function testSingleNode(node) {
   const start = performance.now();
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2000);
-    await fetch(`https://${node.host}/__down?bytes=100000&t=${Date.now()}`, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
+    const timeout = setTimeout(() => controller.abort(), 1800);
+    await fetch(`https://${node.host}/__down?bytes=100000&t=${Date.now()}`, { 
+      mode: 'no-cors', 
+      cache: 'no-store', 
+      signal: controller.signal 
+    });
     clearTimeout(timeout);
     const dur = Math.round(performance.now() - start);
     node.ping = dur;
-    node.speed = (Math.max(1.5, (2000 / dur) * 1.8)).toFixed(1);
+    node.speed = (Math.max(1.8, (2000 / dur) * 2.2)).toFixed(1);
   } catch(e) {
     const dur = Math.round(performance.now() - start);
-    if(dur < 2000){
+    if (dur < 1800) {
       node.ping = dur;
-      node.speed = (Math.max(0.6, (1000 / dur))).toFixed(1);
+      node.speed = (Math.max(0.8, (1000 / dur))).toFixed(1);
     } else {
       node.ping = 999;
       node.speed = "0.0";
@@ -450,8 +469,8 @@ async function testSingleNode(node) {
   }
 }
 
-async function runBenchmarkAll(){
-  if(parsedNodes.length === 0) return;
+async function runBenchmarkAll() {
+  if (parsedNodes.length === 0) return;
   const btn = document.getElementById("benchBtn");
   const progressCard = document.getElementById("progressCard");
   const progressFill = document.getElementById("progressBarFill");
@@ -467,12 +486,14 @@ async function runBenchmarkAll(){
   const total = parsedNodes.length;
   let best = 9999;
 
-  for(let i=0; i<total; i++){
+  for (let i = 0; i < total; i++) {
     progressStatus.innerText = `Testing: ${parsedNodes[i].name} (${parsedNodes[i].proto.toUpperCase()})`;
     await testSingleNode(parsedNodes[i]);
     
-    if(parsedNodes[i].ping && parsedNodes[i].ping < best) best = parsedNodes[i].ping;
-    parsedNodes[i].selected = (parsedNodes[i].ping !== null && parsedNodes[i].ping < 450);
+    if (parsedNodes[i].ping && parsedNodes[i].ping < best) best = parsedNodes[i].ping;
+    
+    // **Ping < 100 ms အောက်ဖြစ်မှသာ အလိုအလျောက် ရွေးချယ်မည် (Auto-Select)**
+    parsedNodes[i].selected = (parsedNodes[i].ping !== null && parsedNodes[i].ping < PING_THRESHOLD);
 
     const completed = i + 1;
     const pct = Math.round((completed / total) * 100);
@@ -486,11 +507,14 @@ async function runBenchmarkAll(){
     renderNodes();
   }
 
-  parsedNodes.sort((a,b) => (a.ping || 999) - (b.ping || 999));
+  // Ping အနည်းဆုံးဖြစ်သော Node များကို ဦးစားပေး စီခြင်း
+  parsedNodes.sort((a, b) => (a.ping || 999) - (b.ping || 999));
   renderNodes();
 
   document.getElementById("bestPing").innerHTML = `${best !== 9999 ? best : '--'} <span style="font-size:16px;color:#a7b3cb;font-weight:600">ms</span>`;
-  progressStatus.innerHTML = `<span style="color:var(--green)"><i class="fa-solid fa-circle-check"></i> Benchmark Completed!</span>`;
+  
+  const under100Count = parsedNodes.filter(n => n.selected).length;
+  progressStatus.innerHTML = `<span style="color:var(--green)"><i class="fa-solid fa-circle-check"></i> Benchmark Completed! Found ${under100Count} nodes &lt; 100ms.</span>`;
   coreMiniText.innerText = "Completed (100%)";
 
   setTimeout(() => {
@@ -501,15 +525,15 @@ async function runBenchmarkAll(){
   }, 4000);
 
   btn.disabled = false;
-  toast("Latency Benchmark Completed!");
+  toast(`Benchmark complete! Auto-selected ${under100Count} nodes below 100ms.`);
 }
 
-async function saveFastSubToGithub(){
+async function saveFastSubToGithub() {
   const token = document.getElementById("tokenInput").value.trim();
   const selected = parsedNodes.filter(n => n.selected).map(n => n.uri);
 
-  if(!token){ toast("Please enter your GitHub PAT token!"); return; }
-  if(selected.length === 0){ toast("Please select at least 1 node!"); return; }
+  if (!token) { toast("Please enter your GitHub PAT token!"); return; }
+  if (selected.length === 0) { toast("No nodes selected (or none below 100ms)!"); return; }
 
   localStorage.setItem("gh_token", token);
   const btn = document.getElementById("saveFastBtn");
@@ -523,18 +547,18 @@ async function saveFastSubToGithub(){
       const getRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/fast-sub.txt`, {
         headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" }
       });
-      if(getRes.ok){
+      if (getRes.ok) {
         const data = await getRes.json();
         sha = data.sha;
       }
-    } catch(e){}
+    } catch(e) {}
 
     const putPayload = {
-      message: `Update fast-sub.txt (${selected.length} nodes)`,
+      message: `Update fast-sub.txt with ${selected.length} nodes (< 100ms)`,
       content: base64Content,
       branch: "main"
     };
-    if(sha) putPayload.sha = sha;
+    if (sha) putPayload.sha = sha;
 
     const putRes = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/fast-sub.txt`, {
       method: "PUT",
@@ -546,13 +570,13 @@ async function saveFastSubToGithub(){
       body: JSON.stringify(putPayload)
     });
 
-    if(putRes.ok){
-      toast(`Saved ${selected.length} nodes to fast-sub.txt successfully!`);
+    if (putRes.ok) {
+      toast(`Saved ${selected.length} nodes (<100ms) to fast-sub.txt successfully!`);
     } else {
       const err = await putRes.json();
       toast(`GitHub Error: ${err.message}`);
     }
-  } catch(e){
+  } catch(e) {
     toast("Network connection failed.");
   } finally {
     btn.disabled = false;
@@ -560,12 +584,12 @@ async function saveFastSubToGithub(){
   }
 }
 
-function addCustomNode(){
+function addCustomNode() {
   const key = prompt("Enter Hysteria 2 (hy2://) or VLESS Reality key:");
-  if(!key) return;
-  let name = `Custom-${parsedNodes.length+1}`;
+  if (!key) return;
+  let name = `Custom-${parsedNodes.length + 1}`;
   let host = "custom.edge";
-  let proto = "vless";
+  let proto = "reality";
 
   if (key.startsWith('hy2://') || key.startsWith('hysteria2://')) {
     proto = "hy2";
@@ -574,30 +598,30 @@ function addCustomNode(){
   }
 
   try {
-    if(key.includes('#')) name = decodeURIComponent(key.split('#')[1]);
+    if (key.includes('#')) name = decodeURIComponent(key.split('#')[1]);
     const match = key.match(/sni=([^&]+)/) || key.match(/host=([^&]+)/) || key.match(/@([^:/?#]+)/);
-    if(match) host = match[1];
-  } catch(e){}
+    if (match) host = match[1];
+  } catch(e) {}
 
   parsedNodes.unshift({ id: Date.now(), uri: key, name, host, flag: "⚡", proto, ping: null, speed: null, selected: true });
   renderNodes();
   toast(`Added "${name}" (${proto.toUpperCase()}) to list.`);
 }
 
-function copySingleUri(i){
+function copySingleUri(i) {
   navigator.clipboard.writeText(parsedNodes[i].uri);
   toast(`Copied config for "${parsedNodes[i].name}"`);
 }
 
-function copyLink(id){
+function copyLink(id) {
   const el = document.getElementById(id);
   navigator.clipboard.writeText(el.value);
   toast("Subscription link copied to clipboard!");
 }
 
-async function triggerGithubUpdate(){
+async function triggerGithubUpdate() {
   const token = document.getElementById("tokenInput").value.trim();
-  if(!token){ toast("GitHub PAT required!"); return; }
+  if (!token) { toast("GitHub PAT required!"); return; }
   localStorage.setItem("gh_token", token);
 
   const btn = document.getElementById("updateBtn");
@@ -610,13 +634,13 @@ async function triggerGithubUpdate(){
       headers: { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" },
       body: JSON.stringify({ ref: "main" })
     });
-    if(res.status === 204){
+    if (res.status === 204) {
       toast("Action dispatched! Refreshing in 15s...");
       setTimeout(fetchAndParseNodes, 15000);
     } else {
       toast("Dispatch failed. Check PAT permissions.");
     }
-  } catch(e){
+  } catch(e) {
     toast("Network Error.");
   } finally {
     btn.disabled = false;
