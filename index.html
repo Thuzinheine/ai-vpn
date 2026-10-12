@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI-VPN Engine | Edge Hub</title>
+  <title>VPN Console</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <script>
     tailwind.config = {
@@ -16,24 +16,24 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Geist', '-apple-system', 'sans-serif'],
-            mono: ['Geist Mono', 'monospace'],
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'SF Pro Text', 'Helvetica Neue', 'sans-serif'],
+            mono: ['JetBrains Mono', 'SF Mono', 'monospace'],
           },
           colors: {
-            app: {
-              bg: '#050506',
-              surface: '#0b0c0e',
-              card: '#111215',
-              cardHover: '#16181c',
-              border: 'rgba(255, 255, 255, 0.07)',
-              borderFocus: 'rgba(255, 255, 255, 0.18)',
-              brand: '#3b82f6',
-              brandGlow: 'rgba(59, 130, 246, 0.15)',
-              emerald: '#10b981',
-              amber: '#f59e0b',
-              text: '#ededed',
-              muted: '#787b86',
-              faint: '#40434c'
+            apple: {
+              canvas: '#000000',
+              panel: '#161618',
+              card: '#1f1f22',
+              cardHover: '#28282c',
+              border: '#2c2c30',
+              borderSubtle: '#222225',
+              blue: '#0a84ff',
+              blueHover: '#0071e3',
+              green: '#30d158',
+              orange: '#ff9f0a',
+              textPrimary: '#f5f5f7',
+              textSecondary: '#86868b',
+              textTertiary: '#545458'
             }
           }
         }
@@ -43,92 +43,86 @@
 
   <style>
     body {
-      background-color: #050506;
-      background-image: 
-        radial-gradient(ellipse 60% 50% at 50% -20%, rgba(59, 130, 246, 0.12), transparent),
-        radial-gradient(circle at 100% 100%, rgba(16, 185, 129, 0.03), transparent 30%);
-      color: #ededed;
+      background-color: #000000;
+      color: #f5f5f7;
       -webkit-font-smoothing: antialiased;
-    }
-    .grid-lines {
-      background-size: 24px 24px;
-      background-image: linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+      -moz-osx-font-smoothing: grayscale;
     }
     .custom-scroll::-webkit-scrollbar {
-      width: 4px;
+      width: 5px;
     }
     .custom-scroll::-webkit-scrollbar-track {
       background: transparent;
     }
     .custom-scroll::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.1);
+      background: #333338;
       border-radius: 9999px;
     }
     .custom-scroll::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: #48484f;
     }
   </style>
 </head>
-<body class="min-h-screen p-4 sm:p-6 lg:p-8 flex items-center justify-center grid-lines selection:bg-blue-600/30 selection:text-white">
+<body class="min-h-screen flex flex-col justify-between p-4 sm:p-6 lg:p-8 selection:bg-apple-blue/30 selection:text-white">
 
-  <!-- Main Container -->
-  <div class="w-full max-w-6xl space-y-4">
+  <!-- Main Viewport Shell -->
+  <div class="max-w-[1240px] w-full mx-auto flex-1 flex flex-col space-y-4">
 
     <!-- Top Status Bar -->
-    <header class="bg-app-surface border border-app-border rounded-2xl px-5 py-3.5 flex flex-wrap items-center justify-between gap-4 backdrop-blur-md">
-      <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
-          <i class="fa-solid fa-bolt-lightning text-xs"></i>
+    <header class="bg-apple-panel border border-apple-border rounded-2xl px-5 py-3.5 flex flex-wrap items-center justify-between gap-4 flex-shrink-0">
+      <div class="flex items-center gap-3.5">
+        <div class="w-8 h-8 rounded-xl bg-apple-card border border-apple-border flex items-center justify-center text-apple-blue">
+          <i class="fa-solid fa-layer-group text-xs"></i>
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold text-white tracking-wide">AI-VPN EDGE</span>
-            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-[10px] font-mono text-app-muted">v3.0.0</span>
+            <h1 class="text-sm font-semibold tracking-tight text-white">AI-VPN Core</h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-apple-card text-apple-textSecondary border border-apple-border">Production</span>
           </div>
-          <p class="text-[11px] text-app-muted">Next-Gen VLESS Auto-Scraper & Latency Pipeline</p>
+          <p class="text-[11px] text-apple-textSecondary mt-0.5">Automated Node Aggregation, Benchmark & Custom Subscriptions</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2 text-xs font-mono">
-        <div class="bg-app-card border border-app-border px-3 py-1.5 rounded-xl flex items-center gap-2">
-          <span class="text-app-muted text-[10px] font-sans">Active</span>
-          <span id="selectedCount" class="font-semibold text-blue-400">0</span>
-          <span class="text-app-faint">/</span>
-          <span id="nodeCount" class="text-app-muted">0</span>
+      <!-- Quick Status Badges -->
+      <div class="flex items-center gap-2.5 text-xs font-mono">
+        <div class="bg-apple-card border border-apple-border px-3.5 py-1.5 rounded-xl flex items-center gap-2">
+          <span class="text-apple-textSecondary text-[11px] font-sans">Active Selection</span>
+          <span id="selectedCount" class="font-bold text-apple-blue font-mono">0</span>
+          <span class="text-apple-textTertiary">/</span>
+          <span id="nodeCount" class="font-medium text-apple-textSecondary font-mono">0</span>
         </div>
-        <div class="bg-app-card border border-app-border px-3 py-1.5 rounded-xl flex items-center gap-2">
-          <span class="text-app-muted text-[10px] font-sans">Lowest Ping</span>
-          <span id="bestPing" class="font-semibold text-emerald-400">-- ms</span>
+        <div class="bg-apple-card border border-apple-border px-3.5 py-1.5 rounded-xl flex items-center gap-2">
+          <span class="text-apple-textSecondary text-[11px] font-sans">Lowest Ping</span>
+          <span id="bestPing" class="font-bold text-apple-green font-mono">-- ms</span>
         </div>
       </div>
     </header>
 
-    <!-- Two-Column Workbench Layout -->
-    <main class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+    <!-- Main Workspace (Proportionally Balanced Two-Column Split) -->
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 items-stretch">
       
-      <!-- Control Panel (Left 5 Cols) -->
-      <section class="lg:col-span-5 space-y-3.5">
+      <!-- Left Column: Settings, Endpoints & Controls (5 Columns) -->
+      <section class="lg:col-span-5 flex flex-col justify-between space-y-4">
         
-        <!-- Primary Config Box -->
-        <div class="bg-app-surface border border-app-border rounded-2xl p-4.5 space-y-3.5">
+        <div class="bg-apple-panel border border-apple-border rounded-2xl p-5 space-y-4 flex-1">
           
-          <!-- Endpoints -->
-          <div class="space-y-2.5">
+          <!-- Endpoints Section -->
+          <div class="space-y-3 pb-3 border-b border-apple-border">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-apple-textSecondary block">Subscription Endpoints</span>
+            
             <!-- sub.txt -->
             <div class="space-y-1">
-              <div class="flex justify-between items-center text-[11px]">
-                <span class="text-app-text font-medium flex items-center gap-1.5">
-                  <i class="fa-solid fa-server text-[10px] text-app-muted"></i> Main Pool (50 Nodes)
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-white font-medium flex items-center gap-1.5">
+                  <i class="fa-solid fa-globe text-[11px] text-apple-textSecondary"></i> Main Sub (All 50 Nodes)
                 </span>
-                <span class="text-[10px] text-app-faint font-mono">sub.txt</span>
+                <span class="text-[10px] text-apple-textTertiary font-mono">sub.txt</span>
               </div>
-              <div class="flex items-center gap-1.5 bg-app-card border border-app-border rounded-xl p-1.5 focus-within:border-app-borderFocus transition">
+              <div class="flex items-center gap-2 bg-apple-card border border-apple-border rounded-xl p-1.5 focus-within:border-apple-blue transition">
                 <input type="text" id="officialSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt"
-                  class="w-full bg-transparent border-0 px-2 text-[11px] text-app-muted font-mono truncate select-all focus:outline-none">
-                <button onclick="copyLink('officialSubUrl', 'copyOfficialBtn')" class="bg-white/[0.04] hover:bg-white/[0.08] text-white px-2.5 py-1 rounded-lg text-[10px] font-mono transition active:scale-95 flex items-center gap-1 flex-shrink-0">
-                  <i class="fa-regular fa-copy"></i>
+                  class="w-full bg-transparent border-0 px-2.5 text-xs text-apple-textSecondary font-mono truncate select-all focus:outline-none">
+                <button onclick="copyLink('officialSubUrl', 'copyOfficialBtn')" class="bg-apple-panel hover:bg-apple-border text-white px-3 py-1.5 rounded-lg text-xs font-medium transition active:scale-95 flex items-center gap-1 flex-shrink-0">
+                  <i class="fa-regular fa-copy text-[10px]"></i>
                   <span id="copyOfficialBtn">Copy</span>
                 </button>
               </div>
@@ -136,79 +130,80 @@
 
             <!-- fast-sub.txt -->
             <div class="space-y-1">
-              <div class="flex justify-between items-center text-[11px]">
-                <span class="text-blue-400 font-medium flex items-center gap-1.5">
-                  <i class="fa-solid fa-bolt text-[10px]"></i> Fast Pool (Custom Selected)
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-apple-blue font-medium flex items-center gap-1.5">
+                  <i class="fa-solid fa-bolt text-[11px]"></i> Fast Sub (Custom Benchmarked)
                 </span>
-                <span class="text-[10px] text-blue-500/50 font-mono">fast-sub.txt</span>
+                <span class="text-[10px] text-apple-blue/60 font-mono">fast-sub.txt</span>
               </div>
-              <div class="flex items-center gap-1.5 bg-app-card border border-app-border rounded-xl p-1.5 focus-within:border-blue-500/40 transition">
+              <div class="flex items-center gap-2 bg-apple-card border border-apple-border rounded-xl p-1.5 focus-within:border-apple-blue transition">
                 <input type="text" id="fastSubUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/fast-sub.txt"
-                  class="w-full bg-transparent border-0 px-2 text-[11px] text-blue-400 font-mono truncate select-all focus:outline-none">
-                <button onclick="copyLink('fastSubUrl', 'copyFastBtn')" class="bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-lg text-[10px] font-mono transition active:scale-95 flex items-center gap-1 flex-shrink-0">
-                  <i class="fa-regular fa-copy"></i>
+                  class="w-full bg-transparent border-0 px-2.5 text-xs text-apple-blue font-mono truncate select-all focus:outline-none">
+                <button onclick="copyLink('fastSubUrl', 'copyFastBtn')" class="bg-apple-blue/15 hover:bg-apple-blue/25 text-apple-blue px-3 py-1.5 rounded-lg text-xs font-semibold transition active:scale-95 flex items-center gap-1 flex-shrink-0">
+                  <i class="fa-regular fa-copy text-[10px]"></i>
                   <span id="copyFastBtn">Copy</span>
                 </button>
               </div>
             </div>
           </div>
 
-          <!-- Token Input -->
-          <div class="space-y-1.5 pt-1">
-            <div class="flex justify-between text-[11px]">
-              <label class="text-app-muted font-medium flex items-center gap-1.5">
-                <i class="fa-solid fa-key text-[10px]"></i> GitHub PAT Token
+          <!-- PAT Key Input -->
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-xs">
+              <label class="text-white font-medium flex items-center gap-1.5">
+                <i class="fa-solid fa-key text-[11px] text-apple-textSecondary"></i> GitHub Access Token (PAT)
               </label>
-              <span class="text-app-faint text-[10px]">Local memory only</span>
+              <span class="text-[10px] text-apple-textTertiary">Browser Memory</span>
             </div>
             <div class="relative">
               <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" 
-                class="w-full bg-app-card border border-app-border rounded-xl pl-3 pr-8 py-2 text-xs text-white placeholder-app-faint focus:outline-none focus:border-app-borderFocus font-mono transition">
-              <button type="button" onclick="toggleTokenVisibility()" class="absolute right-2.5 top-2.5 text-app-faint hover:text-white">
+                class="w-full bg-apple-card border border-apple-border rounded-xl pl-3.5 pr-9 py-2.5 text-xs text-white placeholder-apple-textTertiary focus:outline-none focus:border-apple-blue font-mono transition">
+              <button type="button" onclick="toggleTokenVisibility()" class="absolute right-3 top-2.5 text-apple-textSecondary hover:text-white">
                 <i id="eyeIcon" class="fa-regular fa-eye text-xs"></i>
               </button>
             </div>
           </div>
 
-          <!-- Actions -->
+          <!-- Actions Toolbar -->
           <div class="space-y-2 pt-1">
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-2 gap-2.5">
               <button onclick="triggerGithubUpdate()" id="updateBtn"
-                class="bg-app-card hover:bg-app-cardHover border border-app-border text-app-text font-medium py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 active:scale-95 transition">
-                <i id="btnIcon" class="fa-solid fa-arrows-rotate text-[11px] text-app-muted"></i>
-                <span>Scrape GitHub</span>
+                class="bg-apple-card hover:bg-apple-cardHover border border-apple-border text-white font-medium py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-98 transition">
+                <i id="btnIcon" class="fa-solid fa-arrows-rotate text-[11px]"></i>
+                <span>Action Scrape</span>
               </button>
 
               <button onclick="runBenchmarkAll()" id="benchmarkBtn"
-                class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 rounded-xl text-xs flex items-center justify-center gap-1.5 active:scale-95 transition shadow-lg shadow-blue-600/20">
+                class="bg-apple-blue hover:bg-apple-blueHover text-white font-medium py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-98 transition shadow-sm">
                 <i id="testIcon" class="fa-solid fa-stopwatch text-[11px]"></i>
-                <span>Test Latency</span>
+                <span>Test Ping All</span>
               </button>
             </div>
 
             <button onclick="saveFastSubToGithub()" id="saveFastBtn"
-              class="w-full bg-app-card hover:bg-app-cardHover border border-app-border hover:border-blue-500/40 text-app-text font-medium py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition">
-              <i id="saveFastIcon" class="fa-solid fa-cloud-arrow-up text-blue-400 text-xs"></i>
+              class="w-full bg-apple-card hover:bg-apple-cardHover border border-apple-border hover:border-apple-blue/50 text-white font-medium py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-98 transition">
+              <i id="saveFastIcon" class="fa-solid fa-cloud-arrow-up text-apple-blue text-xs"></i>
               <span id="saveFastText">Save Selected to fast-sub.txt</span>
             </button>
           </div>
 
-          <!-- Status Toast -->
-          <div id="statusBox" class="hidden p-2.5 rounded-xl text-[11px] flex items-center gap-2 border">
-            <i id="statusIcon" class="fa-solid fa-info text-[10px]"></i>
-            <span id="statusMessage" class="truncate font-medium"></span>
+          <!-- Status Message Toast -->
+          <div id="statusBox" class="hidden p-3 rounded-xl text-xs flex items-center gap-2.5 border transition-all">
+            <i id="statusIcon" class="fa-solid fa-circle-info text-xs"></i>
+            <span id="statusMessage" class="font-medium leading-tight"></span>
           </div>
+
         </div>
 
-        <!-- Add Custom Node Box -->
-        <div class="bg-app-surface border border-app-border rounded-2xl p-3.5 space-y-2">
-          <span class="text-[11px] text-app-muted font-medium flex items-center gap-1.5">
-            <i class="fa-solid fa-plus text-[10px]"></i> Add External VLESS Config
+        <!-- Add External Node Box -->
+        <div class="bg-apple-panel border border-apple-border rounded-2xl p-4.5 space-y-2 flex-shrink-0">
+          <span class="text-xs font-medium text-white flex items-center gap-1.5">
+            <i class="fa-solid fa-plus text-[10px] text-apple-textSecondary"></i> Add External VLESS Key
           </span>
           <div class="flex gap-2">
             <input type="text" id="customNodeInput" placeholder="vless://..."
-              class="w-full bg-app-card border border-app-border rounded-xl px-3 py-1.5 text-xs text-white placeholder-app-faint focus:outline-none focus:border-app-borderFocus font-mono transition">
-            <button onclick="addCustomNode()" class="bg-app-card hover:bg-app-cardHover border border-app-border text-white px-3.5 py-1.5 rounded-xl text-xs font-medium active:scale-95 transition">
+              class="w-full bg-apple-card border border-apple-border rounded-xl px-3 py-2 text-xs text-white placeholder-apple-textTertiary focus:outline-none focus:border-apple-blue font-mono transition">
+            <button onclick="addCustomNode()" class="bg-apple-card hover:bg-apple-cardHover border border-apple-border text-white px-4 py-2 rounded-xl text-xs font-medium active:scale-95 transition">
               Add
             </button>
           </div>
@@ -216,31 +211,31 @@
 
       </section>
 
-      <!-- Node Pool Explorer (Right 7 Cols) -->
-      <section class="lg:col-span-7 bg-app-surface border border-app-border rounded-2xl p-4.5 flex flex-col justify-between">
+      <!-- Right Column: Node Selection Matrix (7 Columns) -->
+      <section class="lg:col-span-7 bg-apple-panel border border-apple-border rounded-2xl p-5 flex flex-col justify-between">
         
-        <!-- Header Toolbar -->
-        <div class="flex items-center justify-between pb-3 border-b border-app-border flex-shrink-0">
+        <!-- Header & Filter Bar -->
+        <div class="flex items-center justify-between pb-3.5 border-b border-apple-border flex-shrink-0">
           <div>
-            <h2 class="text-xs font-semibold text-white tracking-wide">Node Matrix</h2>
-            <p class="text-[10px] text-app-muted">Check to include in fast-sub.txt payload</p>
+            <h2 class="text-xs font-semibold text-white tracking-wide uppercase">Node Pool Explorer</h2>
+            <p class="text-[11px] text-apple-textSecondary">Check to tailor your fast-sub.txt</p>
           </div>
 
-          <!-- Filter Pills -->
-          <div class="flex items-center gap-1 bg-app-card p-1 rounded-xl border border-app-border text-[10px] font-mono">
-            <button onclick="selectPreset('all')" class="hover:bg-white/[0.06] text-app-text px-2.5 py-1 rounded-lg transition">All</button>
-            <button onclick="selectPreset('good')" class="hover:bg-white/[0.06] text-blue-400 px-2.5 py-1 rounded-lg transition">&lt; 350ms</button>
-            <button onclick="selectPreset('none')" class="hover:bg-white/[0.06] text-app-muted px-2.5 py-1 rounded-lg transition">Clear</button>
-            <button onclick="fetchAndParseNodes()" title="Reload" class="text-app-muted hover:text-white px-2 py-1 rounded-lg transition">
-              <i class="fa-solid fa-rotate-right text-[10px]"></i>
+          <!-- Quick Filters -->
+          <div class="flex items-center gap-1 bg-apple-card p-1 rounded-xl border border-apple-border text-xs">
+            <button onclick="selectPreset('all')" class="hover:bg-apple-border text-white px-2.5 py-1 rounded-lg transition text-[11px] font-medium">All</button>
+            <button onclick="selectPreset('good')" class="hover:bg-apple-border text-apple-blue px-2.5 py-1 rounded-lg transition text-[11px] font-medium">&lt; 350ms</button>
+            <button onclick="selectPreset('none')" class="hover:bg-apple-border text-apple-textSecondary px-2.5 py-1 rounded-lg transition text-[11px] font-medium">Clear</button>
+            <button onclick="fetchAndParseNodes()" title="Reload" class="text-apple-textSecondary hover:text-white px-2 py-1 rounded-lg transition">
+              <i class="fa-solid fa-arrow-rotate-right text-[10px]"></i>
             </button>
           </div>
         </div>
 
-        <!-- Node Cards Grid -->
-        <div id="nodeListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3 overflow-y-auto custom-scroll max-h-[520px] content-start pr-1">
-          <div class="col-span-full text-center py-28 text-xs text-app-faint">
-            <i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Initializing node pool...
+        <!-- Node Cards Grid Container -->
+        <div id="nodeListContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3 overflow-y-auto custom-scroll flex-1 max-h-[580px] content-start pr-1">
+          <div class="col-span-full text-center py-28 text-xs text-apple-textTertiary">
+            <i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Loading active node pool...
           </div>
         </div>
 
@@ -275,16 +270,16 @@
       const msg = document.getElementById("statusMessage");
       const icon = document.getElementById("statusIcon");
 
-      box.className = "p-2.5 rounded-xl text-[11px] flex items-center gap-2 border transition-all ";
+      box.className = "p-3 rounded-xl text-xs flex items-center gap-2.5 border transition-all ";
       if (type === "success") {
-        box.classList.add("bg-emerald-950/20", "border-emerald-500/30", "text-emerald-400");
-        icon.className = "fa-solid fa-check text-[10px] text-emerald-400";
+        box.classList.add("bg-apple-card", "border-apple-green/40", "text-apple-green");
+        icon.className = "fa-solid fa-check text-xs text-apple-green";
       } else if (type === "error") {
-        box.classList.add("bg-rose-950/20", "border-rose-500/30", "text-rose-400");
-        icon.className = "fa-solid fa-triangle-exclamation text-[10px] text-rose-400";
+        box.classList.add("bg-apple-card", "border-rose-500/40", "text-rose-400");
+        icon.className = "fa-solid fa-triangle-exclamation text-xs text-rose-400";
       } else {
-        box.classList.add("bg-app-card", "border-app-border", "text-app-muted");
-        icon.className = "fa-solid fa-circle-notch fa-spin text-[10px] text-blue-400";
+        box.classList.add("bg-apple-card", "border-apple-border", "text-apple-textSecondary");
+        icon.className = "fa-solid fa-circle-notch fa-spin text-xs text-apple-blue";
       }
       msg.innerText = message;
       box.classList.remove("hidden");
@@ -292,7 +287,7 @@
 
     async function fetchAndParseNodes() {
       const listEl = document.getElementById("nodeListContainer");
-      listEl.innerHTML = `<div class="col-span-full text-center py-28 text-xs text-app-faint"><i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Fetching nodes from sub.txt...</div>`;
+      listEl.innerHTML = `<div class="col-span-full text-center py-28 text-xs text-apple-textTertiary"><i class="fa-solid fa-spinner fa-spin mr-1.5"></i>Loading sub.txt...</div>`;
       
       try {
         const url = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/sub.txt?t=${Date.now()}`;
@@ -324,35 +319,35 @@
     function renderNodes() {
       const listEl = document.getElementById("nodeListContainer");
       if (parsedNodes.length === 0) {
-        listEl.innerHTML = `<div class="col-span-full text-center py-28 text-xs text-app-faint">No nodes in pool.</div>`;
+        listEl.innerHTML = `<div class="col-span-full text-center py-28 text-xs text-apple-textTertiary">No nodes in pool.</div>`;
         return;
       }
 
       listEl.innerHTML = parsedNodes.map((n, i) => `
-        <div class="bg-app-card border ${n.selected ? 'border-blue-500/40 bg-app-cardHover' : 'border-app-border'} hover:border-white/10 p-2.5 rounded-xl flex items-center justify-between gap-2.5 transition">
+        <div class="bg-apple-card border ${n.selected ? 'border-apple-blue/50 bg-apple-cardHover' : 'border-apple-border'} hover:border-apple-border p-2.5 rounded-xl flex items-center justify-between gap-2.5 transition">
           <div class="flex items-center gap-2.5 min-w-0 flex-1">
             <input type="checkbox" ${n.selected ? 'checked' : ''} onchange="toggleSelect(${i})"
-              class="w-3.5 h-3.5 rounded bg-app-surface border-app-border text-blue-500 focus:ring-0 cursor-pointer accent-blue-500">
+              class="w-3.5 h-3.5 rounded bg-apple-panel border-apple-border text-apple-blue focus:ring-0 cursor-pointer accent-apple-blue">
             
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${n.ping ? (n.ping < 250 ? 'bg-emerald-400' : 'bg-amber-400') : 'bg-app-faint'}"></span>
-                <h3 class="text-xs font-medium ${n.selected ? 'text-app-text' : 'text-app-muted'} truncate">${n.name}</h3>
+                <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${n.ping ? (n.ping < 250 ? 'bg-apple-green' : 'bg-apple-orange') : 'bg-apple-textTertiary'}"></span>
+                <h3 class="text-xs font-medium ${n.selected ? 'text-white' : 'text-apple-textSecondary'} truncate">${n.name}</h3>
               </div>
-              <p class="text-[10px] text-app-faint font-mono mt-0.5 truncate pl-3">${n.host}</p>
+              <p class="text-[10px] text-apple-textTertiary font-mono mt-0.5 truncate pl-3">${n.host}</p>
             </div>
           </div>
 
           <div class="flex items-center gap-2 flex-shrink-0">
             <div class="text-right font-mono">
-              <div class="text-[11px] font-medium ${n.ping ? (n.ping < 250 ? 'text-emerald-400' : 'text-amber-400') : 'text-app-faint'}">
+              <div class="text-[11px] font-medium ${n.ping ? (n.ping < 250 ? 'text-apple-green' : 'text-apple-orange') : 'text-apple-textTertiary'}">
                 ${n.ping !== null ? n.ping + ' ms' : '-- ms'}
               </div>
-              <div class="text-[9px] text-app-faint">
+              <div class="text-[9px] text-apple-textTertiary">
                 ${n.speed !== null ? n.speed + ' MB/s' : '-- MB/s'}
               </div>
             </div>
-            <button onclick="copySingleNode(${i})" title="Copy URI" class="bg-white/[0.04] hover:bg-white/[0.08] text-app-muted hover:text-white p-1.5 rounded-lg text-xs active:scale-95 transition">
+            <button onclick="copySingleNode(${i})" title="Copy URI" class="bg-apple-panel hover:bg-apple-border text-apple-textSecondary hover:text-white p-1.5 rounded-lg text-xs active:scale-95 transition">
               <i class="fa-regular fa-copy text-[10px]"></i>
             </button>
           </div>
@@ -415,7 +410,7 @@
       input.value = "";
       document.getElementById("nodeCount").innerText = parsedNodes.length;
       renderNodes();
-      showStatus(`Node "${name}" appended to pool`, "success");
+      showStatus(`Node "${name}" added`, "success");
     }
 
     async function testSingleNode(node) {
@@ -449,7 +444,7 @@
       const icon = document.getElementById("testIcon");
       btn.disabled = true;
       icon.className = "fa-solid fa-spinner fa-spin text-[11px]";
-      showStatus("Testing latency across edge endpoints...", "loading");
+      showStatus("Testing latency across endpoints...", "loading");
 
       let best = 9999;
 
@@ -491,7 +486,7 @@
       saveBtn.disabled = true;
       saveIcon.className = "fa-solid fa-spinner fa-spin text-[11px]";
       saveText.innerText = "Syncing...";
-      showStatus("Pushing payload to fast-sub.txt...", "loading");
+      showStatus("Saving to fast-sub.txt...", "loading");
 
       try {
         const base64Content = btoa(selectedUris.join('\n'));
@@ -510,7 +505,7 @@
         } catch (e) {}
 
         const putPayload = {
-          message: `chore: update fast-sub.txt with ${selectedUris.length} nodes`,
+          message: `Update fast-sub.txt (${selectedUris.length} nodes)`,
           content: base64Content,
           branch: "main"
         };
@@ -527,7 +522,7 @@
         });
 
         if (updateRes.ok) {
-          showStatus(`Synced ${selectedUris.length} nodes to fast-sub.txt`, "success");
+          showStatus(`Saved ${selectedUris.length} nodes to fast-sub.txt`, "success");
           document.getElementById("fastSubUrl").value = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/fast-sub.txt?t=${Date.now()}`;
         } else {
           const err = await updateRes.json();
@@ -537,7 +532,7 @@
         showStatus("Network connection error", "error");
       } finally {
         saveBtn.disabled = false;
-        saveIcon.className = "fa-solid fa-cloud-arrow-up text-blue-400 text-xs";
+        saveIcon.className = "fa-solid fa-cloud-arrow-up text-apple-blue text-xs";
         saveText.innerText = "Save Selected to fast-sub.txt";
       }
     }
@@ -571,7 +566,7 @@
       localStorage.setItem("gh_token", token);
       btn.disabled = true;
       icon.className = "fa-solid fa-spinner fa-spin text-[11px]";
-      showStatus("Dispatching GitHub Workflow...", "loading");
+      showStatus("Dispatching Action...", "loading");
 
       try {
         const response = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW_ID}/dispatches`, {
@@ -585,7 +580,7 @@
         });
 
         if (response.status === 204) {
-          showStatus("Scraper dispatched! Pool will refresh in ~15s", "success");
+          showStatus("Action dispatched! Refreshing in ~15s", "success");
           setTimeout(() => fetchAndParseNodes(), 15000);
         } else {
           showStatus("Trigger failed. Verify PAT permissions.", "error");
