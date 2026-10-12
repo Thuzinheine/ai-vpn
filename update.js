@@ -1,24 +1,24 @@
 /**
- * update.js - Universal Multi-Protocol Aggregator (ES Module)
- * Protocols: VLESS, VMess, Trojan, Shadowsocks, Hysteria 2
+ * update.js - 10ium/telegram-configs-collector Asia Dedicated Scraper
+ * Country Targets: SG, JP, HK, MY, TH (Low Latency & Clean IP)
  */
 import fs from 'node:fs';
 import https from 'node:https';
 import http from 'node:http';
 import net from 'node:net';
 
+// 10ium Country-based Subscription Links (Asia Region)
 const SOURCES = [
-  // NiREvil multi-protocol feeds
-  'https://raw.githubusercontent.com/NiREvil/vless/main/sub/link',
-  'https://raw.githubusercontent.com/NiREvil/vless/main/sub/base64',
-  // Universal Top Mix Subscriptions
-  'https://raw.githubusercontent.com/yebekhe/TVC/main/subscriptions/xray/normal/mix',
-  'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Sub1.txt',
-  'https://raw.githubusercontent.com/barry-far/V2ray-Configs/main/Sub2.txt',
-  'https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/sub/sub_merge.txt',
-  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/hysteria',
-  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/trojan',
-  'https://raw.githubusercontent.com/soroushmirzaei/telegram-configs-collector/main/protocols/shadowsocks'
+  // Singapore (အနိမ့်ဆုံး Ping ရရှိနိုင်သော အဓိက Source)
+  'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/singapore',
+  // Japan (AI Service များနှင့် Streaming များအတွက် အကောင်းဆုံး)
+  'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/japan',
+  // Hong Kong
+  'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/hong%20kong',
+  // Malaysia
+  'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/malaysia',
+  // Thailand
+  'https://raw.githubusercontent.com/10ium/telegram-configs-collector/main/countries/thailand'
 ];
 
 const SUPPORTED_PROTOCOLS = ['vless://', 'vmess://', 'trojan://', 'ss://', 'hy2://', 'hysteria2://'];
@@ -53,6 +53,7 @@ function decodeRecursive(content) {
   return content;
 }
 
+// TCP Handshake ဖြင့် Node လက်ရှိ အသက်ရှင်နေခြင်း စစ်ဆေးခြင်း
 function verifyNodeConnection(host, port, timeout = 1500) {
   return new Promise((resolve) => {
     const socket = new net.Socket();
@@ -75,7 +76,7 @@ function verifyNodeConnection(host, port, timeout = 1500) {
   });
 }
 
-// VMess (Base64 JSON), VLESS, Trojan, SS, Hy2 အားလုံးဆီမှ Host နှင့် Port ကို ထုတ်ယူခြင်း
+// Host & Port ခွဲထုတ်ခြင်း (VMess, VLESS, Trojan, SS, Hy2 အားလုံး အကျုံးဝင်သည်)
 function extractHostPort(uri) {
   try {
     if (uri.startsWith('vmess://')) {
@@ -96,7 +97,6 @@ function extractHostPort(uri) {
       return { host: parts[0], port: parseInt(parts[1], 10) || 8388 };
     }
 
-    // vless, trojan, hy2
     const clean = uri.replace(/^[^:]+:\/\//, '');
     const mainPart = clean.split('?')[0].split('#')[0];
     const hostPort = mainPart.includes('@') ? mainPart.split('@')[1] : mainPart;
@@ -108,12 +108,12 @@ function extractHostPort(uri) {
 }
 
 async function main() {
-  console.log('--- Step 1: Digging All Multi-Protocol Nodes ---');
+  console.log('--- Step 1: Digging 10ium Asia Country Feeds ---');
   let rawNodes = [];
 
   for (const src of SOURCES) {
     try {
-      console.log(`Fetching: ${src}`);
+      console.log(`Fetching Country Feed: ${src}`);
       const raw = await fetchUrl(src);
       const text = decodeRecursive(raw);
       const lines = text.split(/[\r\n]+/);
@@ -125,14 +125,17 @@ async function main() {
           rawNodes.push(trimmed);
         }
       }
-    } catch (err) {}
+    } catch (err) {
+      console.log(`Failed: ${src}`);
+    }
   }
 
   const unique = Array.from(new Set(rawNodes));
-  console.log(`Discovered ${unique.length} candidate nodes across all protocols.`);
+  console.log(`Found ${unique.length} candidate Asia nodes from 10ium.`);
 
-  console.log('--- Step 2: Testing TCP Handshake ---');
-  const candidates = unique.slice(0, 180);
+  console.log('--- Step 2: Live Socket Handshake Verification ---');
+  // Asia node များထဲမှ ပထမ ၁၅၀ ခုအား latency စစ်ဆေးခြင်း
+  const candidates = unique.slice(0, 150);
   let aliveNodes = [];
 
   for (const uri of candidates) {
@@ -141,9 +144,9 @@ async function main() {
 
     const isAlive = await verifyNodeConnection(target.host, target.port, 1200);
     if (isAlive) {
-      console.log(`[ALIVE] ${target.host}:${target.port}`);
+      console.log(`[PASS LIVE] ${target.host}:${target.port}`);
       aliveNodes.push(uri);
-      if (aliveNodes.length >= 70) break;
+      if (aliveNodes.length >= 60) break; // အကောင်းဆုံး ၆၀ ခု ရလျှင် ရပ်မည်
     }
   }
 
@@ -154,7 +157,7 @@ async function main() {
 
   const base64Output = Buffer.from(aliveNodes.join('\n'), 'utf-8').toString('base64');
   fs.writeFileSync('sub.txt', base64Output, 'utf-8');
-  console.log(`Successfully updated sub.txt with ${aliveNodes.length} live verified nodes.`);
+  console.log(`Successfully compiled sub.txt with ${aliveNodes.length} Verified Asia Nodes!`);
 }
 
 main();
