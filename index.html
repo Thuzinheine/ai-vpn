@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI VPN Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-2xl p-6 shadow-2xl space-y-6">
+    <div class="text-center">
+      <h1 class="text-2xl font-bold tracking-tight text-white">⚡ AI VPN Hub</h1>
+      <p class="text-sm text-slate-400 mt-1">Real-time VLESS Subscription Manager</p>
+    </div>
+
+    <!-- Token Input (Local browser storage တွင် မှတ်ထားပေးမည်) -->
+    <div class="space-y-1">
+      <label class="text-xs text-slate-400 font-medium">GitHub Personal Access Token (PAT):</label>
+      <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" 
+        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan-500">
+      <p class="text-[11px] text-slate-500">Token ကို သင့် Browser LocalStorage တွင်သာ သိမ်းဆည်းပါသည်။</p>
+    </div>
+
+    <!-- Action Button -->
+    <button onclick="triggerUpdate()" id="updateBtn"
+      class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-medium py-2.5 rounded-lg transition duration-200 shadow-lg shadow-cyan-900/40">
+      🔄 Update Nodes via GitHub Action
+    </button>
+
+    <!-- Status Message -->
+    <div id="statusText" class="text-xs text-center min-h-[18px] text-slate-400"></div>
+
+    <!-- Output Subscription URL -->
+    <div class="space-y-2 pt-2 border-t border-slate-700/60">
+      <label class="text-xs text-slate-400 font-medium">Your Active Sub Link:</label>
+      <div class="flex gap-2">
+        <input type="text" id="subUrl" readonly value="https://raw.githubusercontent.com/Thuzinheine/ai-vpn/main/sub.txt"
+          class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-300 select-all focus:outline-none">
+        <button onclick="copyLink()" class="bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded-lg text-xs font-medium">
+          Copy
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const OWNER = "Thuzinheine";
+    const REPO = "ai-vpn";
+    const WORKFLOW_ID = "main.yml";
+
+    // Load saved token
+    document.getElementById("tokenInput").value = localStorage.getItem("gh_token") || "";
+
+    async function triggerUpdate() {
+      const token = document.getElementById("tokenInput").value.trim();
+      const status = document.getElementById("statusText");
+      const btn = document.getElementById("updateBtn");
+
+      if (!token) {
+        status.innerHTML = "<span class='text-amber-400'>Token အရင် ထည့်ပေးပါ!</span>";
+        return;
+      }
+
+      localStorage.setItem("gh_token", token);
+      btn.disabled = true;
+      btn.classList.add("opacity-50");
+      status.innerHTML = "<span class='text-cyan-400'>GitHub Actions သို့ အချက်ပြနေပါသည်...</span>";
+
+      try {
+        const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/${WORKFLOW_ID}/dispatches`, {
+          method: "POST",
+          headers: {
+            "Accept": "application/vnd.github+json",
+            "Authorization": `Bearer ${token}`,
+            "X-GitHub-Api-Version": "2022-11-28"
+          },
+          body: JSON.stringify({ ref: "main" })
+        });
+
+        if (res.status === 204) {
+          status.innerHTML = "<span class='text-emerald-400'>Action စတင် run နေပါပြီ! ၁ မိနစ်အတွင်း node များ refresh ဖြစ်ပါမည်။</span>";
+          document.getElementById("subUrl").value = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/sub.txt?t=${Date.now()}`;
+        } else {
+          const data = await res.json();
+          status.innerHTML = `<span class='text-rose-400'>Error: ${data.message}</span>`;
+        }
+      } catch (e) {
+        status.innerHTML = `<span class='text-rose-400'>Connection error ဖြစ်ပေါ်နေပါသည်။</span>`;
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove("opacity-50");
+      }
+    }
+
+    function copyLink() {
+      const copyText = document.getElementById("subUrl");
+      copyText.select();
+      navigator.clipboard.writeText(copyText.value);
+      const status = document.getElementById("statusText");
+      status.innerHTML = "<span class='text-emerald-400'>Link ကို Copy ကူးပြီးပါပြီ!</span>";
+    }
+  </script>
+</body>
+</html>
